@@ -34,7 +34,7 @@ from omegaconf import OmegaConf
 from rich.console import Console
 from rich.table import Table
 
-__version__ = "6.98.1"
+__version__ = "6.101.1"
 PathType = Union[str, pathlib.Path]
 
 home = pathlib.Path.home()
@@ -178,6 +178,7 @@ class Paths:
     gds_ref = test_data / "gds"
     gds_run = GDSDIR_TEMP / "gds_run"
     gds_diff = GDSDIR_TEMP / "gds_diff"
+    cwd = cwd
 
 
 def read_config(

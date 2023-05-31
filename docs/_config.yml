@@ -21,6 +21,8 @@ execute:
     - "*optimiser*"
     - "*03_numerical_implantation*"
     - "*02_model_extraction*"
+    - "*03_cascaded_mzi*"
+    - "*001_meep_sparameters*"
     - "*jupyter_notebooks*"
 
 latex:

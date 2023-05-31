@@ -9,13 +9,14 @@ full: plugins
 all: plugins install full
 
 install:
-	pip install -e .[full,dev] pre-commit
+	pip install -e .[full,dev,kfactory] pre-commit
 	pre-commit install
-	gf install klayout-integration
+	gf install klayout-genericpdk
+	gf install git-diff
 
 dev: full
 	pre-commit install
-	gf install klayout-integration
+	gf install klayout-genericpdk
 
 mamba:
 	bash conda/mamba.sh
@@ -120,7 +121,7 @@ test-femwell:
 	pytest gdsfactory/simulation/fem
 
 test-plugins:
-	pytest gdsfactory/simulation/gmeep gdsfactory/simulation/modes gdsfactory/simulation/lumerical gdsfactory/simulation/gmsh tests/test_klayout gdsfactory/simulation/fem gdsfactory/simulation/gtidy3d
+	pytest gdsfactory/simulation/gmeep gdsfactory/simulation/modes gdsfactory/simulation/lumerical gdsfactory/simulation/gmsh tests/test_klayout gdsfactory/simulation/fem
 
 test-plugins-no-tidy3d:
 	pytest gdsfactory/simulation/gmeep gdsfactory/simulation/modes gdsfactory/simulation/lumerical gdsfactory/simulation/gmsh tests/test_klayout gdsfactory/simulation/fem

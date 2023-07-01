@@ -91,29 +91,38 @@ if __name__ == "__main__":
     from gdsfactory.pdk import get_layer_stack
     from gdsfactory.generic_tech import LAYER
 
-    c = gf.component.Component()
+    c = gf.Component()
 
-    waveguide = c << gf.get_component(gf.components.straight_pin(length=5, taper=None))
+    # waveguide = c << gf.get_component(gf.components.straight_pin(length=5, taper=None))
+    waveguide = c << gf.get_component(gf.components.straight_heater_metal(length=50))
+    # waveguide = c << gf.get_component(gf.components.ring_single_heater())
     wafer = c << gf.components.bbox(bbox=waveguide.bbox, layer=LAYER.WAFER)
 
     filtered_layerstack = LayerStack(
         layers={
             k: get_layer_stack().layers[k]
             for k in (
-                "slab90",
                 "core",
-                "via_contact",
                 "box",
                 "clad",
+                "heater",
+                # "metal2",
+                # "metal3",
+                # "via1",
+                "via2",
             )
         }
     )
 
     filtered_layerstack.layers["core"].info["mesh_order"] = 1
-    filtered_layerstack.layers["slab90"].info["mesh_order"] = 2
-    filtered_layerstack.layers["via_contact"].info["mesh_order"] = 3
     filtered_layerstack.layers["box"].info["mesh_order"] = 4
     filtered_layerstack.layers["clad"].info["mesh_order"] = 5
+    filtered_layerstack.layers["heater"].info["mesh_order"] = 2
+    filtered_layerstack.layers["via2"].info["mesh_order"] = 1
+    filtered_layerstack.layers["via2"].zmin = (
+        filtered_layerstack.layers["heater"].zmin
+        + filtered_layerstack.layers["heater"].thickness
+    )
 
     resolutions = {
         "core": {"resolution": 0.1},
@@ -125,5 +134,5 @@ if __name__ == "__main__":
         layerstack=filtered_layerstack,
         resolutions=resolutions,
         filename="mesh.msh",
-        verbosity=0,
+        verbosity=5,
     )

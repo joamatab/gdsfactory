@@ -14,6 +14,7 @@ from meshwell.prism import Prism
 from meshwell.model import Model
 
 from collections import OrderedDict
+import gmsh
 
 
 def define_prisms(layer_polygons_dict, layerstack, model):
@@ -73,6 +74,8 @@ def xyz_mesh(
     model = Model()
     prisms_dict = define_prisms(layer_polygons_dict, layerstack, model)
 
+    gmsh.option.setNumber("Mesh.ScalingFactor", 1e-6)
+
     # Mesh
     mesh_out = model.mesh(
         entities_dict=prisms_dict,
@@ -125,14 +128,15 @@ if __name__ == "__main__":
     )
 
     resolutions = {
-        "core": {"resolution": 0.1},
-        "slab90": {"resolution": 0.4},
-        "via_contact": {"resolution": 0.4},
+        "core": {"resolution": 0.2},
+        "slab90": {"resolution": 0.8},
+        "via_contact": {"resolution": 1},
     }
     geometry = xyz_mesh(
         component=c,
         layerstack=filtered_layerstack,
         resolutions=resolutions,
         filename="mesh.msh",
+        default_characteristic_length=2,
         verbosity=5,
     )

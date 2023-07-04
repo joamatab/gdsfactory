@@ -14,7 +14,6 @@ from meshwell.prism import Prism
 from meshwell.model import Model
 
 from collections import OrderedDict
-import gmsh
 
 
 def define_prisms(layer_polygons_dict, layerstack, model):
@@ -74,8 +73,6 @@ def xyz_mesh(
     # Meshwell Prisms from gdsfactory polygons and layerstack
     model = Model()
     prisms_dict = define_prisms(layer_polygons_dict, layerstack, model)
-
-    gmsh.option.setNumber("Mesh.ScalingFactor", 1e-6)
 
     # Mesh
     mesh_out = model.mesh(

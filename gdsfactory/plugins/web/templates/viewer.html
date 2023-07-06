@@ -23,7 +23,7 @@
     <h2>Parameters</h2>
     <form action="/update/{{cell_name}}" method="POST">
     <button type="submit" class="btn btn-primary">Update</button>
-    {% for setting_name, setting_value in component.settings.default.items()%}
+    {% for setting_name, setting_value in component.settings.get('default',{}).items()%}
         <div class="mb-3">
             <label for="{{setting_name}}" class="form-label">{{setting_name}}</label>
             {% if setting_name in component.settings.get('changed', {}) %}

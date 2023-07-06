@@ -109,7 +109,6 @@ settings:
     info:
       length: 10.19
       min_bend_radius: 11.744
-    info_version: 2
     module: gdsfactory.components.coupler
     name: coupler_gap0p2_length5p0
   default:
@@ -168,6 +167,5 @@ settings:
       wavelength: 1.53
     length: 10.19
     min_bend_radius: 11.744
-  info_version: 2
   module: gdsfactory.routing.add_fiber_array
   name: coupler_gap0p2_length5p_13b79348

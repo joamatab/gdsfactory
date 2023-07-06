@@ -15,6 +15,5 @@ settings:
     width: 3.0
   function_name: cross
   info: {}
-  info_version: 2
   module: gdsfactory.components.cross
   name: cross

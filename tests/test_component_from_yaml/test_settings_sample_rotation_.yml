@@ -112,6 +112,5 @@ settings:
     instances:
     - r1
     - r2
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: sample_rotation_0aef407a

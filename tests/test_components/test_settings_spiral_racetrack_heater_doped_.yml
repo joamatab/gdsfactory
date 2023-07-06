@@ -103,6 +103,5 @@ settings:
     waveguide_cross_section: strip
   function_name: spiral_racetrack_heater_doped
   info: {}
-  info_version: 2
   module: gdsfactory.components.spiral_heater
   name: spiral_racetrack_heater_doped

@@ -315,8 +315,8 @@ class Component(_GeometryHelper):
     def get_component_spec(self):
         return (
             {
-                "component": self.settings.function_name,
-                "settings": self.settings.changed,
+                "component": self.settings["function_name"],
+                "settings": self.settings["changed"],
             }
             if self.settings
             else {"component": self.name, "settings": {}}
@@ -1134,7 +1134,7 @@ class Component(_GeometryHelper):
     def get_setting(self, setting: str) -> Union[str, int, float]:
         return (
             self.info.get(setting)
-            or self.settings.full.get(setting)
+            or self.settings.get("full", {}).get(setting)
             or self.metadata_child.get(setting)
         )
 

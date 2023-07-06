@@ -146,6 +146,5 @@ settings:
     instances:
     - rings
     - mzis
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: mask_compact_48574a98

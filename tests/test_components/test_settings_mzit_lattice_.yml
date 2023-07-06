@@ -75,6 +75,5 @@ settings:
       function: mzit
   function_name: mzit_lattice
   info: {}
-  info_version: 2
   module: gdsfactory.components.mzit_lattice
   name: mzit_lattice

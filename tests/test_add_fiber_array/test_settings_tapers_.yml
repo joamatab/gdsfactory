@@ -127,7 +127,6 @@ settings:
           width: 2
           width_wide: null
         width: 2.0
-      info_version: 2
       module: gdsfactory.components.straight
       name: straight_length20_width2
     default:
@@ -198,7 +197,6 @@ settings:
         width: 2
         width_wide: null
       width: 2.0
-    info_version: 2
     module: gdsfactory.add_tapers
     name: straight_length20_width_13f2a4af
   default:
@@ -301,6 +299,5 @@ settings:
       width: 2
       width_wide: null
     width: 2.0
-  info_version: 2
   module: gdsfactory.routing.add_fiber_array
   name: straight_length20_width_85caa607

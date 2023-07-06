@@ -106,6 +106,5 @@ settings:
     instances:
     - t
     - b
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: sample_waypoints_dac9e992

@@ -296,6 +296,5 @@ settings:
     xoffset_tip2: 0.4
   function_name: straight_heater_doped_rib
   info: {}
-  info_version: 2
   module: gdsfactory.components.straight_heater_doped_rib
   name: straight_heater_doped_r_fe4184db

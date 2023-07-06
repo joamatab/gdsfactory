@@ -105,7 +105,6 @@ settings:
       function_name: spiral_inner_io
       info:
         length: 9973.393
-      info_version: 2
       module: gdsfactory.components.spiral_inner_io
       name: spiral_inner_io_2a92e51b
     default:
@@ -129,7 +128,6 @@ settings:
     function_name: spiral_inner_io_fiber_single
     info:
       length: 9973.393
-    info_version: 2
     module: gdsfactory.components.spiral_inner_io
     name: spiral_inner_io_2a92e51_825ccbf1
   default:
@@ -215,6 +213,5 @@ settings:
     length: 9973.393
     polarization: te
     wavelength: 1.53
-  info_version: 2
   module: gdsfactory.components.add_grating_couplers
   name: spiral_inner_io_2a92e51_16913f51

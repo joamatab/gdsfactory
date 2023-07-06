@@ -52,7 +52,6 @@ instances:
               radius: 20
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x1_radius20
           default:
@@ -109,7 +108,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x1_r_71050ad9
         ring_single_length_x1_r_9a17daca:
@@ -147,7 +145,6 @@ instances:
               radius: 50
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x1_radius50
           default:
@@ -204,7 +201,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x1_r_9a17daca
         ring_single_length_x1_r_e922fb20:
@@ -242,7 +238,6 @@ instances:
               radius: 30
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x1_radius30
           default:
@@ -299,7 +294,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x1_r_e922fb20
         ring_single_length_x1_r_f293a50f:
@@ -337,7 +331,6 @@ instances:
               radius: 40
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x1_radius40
           default:
@@ -394,7 +387,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x1_r_f293a50f
         ring_single_length_x2_r_039ecebb:
@@ -432,7 +424,6 @@ instances:
               radius: 50
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x2_radius50
           default:
@@ -489,7 +480,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x2_r_039ecebb
         ring_single_length_x2_r_17a807d6:
@@ -527,7 +517,6 @@ instances:
               radius: 20
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x2_radius20
           default:
@@ -584,7 +573,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x2_r_17a807d6
         ring_single_length_x2_r_711910fe:
@@ -622,7 +610,6 @@ instances:
               radius: 30
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x2_radius30
           default:
@@ -679,7 +666,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x2_r_711910fe
         ring_single_length_x2_r_b5c24bf7:
@@ -717,7 +703,6 @@ instances:
               radius: 40
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x2_radius40
           default:
@@ -774,7 +759,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x2_r_b5c24bf7
         ring_single_length_x3_r_82ca69e2:
@@ -812,7 +796,6 @@ instances:
               radius: 40
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x3_radius40
           default:
@@ -869,7 +852,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x3_r_82ca69e2
         ring_single_length_x3_r_9a14b626:
@@ -907,7 +889,6 @@ instances:
               radius: 20
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x3_radius20
           default:
@@ -964,7 +945,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x3_r_9a14b626
         ring_single_length_x3_r_a8320a1f:
@@ -1002,7 +982,6 @@ instances:
               radius: 30
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x3_radius30
           default:
@@ -1059,7 +1038,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x3_r_a8320a1f
         ring_single_length_x3_r_d4663425:
@@ -1097,7 +1075,6 @@ instances:
               radius: 50
             function_name: ring_single
             info: {}
-            info_version: 2
             module: gdsfactory.components.ring_single
             name: ring_single_length_x3_radius50
           default:
@@ -1154,7 +1131,6 @@ instances:
               period: 0.676
               polarization: te
               wavelength: 1.53
-          info_version: 2
           module: gdsfactory.routing.add_fiber_array
           name: ring_single_length_x3_r_d4663425
     settings:

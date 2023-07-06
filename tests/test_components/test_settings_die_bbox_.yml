@@ -34,7 +34,6 @@ settings:
       - 2600
     function_name: rectangle
     info: {}
-    info_version: 2
     module: gdsfactory.components.rectangle
     name: rectangle_size1300__2600
   default:
@@ -67,6 +66,5 @@ settings:
     text_size: 100.0
   function_name: die_bbox
   info: {}
-  info_version: 2
   module: gdsfactory.components.die_bbox
   name: rectangle_size1300__260_516de578

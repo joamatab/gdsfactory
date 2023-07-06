@@ -139,6 +139,5 @@ settings:
         with_undercut: false
   function_name: mzi_pads_center
   info: {}
-  info_version: 2
   module: gdsfactory.components.mzi_pads_center
   name: mzi_pads_center

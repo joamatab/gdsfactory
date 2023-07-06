@@ -105,6 +105,5 @@ settings:
     width_top: 2.0
   function_name: cdc
   info: {}
-  info_version: 2
   module: gdsfactory.components.cdc
   name: cdc

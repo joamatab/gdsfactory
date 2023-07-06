@@ -122,6 +122,5 @@ settings:
     grating_coupler:
       polarization: te
       wavelength: 1.554
-  info_version: 2
   module: gdsfactory.components.grating_coupler_tree
   name: grating_coupler_tree

@@ -64,6 +64,5 @@ settings:
     - 35.231
     - -2.5
     straight_length: 65.462
-  info_version: 2
   module: gdsfactory.components.spiral_heater
   name: spiral_racetrack_fixed_length

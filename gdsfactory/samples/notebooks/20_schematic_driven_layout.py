@@ -76,7 +76,7 @@ se.add_instance("s2", gf.components.straight(length=40))
 # But you can even query the parameters of default components, set only by name through the widget grid, like so:
 
 # %%
-se.instances["mmi1"].settings.full
+se.instances["mmi1"].settings["full"]
 
 # %% [markdown]
 # It is also possible to *instantiate through the widget, then set the settings of our component later, through code.*
@@ -88,8 +88,8 @@ se.update_settings("mmi1", gap_mmi=1.0)
 se.update_settings("mmi2", gap_mmi=0.7)
 
 for inst_name, inst in se.instances.items():
-    if inst.settings.changed:
-        print(f"{inst_name}: {inst.settings.changed}")
+    if inst.settings.get("changed"):
+        print(f"{inst_name}: {inst.settings.get('changed')}")
 
 # %% [markdown]
 # ## Define nets

@@ -163,7 +163,6 @@ settings:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
     name: straight_1dc14831
   default:
@@ -274,6 +273,5 @@ settings:
       width: 0.5
       width_wide: null
     width: 0.5
-  info_version: 2
   module: gdsfactory.components.extension
   name: straight_1dc14831_exten_a87df102

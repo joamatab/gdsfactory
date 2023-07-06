@@ -56,6 +56,5 @@ settings:
   function_name: taper_strip_to_ridge
   info:
     length: 20.0
-  info_version: 2
   module: gdsfactory.components.taper
   name: taper_strip_to_ridge_daef8427

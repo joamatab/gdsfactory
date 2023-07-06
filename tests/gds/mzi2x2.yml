@@ -26,7 +26,6 @@ cells:
       dy: 10.0
       function_name: cross_section
       length: 16.637
-      module: gdsfactory.cross_section
       radius: 10.0
       radius_min: 7.061
       settings:
@@ -62,7 +61,6 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.bend_euler
     name: bend_euler_be5e636a
   mmi1x2_be5e636a:
@@ -95,7 +93,6 @@ cells:
       with_bbox: true
     function_name: mmi1x2
     info: {}
-    info_version: 2
     module: gdsfactory.components.mmi1x2
     name: mmi1x2_be5e636a
   mzi_6f76ede3:
@@ -163,10 +160,9 @@ cells:
       with_splitter: true
     function_name: mzi
     info: {}
-    info_version: 2
     module: gdsfactory.components.mzi
     name: mzi_6f76ede3
-  straight_59c1c3cb:
+  straight_166ff54a:
     changed:
       cross_section:
         auto_widen: false
@@ -180,7 +176,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -232,7 +227,7 @@ cells:
         taper_length: 10.0
         width: 0.5
         width_wide: null
-      length: 7.0
+      length: 2.0
     child: null
     default:
       cross_section: strip
@@ -252,7 +247,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -304,7 +298,7 @@ cells:
         taper_length: 10.0
         width: 0.5
         width_wide: null
-      length: 7.0
+      length: 2.0
       npoints: 2
       with_bbox: true
     function_name: straight
@@ -321,7 +315,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -374,8 +367,7 @@ cells:
         width: 0.5
         width_wide: null
       function_name: cross_section
-      length: 7.0
-      module: gdsfactory.cross_section
+      length: 2.0
       settings:
         add_bbox: null
         add_pins: null
@@ -409,9 +401,249 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
-    name: straight_59c1c3cb
+    name: straight_166ff54a
+  straight_33e06d63:
+    changed:
+      cross_section:
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: []
+        bbox_offsets: []
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info:
+          function_name: cross_section
+          settings:
+            add_bbox: null
+            add_pins: null
+            auto_widen: false
+            auto_widen_minimum_length: 200.0
+            bbox_layers: null
+            bbox_offsets: null
+            cladding_layers: null
+            cladding_offsets: null
+            cladding_simplify: null
+            decorator: null
+            end_straight_length: 0.01
+            gap: 3.0
+            info: null
+            layer: WG
+            min_length: 0.01
+            mirror: false
+            name: null
+            offset: 0
+            port_names:
+            - o1
+            - o2
+            port_types:
+            - optical
+            - optical
+            radius: 10.0
+            sections: null
+            snap_to_grid: null
+            start_straight_length: 0.01
+            taper_length: 10.0
+            width: 0.5
+            width_wide: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: null
+        offset: 0.0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: []
+        simplify: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      length: 0.01
+    child: null
+    default:
+      cross_section: strip
+      length: 10.0
+      npoints: 2
+      with_bbox: true
+    full:
+      cross_section:
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: []
+        bbox_offsets: []
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info:
+          function_name: cross_section
+          settings:
+            add_bbox: null
+            add_pins: null
+            auto_widen: false
+            auto_widen_minimum_length: 200.0
+            bbox_layers: null
+            bbox_offsets: null
+            cladding_layers: null
+            cladding_offsets: null
+            cladding_simplify: null
+            decorator: null
+            end_straight_length: 0.01
+            gap: 3.0
+            info: null
+            layer: WG
+            min_length: 0.01
+            mirror: false
+            name: null
+            offset: 0
+            port_names:
+            - o1
+            - o2
+            port_types:
+            - optical
+            - optical
+            radius: 10.0
+            sections: null
+            snap_to_grid: null
+            start_straight_length: 0.01
+            taper_length: 10.0
+            width: 0.5
+            width_wide: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: null
+        offset: 0.0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: []
+        simplify: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      length: 0.01
+      npoints: 2
+      with_bbox: true
+    function_name: straight
+    info:
+      cross_section:
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: []
+        bbox_offsets: []
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info:
+          function_name: cross_section
+          settings:
+            add_bbox: null
+            add_pins: null
+            auto_widen: false
+            auto_widen_minimum_length: 200.0
+            bbox_layers: null
+            bbox_offsets: null
+            cladding_layers: null
+            cladding_offsets: null
+            cladding_simplify: null
+            decorator: null
+            end_straight_length: 0.01
+            gap: 3.0
+            info: null
+            layer: WG
+            min_length: 0.01
+            mirror: false
+            name: null
+            offset: 0
+            port_names:
+            - o1
+            - o2
+            port_types:
+            - optical
+            - optical
+            radius: 10.0
+            sections: null
+            snap_to_grid: null
+            start_straight_length: 0.01
+            taper_length: 10.0
+            width: 0.5
+            width_wide: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: null
+        offset: 0.0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: []
+        simplify: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      function_name: cross_section
+      length: 0.01
+      settings:
+        add_bbox: null
+        add_pins: null
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: null
+        bbox_offsets: null
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        decorator: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: null
+        offset: 0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      width: 0.5
+    module: gdsfactory.components.straight
+    name: straight_33e06d63
   straight_5d53fdc2:
     changed:
       cross_section:
@@ -435,7 +667,6 @@ cells:
         function: cross_section
       function_name: cross_section
       length: 7.0
-      module: gdsfactory.cross_section
       settings:
         add_bbox: null
         add_pins: null
@@ -469,10 +700,9 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
     name: straight_5d53fdc2
-  straight_d0c013f6:
+  straight_d39d896b:
     changed:
       cross_section:
         auto_widen: false
@@ -486,7 +716,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -538,7 +767,7 @@ cells:
         taper_length: 10.0
         width: 0.5
         width_wide: null
-      length: 0.01
+      length: 7.0
     child: null
     default:
       cross_section: strip
@@ -558,7 +787,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -610,7 +838,7 @@ cells:
         taper_length: 10.0
         width: 0.5
         width_wide: null
-      length: 0.01
+      length: 7.0
       npoints: 2
       with_bbox: true
     function_name: straight
@@ -627,7 +855,6 @@ cells:
         gap: 3.0
         info:
           function_name: cross_section
-          module: gdsfactory.cross_section
           settings:
             add_bbox: null
             add_pins: null
@@ -680,8 +907,7 @@ cells:
         width: 0.5
         width_wide: null
       function_name: cross_section
-      length: 0.01
-      module: gdsfactory.cross_section
+      length: 7.0
       settings:
         add_bbox: null
         add_pins: null
@@ -715,9 +941,8 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
-    name: straight_d0c013f6
+    name: straight_d39d896b
   straight_dcfdf04b:
     changed:
       cross_section:
@@ -741,7 +966,6 @@ cells:
         function: cross_section
       function_name: cross_section
       length: 0.1
-      module: gdsfactory.cross_section
       settings:
         add_bbox: null
         add_pins: null
@@ -775,255 +999,8 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
     name: straight_dcfdf04b
-  straight_de17af81:
-    changed:
-      cross_section:
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: []
-        bbox_offsets: []
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info:
-          function_name: cross_section
-          module: gdsfactory.cross_section
-          settings:
-            add_bbox: null
-            add_pins: null
-            auto_widen: false
-            auto_widen_minimum_length: 200.0
-            bbox_layers: null
-            bbox_offsets: null
-            cladding_layers: null
-            cladding_offsets: null
-            cladding_simplify: null
-            decorator: null
-            end_straight_length: 0.01
-            gap: 3.0
-            info: null
-            layer: WG
-            min_length: 0.01
-            mirror: false
-            name: null
-            offset: 0
-            port_names:
-            - o1
-            - o2
-            port_types:
-            - optical
-            - optical
-            radius: 10.0
-            sections: null
-            snap_to_grid: null
-            start_straight_length: 0.01
-            taper_length: 10.0
-            width: 0.5
-            width_wide: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: null
-        offset: 0.0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: []
-        simplify: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      length: 2.0
-    child: null
-    default:
-      cross_section: strip
-      length: 10.0
-      npoints: 2
-      with_bbox: true
-    full:
-      cross_section:
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: []
-        bbox_offsets: []
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info:
-          function_name: cross_section
-          module: gdsfactory.cross_section
-          settings:
-            add_bbox: null
-            add_pins: null
-            auto_widen: false
-            auto_widen_minimum_length: 200.0
-            bbox_layers: null
-            bbox_offsets: null
-            cladding_layers: null
-            cladding_offsets: null
-            cladding_simplify: null
-            decorator: null
-            end_straight_length: 0.01
-            gap: 3.0
-            info: null
-            layer: WG
-            min_length: 0.01
-            mirror: false
-            name: null
-            offset: 0
-            port_names:
-            - o1
-            - o2
-            port_types:
-            - optical
-            - optical
-            radius: 10.0
-            sections: null
-            snap_to_grid: null
-            start_straight_length: 0.01
-            taper_length: 10.0
-            width: 0.5
-            width_wide: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: null
-        offset: 0.0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: []
-        simplify: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      length: 2.0
-      npoints: 2
-      with_bbox: true
-    function_name: straight
-    info:
-      cross_section:
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: []
-        bbox_offsets: []
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info:
-          function_name: cross_section
-          module: gdsfactory.cross_section
-          settings:
-            add_bbox: null
-            add_pins: null
-            auto_widen: false
-            auto_widen_minimum_length: 200.0
-            bbox_layers: null
-            bbox_offsets: null
-            cladding_layers: null
-            cladding_offsets: null
-            cladding_simplify: null
-            decorator: null
-            end_straight_length: 0.01
-            gap: 3.0
-            info: null
-            layer: WG
-            min_length: 0.01
-            mirror: false
-            name: null
-            offset: 0
-            port_names:
-            - o1
-            - o2
-            port_types:
-            - optical
-            - optical
-            radius: 10.0
-            sections: null
-            snap_to_grid: null
-            start_straight_length: 0.01
-            taper_length: 10.0
-            width: 0.5
-            width_wide: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: null
-        offset: 0.0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: []
-        simplify: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      function_name: cross_section
-      length: 2.0
-      module: gdsfactory.cross_section
-      settings:
-        add_bbox: null
-        add_pins: null
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: null
-        bbox_offsets: null
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        decorator: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: null
-        offset: 0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      width: 0.5
-    info_version: 2
-    module: gdsfactory.components.straight
-    name: straight_de17af81
   straight_ebcc6dc8:
     changed:
       cross_section:
@@ -1047,7 +1024,6 @@ cells:
         function: cross_section
       function_name: cross_section
       length: 2.0
-      module: gdsfactory.cross_section
       settings:
         add_bbox: null
         add_pins: null
@@ -1081,7 +1057,6 @@ cells:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.straight
     name: straight_ebcc6dc8
 name: mzi_6f76ede3
@@ -1175,6 +1150,5 @@ settings:
     with_splitter: true
   function_name: mzi
   info: {}
-  info_version: 2
   module: gdsfactory.components.mzi
   name: mzi_6f76ede3

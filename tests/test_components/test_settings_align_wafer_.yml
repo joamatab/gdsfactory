@@ -19,6 +19,5 @@ settings:
     width: 10.0
   function_name: align_wafer
   info: {}
-  info_version: 2
   module: gdsfactory.components.align
   name: align_wafer

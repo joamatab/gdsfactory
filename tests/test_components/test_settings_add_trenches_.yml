@@ -77,7 +77,6 @@ settings:
     info:
       length: 10.186
       min_bend_radius: 11.857
-    info_version: 2
     module: gdsfactory.components.coupler
     name: coupler
   default:
@@ -100,6 +99,5 @@ settings:
   info:
     length: 10.186
     min_bend_radius: 11.857
-  info_version: 2
   module: gdsfactory.components.add_trenches
   name: coupler_add_trenches

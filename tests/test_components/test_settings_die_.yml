@@ -35,6 +35,5 @@ settings:
     text_size: 100.0
   function_name: die
   info: {}
-  info_version: 2
   module: gdsfactory.components.die
   name: die

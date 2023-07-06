@@ -171,6 +171,5 @@ settings:
     - mmi_short
     polarization: te
     wavelength: 1.55
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: sample_mmis_6fafede2

@@ -197,10 +197,14 @@ def get_netlist(
 
         # Prefer name from settings over c.name
         if c.settings:
-            settings = c.settings.full if full_settings else c.settings.changed
+            settings = (
+                c.settings.get("full", {})
+                if full_settings
+                else c.settings.get("changed", {})
+            )
 
             instance.update(
-                component=getattr(c.settings, "function_name", c.name),
+                component=c.settings.get("function_name", c.name),
                 settings=clean_value_json(settings),
             )
 
@@ -527,7 +531,7 @@ def _get_references_to_netlist(component: Component) -> List[ComponentReference]
     references = component.references
     if not references and "transformed_cell" in component.info:
         # expand transformed, flattened cells
-        ref = component.settings.full["ref"]
+        ref = component.settings["full"]["ref"]
         original_cell = CACHE[component.info["transformed_cell"]]
         references = [
             ComponentReference(
@@ -591,7 +595,7 @@ def get_netlist_recursive(
                 inst_name = get_instance_name(component, ref)
                 netlist_dict = {"component": f"{rcell.name}{component_suffix}"}
                 if hasattr(rcell, "settings") and hasattr(rcell.settings, "full"):
-                    netlist_dict.update(settings=rcell.settings.full)
+                    netlist_dict.update(settings=rcell.settings["full"])
                 if hasattr(rcell, "info"):
                     netlist_dict.update(info=rcell.info)
                 netlist["instances"][inst_name] = netlist_dict

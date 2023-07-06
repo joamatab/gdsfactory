@@ -6,10 +6,10 @@ import hashlib
 import inspect
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar
+from typing import Any, Callable, Dict, Tuple, Type, TypeVar
 
 import toolz
-from pydantic import BaseModel, validate_arguments
+from pydantic import validate_arguments
 
 from gdsfactory.component import Component
 from gdsfactory.name import clean_name, get_name_short
@@ -47,21 +47,6 @@ def get_source_code(func: Callable) -> str:
     else:
         raise ValueError(f"{func!r} needs to be callable")
     return source
-
-
-class Settings(BaseModel):
-    name: str
-    function_name: str
-    module: str
-
-    info: Dict[str, Any]  # derived properties (length, resistance)
-    info_version: int = INFO_VERSION
-
-    full: Dict[str, Any]
-    changed: Dict[str, Any]
-    default: Dict[str, Any]
-
-    child: Optional[Dict[str, Any]] = None
 
 
 def cell_without_validator(func: _F) -> _F:
@@ -421,7 +406,7 @@ def test_names() -> None:
     assert name_args == name_kwargs, name_with_prefix
 
     c = wg(length=3.1)
-    assert c.settings.changed["length"] == 3.1
+    assert c.settings["changed"]["length"] == 3.1
 
 
 @cell

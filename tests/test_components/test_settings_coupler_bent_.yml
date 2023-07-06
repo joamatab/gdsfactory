@@ -67,6 +67,5 @@ settings:
     width2: 0.4
   function_name: coupler_bent
   info: {}
-  info_version: 2
   module: gdsfactory.components.coupler_bent
   name: coupler_bent

@@ -14,6 +14,5 @@ settings:
     - wg_b2
     - wg_c1
     - wg_c2
-  info_version: 2
   module: yaml_jinja
   name: aar_step_definitions

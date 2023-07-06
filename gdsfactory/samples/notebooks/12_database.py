@@ -50,7 +50,7 @@ with Session(engine) as session:
 
     component_settings = []
 
-    for key, value in c.settings.changed.items():
+    for key, value in c.settings.get("changed", {}).items():
         s = m.ComponentInfo(component=c1, component_id=c1.id, name=key, value=value)
         component_settings.append(s)
 

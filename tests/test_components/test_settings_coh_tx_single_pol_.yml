@@ -359,6 +359,5 @@ settings:
     xspacing: 40.0
   function_name: coh_tx_single_pol
   info: {}
-  info_version: 2
   module: gdsfactory.components.coh_tx_single_pol
   name: coh_tx_single_pol

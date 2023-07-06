@@ -97,6 +97,5 @@ settings:
   info:
     instances:
     - mmi1x2_sweep
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: mask_8d17f522

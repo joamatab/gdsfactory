@@ -33,6 +33,5 @@ settings:
     tapered_width: 0.2
   function_name: terminator
   info: {}
-  info_version: 2
   module: gdsfactory.components.terminator
   name: terminator

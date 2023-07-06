@@ -22,7 +22,6 @@ settings:
       width: 3.0
     function_name: cross
     info: {}
-    info_version: 2
     module: gdsfactory.components.cross
     name: cross_layer2__0
   default:
@@ -43,6 +42,5 @@ settings:
       - 0
   function_name: copy_layers
   info: {}
-  info_version: 2
   module: gdsfactory.components.copy_layers
   name: cross_layer2__0_copy_layers

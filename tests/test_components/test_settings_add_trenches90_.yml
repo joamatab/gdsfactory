@@ -96,7 +96,6 @@ settings:
         width: 0.5
         width_wide: null
       width: 0.5
-    info_version: 2
     module: gdsfactory.components.bend_euler
     name: bend_euler
   default:
@@ -162,6 +161,5 @@ settings:
       width: 0.5
       width_wide: null
     width: 0.5
-  info_version: 2
   module: gdsfactory.components.add_trenches
   name: bend_euler_add_trenches_cb24b746

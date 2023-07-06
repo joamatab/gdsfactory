@@ -1,20 +1,20 @@
 connections:
-  bend_euler_1,o1: straight_1,o2
-  bend_euler_1,o2: straight_2,o1
-  bend_euler_2,o1: straight_2,o2
-  bend_euler_2,o2: straight_3,o1
-  bend_euler_3,o1: straight_3,o2
-  bend_euler_3,o2: straight_4,o1
-  bend_euler_4,o1: straight_4,o2
-  bend_euler_4,o2: straight_5,o1
-  bend_euler_5,o1: straight_6,o2
-  bend_euler_5,o2: straight_7,o1
-  bend_euler_6,o1: straight_7,o2
-  bend_euler_6,o2: straight_8,o1
-  bend_euler_7,o1: straight_8,o2
-  bend_euler_7,o2: straight_9,o1
-  bend_euler_8,o1: straight_9,o2
-  bend_euler_8,o2: straight_10,o1
+  bend_euler_c22879f1_1,o1: straight_2cf638e0_1,o2
+  bend_euler_c22879f1_1,o2: straight_f06d3175_1,o1
+  bend_euler_c22879f1_2,o1: straight_f06d3175_1,o2
+  bend_euler_c22879f1_2,o2: straight_4aa0b60f_1,o1
+  bend_euler_c22879f1_3,o1: straight_4aa0b60f_1,o2
+  bend_euler_c22879f1_3,o2: straight_722003ab_1,o1
+  bend_euler_c22879f1_4,o1: straight_722003ab_1,o2
+  bend_euler_c22879f1_4,o2: straight_c30961b2_1,o1
+  bend_euler_c22879f1_5,o1: straight_f98cf026_1,o2
+  bend_euler_c22879f1_5,o2: straight_f06d3175_2,o1
+  bend_euler_c22879f1_6,o1: straight_f06d3175_2,o2
+  bend_euler_c22879f1_6,o2: straight_f06d3175_3,o1
+  bend_euler_c22879f1_7,o1: straight_f06d3175_3,o2
+  bend_euler_c22879f1_7,o2: straight_722003ab_2,o1
+  bend_euler_c22879f1_8,o1: straight_722003ab_2,o2
+  bend_euler_c22879f1_8,o2: straight_1c3ca994_1,o1
 instances:
   b:
     component: pad_array
@@ -24,7 +24,7 @@ instances:
       - 100.0
     settings:
       orientation: 90
-  bend_euler_1:
+  bend_euler_c22879f1_1:
     component: bend_euler
     info:
       dy: 10.0
@@ -87,7 +87,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_2:
+  bend_euler_c22879f1_2:
     component: bend_euler
     info:
       dy: 10.0
@@ -150,7 +150,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_3:
+  bend_euler_c22879f1_3:
     component: bend_euler
     info:
       dy: 10.0
@@ -213,7 +213,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_4:
+  bend_euler_c22879f1_4:
     component: bend_euler
     info:
       dy: 10.0
@@ -276,7 +276,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_5:
+  bend_euler_c22879f1_5:
     component: bend_euler
     info:
       dy: 10.0
@@ -339,7 +339,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_6:
+  bend_euler_c22879f1_6:
     component: bend_euler
     info:
       dy: 10.0
@@ -402,7 +402,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_7:
+  bend_euler_c22879f1_7:
     component: bend_euler
     info:
       dy: 10.0
@@ -465,7 +465,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  bend_euler_8:
+  bend_euler_c22879f1_8:
     component: bend_euler
     info:
       dy: 10.0
@@ -528,81 +528,7 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-  straight_1:
-    component: straight
-    info:
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      function_name: cross_section
-      length: 290.0
-      settings:
-        add_bbox: null
-        add_pins:
-          function: add_pins
-          settings:
-            function:
-              function: add_pin_rectangle_inside
-              settings:
-                layer_label: null
-                pin_length: 0.001
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: null
-        bbox_offsets: null
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        decorator: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: strip
-        offset: 0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      width: 0.5
-    settings:
-      auto_widen: false
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      length: 290.0
-  straight_10:
+  straight_1c3ca994_1:
     component: straight
     info:
       cross_section:
@@ -676,7 +602,7 @@ instances:
                   pin_length: 0.001
           name: strip
       length: 440.0
-  straight_2:
+  straight_2cf638e0_1:
     component: straight
     info:
       cross_section:
@@ -693,7 +619,7 @@ instances:
                   pin_length: 0.001
           name: strip
       function_name: cross_section
-      length: 380.0
+      length: 290.0
       settings:
         add_bbox: null
         add_pins:
@@ -749,8 +675,8 @@ instances:
                   layer_label: null
                   pin_length: 0.001
           name: strip
-      length: 380.0
-  straight_3:
+      length: 290.0
+  straight_4aa0b60f_1:
     component: straight
     info:
       cross_section:
@@ -824,7 +750,7 @@ instances:
                   pin_length: 0.001
           name: strip
       length: 80.0
-  straight_4:
+  straight_722003ab_1:
     component: straight
     info:
       cross_section:
@@ -898,7 +824,81 @@ instances:
                   pin_length: 0.001
           name: strip
       length: 630.0
-  straight_5:
+  straight_722003ab_2:
+    component: straight
+    info:
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      function_name: cross_section
+      length: 630.0
+      settings:
+        add_bbox: null
+        add_pins:
+          function: add_pins
+          settings:
+            function:
+              function: add_pin_rectangle_inside
+              settings:
+                layer_label: null
+                pin_length: 0.001
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: null
+        bbox_offsets: null
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        decorator: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: strip
+        offset: 0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      width: 0.5
+    settings:
+      auto_widen: false
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      length: 630.0
+  straight_c30961b2_1:
     component: straight
     info:
       cross_section:
@@ -972,7 +972,229 @@ instances:
                   pin_length: 0.001
           name: strip
       length: 590.0
-  straight_6:
+  straight_f06d3175_1:
+    component: straight
+    info:
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      function_name: cross_section
+      length: 380.0
+      settings:
+        add_bbox: null
+        add_pins:
+          function: add_pins
+          settings:
+            function:
+              function: add_pin_rectangle_inside
+              settings:
+                layer_label: null
+                pin_length: 0.001
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: null
+        bbox_offsets: null
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        decorator: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: strip
+        offset: 0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      width: 0.5
+    settings:
+      auto_widen: false
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      length: 380.0
+  straight_f06d3175_2:
+    component: straight
+    info:
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      function_name: cross_section
+      length: 380.0
+      settings:
+        add_bbox: null
+        add_pins:
+          function: add_pins
+          settings:
+            function:
+              function: add_pin_rectangle_inside
+              settings:
+                layer_label: null
+                pin_length: 0.001
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: null
+        bbox_offsets: null
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        decorator: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: strip
+        offset: 0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      width: 0.5
+    settings:
+      auto_widen: false
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      length: 380.0
+  straight_f06d3175_3:
+    component: straight
+    info:
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      function_name: cross_section
+      length: 380.0
+      settings:
+        add_bbox: null
+        add_pins:
+          function: add_pins
+          settings:
+            function:
+              function: add_pin_rectangle_inside
+              settings:
+                layer_label: null
+                pin_length: 0.001
+        auto_widen: false
+        auto_widen_minimum_length: 200.0
+        bbox_layers: null
+        bbox_offsets: null
+        cladding_layers: null
+        cladding_offsets: null
+        cladding_simplify: null
+        decorator: null
+        end_straight_length: 0.01
+        gap: 3.0
+        info: null
+        layer: WG
+        min_length: 0.01
+        mirror: false
+        name: strip
+        offset: 0
+        port_names:
+        - o1
+        - o2
+        port_types:
+        - optical
+        - optical
+        radius: 10.0
+        sections: null
+        snap_to_grid: null
+        start_straight_length: 0.01
+        taper_length: 10.0
+        width: 0.5
+        width_wide: null
+      width: 0.5
+    settings:
+      auto_widen: false
+      cross_section:
+        function: cross_section
+        settings:
+          add_bbox: null
+          add_pins:
+            function: add_pins
+            settings:
+              function:
+                function: add_pin_rectangle_inside
+                settings:
+                  layer_label: null
+                  pin_length: 0.001
+          name: strip
+      length: 380.0
+  straight_f98cf026_1:
     component: straight
     info:
       cross_section:
@@ -1046,228 +1268,6 @@ instances:
                   pin_length: 0.001
           name: strip
       length: 140.0
-  straight_7:
-    component: straight
-    info:
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      function_name: cross_section
-      length: 380.0
-      settings:
-        add_bbox: null
-        add_pins:
-          function: add_pins
-          settings:
-            function:
-              function: add_pin_rectangle_inside
-              settings:
-                layer_label: null
-                pin_length: 0.001
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: null
-        bbox_offsets: null
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        decorator: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: strip
-        offset: 0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      width: 0.5
-    settings:
-      auto_widen: false
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      length: 380.0
-  straight_8:
-    component: straight
-    info:
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      function_name: cross_section
-      length: 380.0
-      settings:
-        add_bbox: null
-        add_pins:
-          function: add_pins
-          settings:
-            function:
-              function: add_pin_rectangle_inside
-              settings:
-                layer_label: null
-                pin_length: 0.001
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: null
-        bbox_offsets: null
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        decorator: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: strip
-        offset: 0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      width: 0.5
-    settings:
-      auto_widen: false
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      length: 380.0
-  straight_9:
-    component: straight
-    info:
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      function_name: cross_section
-      length: 630.0
-      settings:
-        add_bbox: null
-        add_pins:
-          function: add_pins
-          settings:
-            function:
-              function: add_pin_rectangle_inside
-              settings:
-                layer_label: null
-                pin_length: 0.001
-        auto_widen: false
-        auto_widen_minimum_length: 200.0
-        bbox_layers: null
-        bbox_offsets: null
-        cladding_layers: null
-        cladding_offsets: null
-        cladding_simplify: null
-        decorator: null
-        end_straight_length: 0.01
-        gap: 3.0
-        info: null
-        layer: WG
-        min_length: 0.01
-        mirror: false
-        name: strip
-        offset: 0
-        port_names:
-        - o1
-        - o2
-        port_types:
-        - optical
-        - optical
-        radius: 10.0
-        sections: null
-        snap_to_grid: null
-        start_straight_length: 0.01
-        taper_length: 10.0
-        width: 0.5
-        width_wide: null
-      width: 0.5
-    settings:
-      auto_widen: false
-      cross_section:
-        function: cross_section
-        settings:
-          add_bbox: null
-          add_pins:
-            function: add_pins
-            settings:
-              function:
-                function: add_pin_rectangle_inside
-                settings:
-                  layer_label: null
-                  pin_length: 0.001
-          name: strip
-      length: 630.0
   t:
     component: pad_array
     info:
@@ -1282,96 +1282,96 @@ placements:
     rotation: 0
     x: 0.0
     y: 0.0
-  bend_euler_1:
+  bend_euler_c22879f1_1:
     mirror: true
     rotation: 90
     x: 0.0
     y: 290.0
-  bend_euler_2:
+  bend_euler_c22879f1_2:
     mirror: 0
     rotation: 0
     x: 390.0
     y: 300.0
-  bend_euler_3:
+  bend_euler_c22879f1_3:
     mirror: 0
     rotation: 90
     x: 400.0
     y: 390.0
-  bend_euler_4:
+  bend_euler_c22879f1_4:
     mirror: true
     rotation: 180
     x: -240.0
     y: 400.0
-  bend_euler_5:
+  bend_euler_c22879f1_5:
     mirror: true
     rotation: 90
     x: 150.0
     y: 140.0
-  bend_euler_6:
+  bend_euler_c22879f1_6:
     mirror: 0
     rotation: 0
     x: 540.0
     y: 150.0
-  bend_euler_7:
+  bend_euler_c22879f1_7:
     mirror: 0
     rotation: 90
     x: 550.0
     y: 540.0
-  bend_euler_8:
+  bend_euler_c22879f1_8:
     mirror: true
     rotation: 180
     x: -90.0
     y: 550.0
-  straight_1:
-    mirror: 0
-    rotation: 90
-    x: 0.0
-    y: 0.0
-  straight_10:
+  straight_1c3ca994_1:
     mirror: 0
     rotation: 90
     x: -100.0
     y: 560.0
-  straight_2:
+  straight_2cf638e0_1:
     mirror: 0
-    rotation: 0
-    x: 10.0
-    y: 300.0
-  straight_3:
+    rotation: 90
+    x: 0.0
+    y: 0.0
+  straight_4aa0b60f_1:
     mirror: 0
     rotation: 90
     x: 400.0
     y: 310.0
-  straight_4:
+  straight_722003ab_1:
     mirror: 0
     rotation: 180
     x: 390.0
     y: 400.0
-  straight_5:
-    mirror: 0
-    rotation: 90
-    x: -250.0
-    y: 410.0
-  straight_6:
-    mirror: 0
-    rotation: 90
-    x: 150.0
-    y: 0.0
-  straight_7:
-    mirror: 0
-    rotation: 0
-    x: 160.0
-    y: 150.0
-  straight_8:
-    mirror: 0
-    rotation: 90
-    x: 550.0
-    y: 160.0
-  straight_9:
+  straight_722003ab_2:
     mirror: 0
     rotation: 180
     x: 540.0
     y: 550.0
+  straight_c30961b2_1:
+    mirror: 0
+    rotation: 90
+    x: -250.0
+    y: 410.0
+  straight_f06d3175_1:
+    mirror: 0
+    rotation: 0
+    x: 10.0
+    y: 300.0
+  straight_f06d3175_2:
+    mirror: 0
+    rotation: 0
+    x: 160.0
+    y: 150.0
+  straight_f06d3175_3:
+    mirror: 0
+    rotation: 90
+    x: 550.0
+    y: 160.0
+  straight_f98cf026_1:
+    mirror: 0
+    rotation: 90
+    x: 150.0
+    y: 0.0
   t:
     mirror: 0
     rotation: 0
@@ -1424,10 +1424,10 @@ warnings:
     unconnected_ports:
     - message: 4 unconnected optical ports!
       ports:
-      - straight_1,o1
-      - straight_5,o2
-      - straight_6,o1
-      - straight_10,o2
+      - straight_2cf638e0_1,o1
+      - straight_c30961b2_1,o2
+      - straight_f98cf026_1,o1
+      - straight_1c3ca994_1,o2
       values:
       - - 0.0
         - 0.0

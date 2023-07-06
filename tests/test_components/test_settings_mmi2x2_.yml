@@ -79,6 +79,5 @@ settings:
     with_bbox: true
   function_name: mmi2x2
   info: {}
-  info_version: 2
   module: gdsfactory.components.mmi2x2
   name: mmi2x2

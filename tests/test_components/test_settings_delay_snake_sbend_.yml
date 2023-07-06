@@ -51,6 +51,5 @@ settings:
   info:
     bend180_radius: 5.0
     min_bend_radius: 364.774
-  info_version: 2
   module: gdsfactory.components.delay_snake_sbend
   name: delay_snake_sbend

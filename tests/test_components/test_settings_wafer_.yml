@@ -31,6 +31,5 @@ settings:
     yspacing: null
   function_name: wafer
   info: {}
-  info_version: 2
   module: gdsfactory.components.wafer
   name: wafer

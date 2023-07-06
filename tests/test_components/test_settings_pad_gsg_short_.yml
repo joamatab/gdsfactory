@@ -33,6 +33,5 @@ settings:
         layer: M3
   function_name: pad_gsg_short
   info: {}
-  info_version: 2
   module: gdsfactory.components.pad_gsg
   name: pad_gsg_short

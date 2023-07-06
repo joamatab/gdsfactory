@@ -53,7 +53,6 @@ settings:
       radius: 10.0
     function_name: ring_single
     info: {}
-    info_version: 2
     module: gdsfactory.components.ring_single
     name: ring_single
   default:
@@ -74,6 +73,5 @@ settings:
     top: true
   function_name: add_trenches
   info: {}
-  info_version: 2
   module: gdsfactory.components.add_trenches
   name: ring_single_add_trenche_1b7bb09d

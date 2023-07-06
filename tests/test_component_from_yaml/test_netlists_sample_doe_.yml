@@ -33,7 +33,6 @@ instances:
             with_bbox: true
           function_name: mmi1x2
           info: {}
-          info_version: 2
           module: gdsfactory.components.mmi1x2
           name: mmi1x2_length_mmi100_width_mmi10
         mmi1x2_length_mmi100_width_mmi4:
@@ -65,7 +64,6 @@ instances:
             with_bbox: true
           function_name: mmi1x2
           info: {}
-          info_version: 2
           module: gdsfactory.components.mmi1x2
           name: mmi1x2_length_mmi100_width_mmi4
         mmi1x2_length_mmi2_width_mmi10:
@@ -97,7 +95,6 @@ instances:
             with_bbox: true
           function_name: mmi1x2
           info: {}
-          info_version: 2
           module: gdsfactory.components.mmi1x2
           name: mmi1x2_length_mmi2_width_mmi10
         mmi1x2_length_mmi2_width_mmi4:
@@ -129,7 +126,6 @@ instances:
             with_bbox: true
           function_name: mmi1x2
           info: {}
-          info_version: 2
           module: gdsfactory.components.mmi1x2
           name: mmi1x2_length_mmi2_width_mmi4
     settings:

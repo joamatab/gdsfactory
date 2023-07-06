@@ -25,6 +25,5 @@ settings:
       function: mmi1x2
   function_name: loop_mirror
   info: {}
-  info_version: 2
   module: gdsfactory.components.loop_mirror
   name: loop_mirror

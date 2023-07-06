@@ -4,7 +4,7 @@ import gdsfactory as gf
 from gdsfactory.get_netlist_flat import get_netlist_flat
 
 
-def test_flat_netlist_photonic():
+def test_flat_netlist_photonic() -> None:
     coupler_lengths = [10, 20, 30, 40]
     coupler_gaps = [0.1, 0.2, 0.4, 0.5]
     delta_lengths = [10, 100, 200]
@@ -17,7 +17,7 @@ def test_flat_netlist_photonic():
     gf.get_netlist_flat.get_netlist_flat(c)
 
 
-def test_flatten_netlist_identical_references():
+def test_flatten_netlist_identical_references() -> None:
     """
     Testing electrical netlist w/ identical component references
     """

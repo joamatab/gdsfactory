@@ -77,7 +77,6 @@ settings:
       radius: 10.0
     function_name: ring_double
     info: {}
-    info_version: 2
     module: gdsfactory.components.ring_double
     name: ring_double
   default:
@@ -98,6 +97,5 @@ settings:
     top: true
   function_name: add_trenches
   info: {}
-  info_version: 2
   module: gdsfactory.components.add_trenches
   name: ring_double_add_trenche_eecddedf

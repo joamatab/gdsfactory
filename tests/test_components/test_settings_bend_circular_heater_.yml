@@ -48,6 +48,5 @@ settings:
   function_name: bend_circular_heater
   info:
     length: 15.708
-  info_version: 2
   module: gdsfactory.components.bend_circular_heater
   name: bend_circular_heater

@@ -122,6 +122,5 @@ settings:
     instances:
     - mmi_bot
     - mmi_top
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: sample_docstring_7864c0c5

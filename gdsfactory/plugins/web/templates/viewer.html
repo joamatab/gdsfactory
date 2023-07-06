@@ -26,8 +26,8 @@
     {% for setting_name, setting_value in component.settings.default.items()%}
         <div class="mb-3">
             <label for="{{setting_name}}" class="form-label">{{setting_name}}</label>
-            {% if setting_name in component.settings.changed %}
-            <input type="text" class="form-control" id="{{setting_name}}" name="{{setting_name}}" value="{{component.settings.changed[setting_name]}}"">
+            {% if setting_name in component.settings.get('changed', {}) %}
+            <input type="text" class="form-control" id="{{setting_name}}" name="{{setting_name}}" value="{{component.settings.get('changed', {}).get(setting_name)}}"">
             {% else %}
             <input type="text" class="form-control" id="{{setting_name}}" name="{{setting_name}}" placeholder="{{setting_value}}">
             {% endif %}

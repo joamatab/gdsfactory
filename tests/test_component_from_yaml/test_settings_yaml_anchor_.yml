@@ -114,6 +114,5 @@ settings:
     instances:
     - mmi_long
     - mmi_short
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: yaml_anchor_14cbc915

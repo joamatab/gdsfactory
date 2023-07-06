@@ -171,7 +171,7 @@ if __name__ == "__main__":
     # c.pprint_ports()
     # c = straight_heater_metal(heater_width=5, length=50.0)
 
-    c = straight_heater_metal(length=40, port_orientation1=-90)
+    c = straight_heater_metal(length=40, port_orientation1=+90)
     # n = c.get_netlist()
     c.show(show_ports=True)
     # scene = c.to_3d()

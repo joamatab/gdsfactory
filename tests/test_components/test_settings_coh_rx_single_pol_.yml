@@ -83,6 +83,5 @@ settings:
     with_pads: true
   function_name: coh_rx_single_pol
   info: {}
-  info_version: 2
   module: gdsfactory.components.coh_rx_single_pol
   name: coh_rx_single_pol

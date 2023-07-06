@@ -97,6 +97,5 @@ settings:
       function: coupler
   function_name: mzi_lattice
   info: {}
-  info_version: 2
   module: gdsfactory.components.mzi_lattice
   name: mzi_lattice

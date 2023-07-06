@@ -98,7 +98,6 @@ settings:
       size:
       - 100.0
       - 100.0
-    info_version: 2
     module: gdsfactory.components.pad
     name: pad_array
   default:
@@ -128,6 +127,5 @@ settings:
     size:
     - 100.0
     - 100.0
-  info_version: 2
   module: gdsfactory.components.add_fiducials
   name: pad_array_add_fiducials

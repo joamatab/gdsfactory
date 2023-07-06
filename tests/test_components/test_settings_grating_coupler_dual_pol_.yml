@@ -87,6 +87,5 @@ settings:
   info:
     polarization: dual
     wavelength: 1.55
-  info_version: 2
   module: gdsfactory.components.grating_coupler_dual_pol
   name: grating_coupler_dual_pol

@@ -13,6 +13,5 @@ settings:
     psize: 1
   function_name: qrcode
   info: {}
-  info_version: 2
   module: gdsfactory.components.version_stamp
   name: qrcode

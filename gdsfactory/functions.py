@@ -247,7 +247,7 @@ def add_settings_label(
     component = get_component(component)
 
     ignore = ignore or []
-    settings = settings or component.settings.changed.keys()
+    settings = settings or component.settings.get("changed", {}).keys()
     settings = set(settings) - set(ignore)
 
     d = {setting: component.get_setting(setting) for setting in settings}

@@ -21,6 +21,5 @@ settings:
     - 5
   function_name: fiducial_squares
   info: {}
-  info_version: 2
   module: gdsfactory.components.fiducial_squares
   name: fiducial_squares

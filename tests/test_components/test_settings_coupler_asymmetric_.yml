@@ -53,6 +53,5 @@ settings:
     gap: 0.234
   function_name: coupler_asymmetric
   info: {}
-  info_version: 2
   module: gdsfactory.components.coupler_asymmetric
   name: coupler_asymmetric

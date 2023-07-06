@@ -43,6 +43,5 @@ settings:
     width2: 5.0
   function_name: taper_parabolic
   info: {}
-  info_version: 2
   module: gdsfactory.components.taper_parabolic
   name: taper_parabolic

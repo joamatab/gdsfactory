@@ -87,6 +87,5 @@ settings:
     sides: 6
   function_name: regular_polygon
   info: {}
-  info_version: 2
   module: gdsfactory.components.regular_polygon
   name: regular_polygon

@@ -75,6 +75,5 @@ settings:
   info:
     length: 10.186
     min_bend_radius: 11.857
-  info_version: 2
   module: gdsfactory.components.coupler
   name: coupler

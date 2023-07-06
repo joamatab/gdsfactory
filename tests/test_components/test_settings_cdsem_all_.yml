@@ -49,6 +49,5 @@ settings:
     - 1.0
   function_name: cdsem_all
   info: {}
-  info_version: 2
   module: gdsfactory.components.cdsem_all
   name: cdsem_all

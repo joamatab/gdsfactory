@@ -95,7 +95,7 @@ def pad_array(
     """
     c = Component()
     pad = gf.get_component(pad)
-    size = pad.settings.full["size"]
+    size = pad.settings["full"]["size"]
     c.info["size"] = size
 
     c.add_array(pad, columns=columns, rows=rows, spacing=spacing)

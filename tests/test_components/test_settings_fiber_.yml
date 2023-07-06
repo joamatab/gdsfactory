@@ -27,6 +27,5 @@ settings:
     layer_core: WG
   function_name: fiber
   info: {}
-  info_version: 2
   module: gdsfactory.components.fiber
   name: fiber

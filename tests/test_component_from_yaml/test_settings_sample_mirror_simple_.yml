@@ -92,6 +92,5 @@ settings:
     instances:
     - s
     - b
-  info_version: 2
   module: gdsfactory.read.from_yaml
   name: sample_mirror_simple_f31e619a

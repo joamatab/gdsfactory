@@ -17,6 +17,5 @@ settings:
     width: 10.0
   function_name: add_frame
   info: {}
-  info_version: 2
   module: gdsfactory.components.align
   name: add_frame

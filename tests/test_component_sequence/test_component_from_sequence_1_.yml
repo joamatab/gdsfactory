@@ -89,6 +89,5 @@ settings:
       - o2
   function_name: component_sequence
   info: {}
-  info_version: 2
   module: gdsfactory.components.component_sequence
   name: component_sequence_ae8efed6

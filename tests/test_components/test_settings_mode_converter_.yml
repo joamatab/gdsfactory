@@ -85,6 +85,5 @@ settings:
     taper_length: 25
   function_name: mode_converter
   info: {}
-  info_version: 2
   module: gdsfactory.components.mode_converter
   name: mode_converter

@@ -1,20 +1,20 @@
 connections:
-  coupler_ring_1,o2: straight_1,o1
-  coupler_ring_1,o3: straight_2,o1
-  coupler_ring_2,o2: straight_2,o2
-  coupler_ring_2,o3: straight_1,o2
+  coupler_ring_length_x0p_917db7b8_1,o2: straight_length0p01_1,o1
+  coupler_ring_length_x0p_917db7b8_1,o3: straight_length0p01_2,o1
+  coupler_ring_length_x0p_917db7b8_2,o2: straight_length0p01_2,o2
+  coupler_ring_length_x0p_917db7b8_2,o3: straight_length0p01_1,o2
 instances:
-  coupler_ring_1:
+  coupler_ring_length_x0p_917db7b8_1:
     component: coupler_ring
     settings:
       length_x: 0.01
       radius: 10.0
-  coupler_ring_2:
+  coupler_ring_length_x0p_917db7b8_2:
     component: coupler_ring
     settings:
       length_x: 0.01
       radius: 10.0
-  straight_1:
+  straight_length0p01_1:
     component: straight
     info:
       cross_section: strip
@@ -62,7 +62,7 @@ instances:
       width: 0.5
     settings:
       length: 0.01
-  straight_2:
+  straight_length0p01_2:
     component: straight
     info:
       cross_section: strip
@@ -112,28 +112,28 @@ instances:
       length: 0.01
 name: ring_double
 placements:
-  coupler_ring_1:
+  coupler_ring_length_x0p_917db7b8_1:
     mirror: 0
     rotation: 0
     x: 0.0
     y: 0.0
-  coupler_ring_2:
+  coupler_ring_length_x0p_917db7b8_2:
     mirror: 0
     rotation: 180
     x: -0.01
     y: 21.41
-  straight_1:
+  straight_length0p01_1:
     mirror: 0
     rotation: 90
     x: -10.01
     y: 10.7
-  straight_2:
+  straight_length0p01_2:
     mirror: 0
     rotation: 90
     x: 10.0
     y: 10.7
 ports:
-  o1: coupler_ring_1,o1
-  o2: coupler_ring_1,o4
-  o3: coupler_ring_2,o4
-  o4: coupler_ring_2,o1
+  o1: coupler_ring_length_x0p_917db7b8_1,o1
+  o2: coupler_ring_length_x0p_917db7b8_1,o4
+  o3: coupler_ring_length_x0p_917db7b8_2,o4
+  o4: coupler_ring_length_x0p_917db7b8_2,o1

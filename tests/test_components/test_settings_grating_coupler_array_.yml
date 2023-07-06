@@ -93,6 +93,5 @@ settings:
     with_loopback: false
   function_name: grating_coupler_array
   info: {}
-  info_version: 2
   module: gdsfactory.components.grating_coupler_array
   name: grating_coupler_array

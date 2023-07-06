@@ -61,6 +61,5 @@ settings:
     with_splitter: true
   function_name: mzi_arms
   info: {}
-  info_version: 2
   module: gdsfactory.components.mzi_arms
   name: mzi_arms

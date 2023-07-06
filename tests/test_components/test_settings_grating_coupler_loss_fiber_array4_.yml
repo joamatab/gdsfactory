@@ -19,6 +19,5 @@ settings:
     pitch: 127.0
   function_name: grating_coupler_loss_fiber_array4
   info: {}
-  info_version: 2
   module: gdsfactory.components.grating_coupler_loss
   name: grating_coupler_loss_fi_da445079

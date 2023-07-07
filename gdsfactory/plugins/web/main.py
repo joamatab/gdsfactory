@@ -23,6 +23,7 @@ from gdsfactory.config import PATH, GDSDIR_TEMP, CONF
 from gdsfactory.plugins.web.server import LayoutViewServerEndpoint, get_layout_view
 
 from gdsfactory.watch import FileWatcher
+from gdsfactory.cell import Settings
 
 module_path = Path(__file__).parent.absolute()
 
@@ -67,7 +68,6 @@ def get_url(request: Request) -> str:
         + port_mod
         + request.url.path
     )
-
     return url
 
 
@@ -139,22 +139,26 @@ async def view_cell(request: Request, cell_name: str, variant: Optional[str] = N
 
     if variant in LOADED_COMPONENTS:
         component = LOADED_COMPONENTS[variant]
-    elif cell_name in gds_names:
-        gdspath = GDSDIR_TEMP / cell_name
-        component = gf.import_gds(gdspath=gdspath.with_suffix(".gds"))
-        component.settings["default"] = component.settings.get("default", {})
-        component.settings["changed"] = component.settings.get("changed", {})
     else:
-        component = gf.get_component(cell_name)
+        try:
+            component = gf.get_component(cell_name)
+        except Exception as e:
+            if cell_name not in gds_names:
+                raise HTTPException(
+                    status_code=400, detail=f"Component not found. {e}"
+                ) from e
+
+            gdspath = GDSDIR_TEMP / cell_name
+            component = gf.import_gds(gdspath=gdspath.with_suffix(".gds"))
+            component.settings = Settings(name=component.name)
     layout_view = get_layout_view(component)
     pixel_data = layout_view.get_pixels_with_options(800, 400).to_png_data()
-    # pixel_data = layout_view.get_screenshot_pixels().to_png_data()
     b64_data = base64.b64encode(pixel_data).decode("utf-8")
     return templates.TemplateResponse(
         "viewer.html",
         {
             "request": request,
-            "cell_name": str(cell_name),
+            "cell_name": cell_name,
             "variant": variant,
             "title": "Viewer",
             "initial_view": b64_data,
@@ -165,13 +169,12 @@ async def view_cell(request: Request, cell_name: str, variant: Optional[str] = N
 
 
 def _parse_value(value: str):
-    if value.startswith("{") or value.startswith("["):
-        try:
-            return orjson.loads(value.replace("'", '"'))
-        except orjson.JSONDecodeError as e:
-            raise ValueError(f"Unable to decode parameter value, {value}: {e.msg}")
-    else:
+    if not value.startswith("{") and not value.startswith("["):
         return value
+    try:
+        return orjson.loads(value.replace("'", '"'))
+    except orjson.JSONDecodeError as e:
+        raise ValueError(f"Unable to decode parameter value, {value}: {e.msg}") from e
 
 
 @app.post("/update/{cell_name}")
@@ -183,13 +186,14 @@ async def update_cell(request: Request, cell_name: str):
             f"/view/{cell_name}",
             status_code=status.HTTP_302_FOUND,
         )
-    new_component = gf.get_component(
-        {"component": cell_name, "settings": changed_settings}
-    )
-    LOADED_COMPONENTS[new_component.name] = new_component
+    component = gf.get_component({"component": cell_name, "settings": changed_settings})
+    variant = component.name
+
+    LOADED_COMPONENTS[component.name] = component
     logger.info(data)
+    logger.info(f"update {cell_name} {variant}")
     return RedirectResponse(
-        f"/view/{cell_name}?variant={new_component.name}",
+        f"/view/{cell_name}?variant={variant}",
         status_code=status.HTTP_302_FOUND,
     )
 
@@ -221,10 +225,9 @@ async def filewatcher(request: Request):
 
     if CONF.last_saved_files:
         component = gf.import_gds(gf.CONF.last_saved_files[-1])
+        component.settings = Settings(name=component.name)
     else:
         component = gf.components.straight()
-    component.settings["default"] = component.settings.get("default", {})
-    component.settings["changed"] = component.settings.get("changed", {})
 
     layout_view = get_layout_view(component)
     pixel_data = layout_view.get_pixels_with_options(800, 400).to_png_data()
@@ -262,27 +265,9 @@ async def watch_folder(request: Request, folder_path: str = Form(...)):
     watcher = FileWatcher(path=folder_path)
     watcher.start()
     output += f"watching {watched_folder}\n"
-
-    component = component or gf.components.straight()
-    component.settings["default"] = component.settings.get("default", {})
-    component.settings["changed"] = component.settings.get("changed", {})
-
-    layout_view = get_layout_view(component)
-    pixel_data = layout_view.get_pixels_with_options(800, 400).to_png_data()
-    b64_data = base64.b64encode(pixel_data).decode("utf-8")
-
-    return templates.TemplateResponse(
-        "filewatcher.html",
-        {
-            "request": request,
-            "output": output,
-            "cell_name": str(component.name),
-            "variant": None,
-            "title": "Viewer",
-            "initial_view": b64_data,
-            "component": component,
-            "url": get_url(request),
-        },
+    return RedirectResponse(
+        "/filewatcher",
+        status_code=status.HTTP_302_FOUND,
     )
 
 

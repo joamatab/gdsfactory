@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import itertools as it
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.grid import grid, grid_with_text
 from gdsfactory.pack import pack
-from gdsfactory.typings import CellSpec, ComponentSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CellSpec, ComponentSpec, Optional
 
 _doe = "mmi1x2"
 _settings = dict(length_mmi=[2.5, 100], width_mmi=[4, 10])
@@ -18,13 +20,14 @@ def generate_doe(
     doe: ComponentSpec,
     settings: dict[str, list[Any]],
     do_permutations: bool = False,
-    function: Optional[CellSpec] = None,
+    function: Optional[CellSpec] | None = None,
 ) -> tuple[list[Component], list[dict]]:
     """Generates a component DOE (Design of Experiment).
 
     which can then be packed, or used elsewhere.
 
     Args:
+    ----
         doe: function to return Components.
         settings: component settings.
         do_permutations: for each setting.
@@ -38,7 +41,8 @@ def generate_doe(
     if function:
         function = gf.get_cell(function)
         if not callable(function):
-            raise ValueError(f"Error {function!r} needs to be callable.")
+            msg = f"Error {function!r} needs to be callable."
+            raise ValueError(msg)
         component_list = [
             function(gf.get_component(doe, **settings)) for settings in settings_list
         ]
@@ -54,18 +58,20 @@ def pack_doe(
     doe: ComponentSpec = _doe,
     settings: dict[str, list[Any]] = _settings,
     do_permutations: bool = False,
-    function: Optional[CellSpec] = None,
+    function: Optional[CellSpec] | None = None,
     **kwargs,
 ) -> Component:
     """Packs a component DOE (Design of Experiment) using pack.
 
     Args:
+    ----
         doe: function to return Components.
         settings: component settings.
         do_permutations: for each setting.
         function: to apply (add padding, grating couplers).
 
-    keyword Args:
+    Keyword Args:
+    ------------
         spacing: Minimum distance between adjacent shapes.
         aspect_ratio: (width, height) ratio of the rectangular bin.
         max_size: Limits the size into which the shapes will be packed.
@@ -83,14 +89,18 @@ def pack_doe(
         v_mirror: vertical mirror using x axis (1, y) (0, y).
     """
     component_list, settings_list = generate_doe(
-        doe, settings, do_permutations, function
+        doe,
+        settings,
+        do_permutations,
+        function,
     )
 
     c = pack(component_list=component_list, **kwargs)
 
     if len(c) > 1:
+        msg = f"failed to pack in one Component, it created {len(c)} Components"
         raise ValueError(
-            f"failed to pack in one Component, it created {len(c)} Components"
+            msg,
         )
     c = c[0]
     c.doe_names = [component.name for component in component_list]
@@ -103,20 +113,22 @@ def pack_doe_grid(
     doe: ComponentSpec = _doe,
     settings: dict[str, list[Any]] = _settings,
     do_permutations: bool = False,
-    function: Optional[CellSpec] = None,
+    function: Optional[CellSpec] | None = None,
     with_text: bool = False,
     **kwargs,
 ) -> Component:
     """Packs a component DOE (Design of Experiment) using grid.
 
     Args:
+    ----
         component: function to return Components.
         settings: component settings.
         do_permutations: for each setting.
         function: to apply to component (add padding, grating couplers).
         with_text: includes text label.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         spacing: between adjacent elements on the grid, can be a tuple for
             different distances in height and width.
         separation: If True, guarantees elements are separated with fixed spacing
@@ -139,7 +151,8 @@ def pack_doe_grid(
     if function:
         function = gf.get_cell(function)
         if not callable(function):
-            raise ValueError(f"Error {function!r} needs to be callable.")
+            msg = f"Error {function!r} needs to be callable."
+            raise ValueError(msg)
         component_list = [
             function(gf.get_component(doe, **settings)) for settings in settings_list
         ]
@@ -160,15 +173,5 @@ def pack_doe_grid(
 
 
 if __name__ == "__main__":
-    # c = pack_doe_grid(
-    #     doe="mmi1x2",
-    #     settings=dict(length_mmi=[2.5, 100], width_mmi=[4, 10]),
-    #     with_text=True,
-    #     spacing=(100, 100),
-    #     shape=(2, 2),
-    #     do_permutations=True,
-    # )
-
-    # c = pack_doe(doe="mmi1x2", settings=dict(length_mmi=[2, 100], width_mmi=[4, 10]))
     c = pack_doe()
     c.show(show_ports=True)

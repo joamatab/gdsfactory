@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.components.bbox import bbox
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler import coupler
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -22,6 +25,7 @@ def add_trenches(
     """Return component with trenches.
 
     Args:
+    ----
         component: component to add to the trenches.
         cross_section: spec (CrossSection, string or dict).
         top: add top trenches.
@@ -44,7 +48,12 @@ def add_trenches(
 
     core = component
     clad = bbox(
-        core.bbox, layer=layer_trench, top=top, bottom=bot, left=left, right=right
+        core.bbox,
+        layer=layer_trench,
+        top=top,
+        bottom=bot,
+        left=left,
+        right=right,
     )
     ref = c << gf.geometry.boolean(clad, core, operation="not", layer=layer_trench)
 
@@ -61,7 +70,12 @@ def add_trenches(
 
 
 add_trenches90 = partial(
-    add_trenches, component=bend_euler, top=False, bot=True, right=True, left=False
+    add_trenches,
+    component=bend_euler,
+    top=False,
+    bot=True,
+    right=True,
+    left=False,
 )
 
 if __name__ == "__main__":

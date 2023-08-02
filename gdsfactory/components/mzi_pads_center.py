@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.components.mzi import mzi as mzi_function
 from gdsfactory.components.pad import pad_small
 from gdsfactory.components.straight_heater_metal import straight_heater_metal
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Union
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Union
 
 
 @gf.cell
@@ -36,6 +40,7 @@ def mzi_pads_center(
     and is shared between top and bottom phase shifters.
 
     Args:
+    ----
         ps_top: phase shifter top.
         ps_bot: phase shifter bottom.
         mzi: interferometer.
@@ -72,11 +77,15 @@ def mzi_pads_center(
     port_names = list(mzi_ps.ports.keys())
     for port_name in [mzi_sig_top, mzi_gnd_top, mzi_sig_bot, mzi_gnd_bot]:
         if port_name not in port_names:
-            raise ValueError(f"port {port_name!r} not in {port_names}")
+            msg = f"port {port_name!r} not in {port_names}"
+            raise ValueError(msg)
 
     m = c << mzi_ps
     pads = c << gf.components.array(
-        component=pad, columns=3, rows=1, spacing=(pad_spacing, pad_spacing)
+        component=pad,
+        columns=3,
+        rows=1,
+        spacing=(pad_spacing, pad_spacing),
     )
     pads.x = m.x
     pads.y = m.y
@@ -121,8 +130,5 @@ def mzi_pads_center(
 
 
 if __name__ == "__main__":
-    # mzi_ps_fa = gf.compose(gf.routing.add_fiber_array, mzi_pads_center)
-    # mzi_ps_fs = gf.compose(gf.routing.add_fiber_single, mzi_pads_center)
-    # c = mzi_ps_fs()
     c = mzi_pads_center()
     c.show(show_ports=True)

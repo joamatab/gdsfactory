@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.port import Port
 from gdsfactory.routing.get_bundle_from_waypoints import get_bundle_from_waypoints
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 
 def test_get_bundle_from_waypointsB(
@@ -38,9 +42,9 @@ def test_get_bundle_from_waypointsB(
     c.add_ports(ports1)
     c.add_ports(ports2)
     waypoints = [
-        p0 + (200, 0),
-        p0 + (200, -200),
-        p0 + (400, -200),
+        (*p0, 200, 0),
+        (*p0, 200, -200),
+        (*p0, 400, -200),
         (p0[0] + 400, ports2[0].y),
     ]
 
@@ -82,9 +86,9 @@ def test_get_bundle_from_waypointsC(
     c.add_ports(ports1)
     c.add_ports(ports2)
     waypoints = [
-        ports1[0].center + (200, 0),
-        ports1[0].center + (200, -200),
-        ports1[0].center + (400, -200),
+        (*ports1[0].center, 200, 0),
+        (*ports1[0].center, 200, -200),
+        (*ports1[0].center, 400, -200),
         (ports1[0].x + 400, ports2[0].y),
         ports2[0].center,
     ]
@@ -105,7 +109,10 @@ def test_get_bundle_from_waypoints_staggered(
 ) -> None:
     c = gf.Component()
     r = c << gf.components.array(
-        component=gf.components.straight, rows=2, columns=1, spacing=(0, 20)
+        component=gf.components.straight,
+        rows=2,
+        columns=1,
+        spacing=(0, 20),
     )
     r.movex(60)
     r.movey(40)
@@ -118,7 +125,7 @@ def test_get_bundle_from_waypoints_staggered(
     ports2 = r.get_ports_list(orientation=180)
 
     dx = 20
-    p0 = ports1[0].center + (dx, 0)
+    p0 = (*ports1[0].center, dx, 0)
     p1 = (ports1[0].center[0] + dx, ports2[0].center[1])
     waypoints = (p0, p1)
 
@@ -133,6 +140,4 @@ def test_get_bundle_from_waypoints_staggered(
 
 
 if __name__ == "__main__":
-    # test_get_bundle_from_waypointsC(None, check=False)
-    # test_get_bundle_from_waypointsB(None, check=False)
     test_get_bundle_from_waypoints_staggered(None, check=False)

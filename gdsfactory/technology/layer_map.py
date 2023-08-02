@@ -1,18 +1,19 @@
 import pathlib
-from typing import Union
 
 from gdsfactory.technology.layer_views import LayerViews
 
 
 def lyp_to_dataclass(
-    lyp_filepath: Union[str, pathlib.Path], overwrite: bool = True
+    lyp_filepath: str | pathlib.Path,
+    overwrite: bool = True,
 ) -> str:
     """Returns python LayerMap script from a klayout layer properties file lyp."""
     filepathin = pathlib.Path(lyp_filepath)
     filepathout = filepathin.with_suffix(".py")
 
     if filepathout.exists() and not overwrite:
-        raise FileExistsError(f"You can delete {filepathout}")
+        msg = f"You can delete {filepathout}"
+        raise FileExistsError(msg)
 
     script = """
 from pydantic import BaseModel

@@ -31,7 +31,7 @@ from gdsfactory.samples.pdk.fab_c import cells
 cell_names = list(cells.keys())
 
 
-@pytest.fixture(params=cell_names, scope="function")
+@pytest.fixture(params=cell_names)
 def component_name(request) -> str:
     return request.param
 

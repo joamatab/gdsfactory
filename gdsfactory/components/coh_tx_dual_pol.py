@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -22,6 +26,7 @@ def coh_tx_dual_pol(
     """Dual polarization coherent transmitter.
 
     Args:
+    ----
         splitter: splitter function.
         combiner: combiner function.
         spol_coh_tx: function generating a coherent tx for a single polarization.

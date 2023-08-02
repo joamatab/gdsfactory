@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.pad import pad as pad_function
 from gdsfactory.components.rectangle import rectangle
-from gdsfactory.typings import ComponentSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, LayerSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def pads_shorted(
     """Returns a 1D array of shorted_pads.
 
     Args:
+    ----
         pad: pad spec.
         columns: number of columns.
         pad_spacing: in um

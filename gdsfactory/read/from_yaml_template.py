@@ -1,7 +1,8 @@
 import pathlib
+from collections.abc import Callable, Iterable
 from inspect import Parameter, Signature, signature
 from io import IOBase
-from typing import IO, Any, Callable, Dict, Iterable, Optional, Tuple, Union
+from typing import IO, Any
 
 import jinja2
 import yaml
@@ -11,14 +12,16 @@ from gdsfactory.component import Component
 __all__ = ["cell_from_yaml_template"]
 
 
-def split_default_settings_from_yaml(yaml_lines: Iterable[str]) -> Tuple[str, str]:
+def split_default_settings_from_yaml(yaml_lines: Iterable[str]) -> tuple[str, str]:
     """Separates out the 'default_settings' block from the rest of the file body.
     Note: 'default settings' MUST be at the TOP of the file.
 
     Args:
+    ----
         yaml_lines: the lines of text in the yaml file.
 
     Returns:
+    -------
         a tuple of (main file contents), (setting block), both as multi-line strings.
     """
     settings_lines = []
@@ -61,18 +64,20 @@ def _split_yaml_definition(subpic_yaml):
 
 
 def cell_from_yaml_template(
-    filename: Union[str, IO[Any], pathlib.Path],
+    filename: str | IO[Any] | pathlib.Path,
     name: str,
-    routing_strategy: Optional[Dict[str, Callable]] = None,
+    routing_strategy: dict[str, Callable] | None = None,
 ) -> Callable:
     """Gets a PIC factory function from a yaml definition, which can optionally be a jinja template.
 
     Args:
+    ----
         filename: the filepath of the pic yaml template.
         name: the name of the component to create.
         routing_strategy: a dictionary of routing functions.
 
     Returns:
+    -------
          a factory function for the component.
     """
     from gdsfactory.pdk import get_routing_strategies
@@ -80,7 +85,9 @@ def cell_from_yaml_template(
     if routing_strategy is None:
         routing_strategy = get_routing_strategies()
     return yaml_cell(
-        yaml_definition=filename, name=name, routing_strategy=routing_strategy
+        yaml_definition=filename,
+        name=name,
+        routing_strategy=routing_strategy,
     )
 
 
@@ -90,12 +97,14 @@ def get_default_settings_dict(default_settings):
         try:
             settings[k] = v["value"]
         except TypeError as te:
+            msg = f'Default setting "{k}" should be a dictionary with "value" defined.'
             raise TypeError(
-                f'Default setting "{k}" should be a dictionary with "value" defined.'
+                msg,
             ) from te
         except KeyError as ke:
+            msg = f'Required key "value" not supplied for default setting "{k}"'
             raise KeyError(
-                f'Required key "value" not supplied for default setting "{k}"'
+                msg,
             ) from ke
     return settings
 
@@ -104,11 +113,13 @@ def yaml_cell(yaml_definition, name: str, routing_strategy) -> Callable[..., Com
     """The "cell" decorator equivalent for yaml files. Generates a proper cell function for yaml-defined circuits.
 
     Args:
+    ----
         yaml_definition: the filename to the pic yaml definition.
         name: the name of the pic to create.
         routing_strategy: a dictionary of routing strategies to use for pic generation.
 
     Returns:
+    -------
         a dynamically-generated function for the yaml file.
     """
     from gdsfactory.cell import cell_without_validator
@@ -131,11 +142,14 @@ def yaml_cell(yaml_definition, name: str, routing_strategy) -> Callable[..., Com
 
     for default_key, default_value in default_settings.items():
         p = Parameter(
-            name=default_key, kind=Parameter.KEYWORD_ONLY, default=default_value
+            name=default_key,
+            kind=Parameter.KEYWORD_ONLY,
+            default=default_value,
         )
         params.append(p)
         description = default_settings_def[default_key].get(
-            "description", "No description given"
+            "description",
+            "No description given",
         )
         docstring_lines.append(f"    {default_key}: {description}")
     new_sig = Signature(parameters=params, return_annotation=sig.return_annotation)
@@ -161,6 +175,7 @@ def _pic_from_templated_yaml(evaluated_text, name, routing_strategy) -> Componen
     This is a lower-level function. See from_yaml_template() for more common usage.
 
     Args:
+    ----
         name: the pic name.
         routing_strategy: a dictionary of route factories.
 

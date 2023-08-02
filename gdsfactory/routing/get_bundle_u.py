@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy import float64, ndarray
@@ -8,7 +8,6 @@ from numpy import float64, ndarray
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.geometry.functions import remove_identicals
-from gdsfactory.port import Port
 from gdsfactory.routing.get_route import get_route_from_waypoints
 from gdsfactory.routing.manhattan import (
     generate_manhattan_waypoints,
@@ -16,11 +15,18 @@ from gdsfactory.routing.manhattan import (
 )
 from gdsfactory.routing.path_length_matching import path_length_matched_points
 from gdsfactory.routing.route_ports_to_side import route_ports_to_side
-from gdsfactory.typings import ComponentSpec, Route
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.port import Port
+    from gdsfactory.typings import ComponentSpec, Route
 
 
 def _groups(
-    ports: list[Port], cut: float64, axis: str = "X"
+    ports: list[Port],
+    cut: float64,
+    axis: str = "X",
 ) -> tuple[list[Port], list[Any]] | tuple[list[Port], list[Port]]:
     if axis == "Y":
         group1 = [p for p in ports if p.x <= cut]
@@ -47,6 +53,7 @@ def get_bundle_udirect(
     r"""Returns list of routes.
 
     Args:
+    ----
         ports1: list of start ports.
         ports2: list of end ports.
         route_filter: filter to apply to the manhattan waypoints
@@ -63,6 +70,7 @@ def get_bundle_udirect(
             length matching loops to (requires path_length_match_loops != None).
 
     Returns:
+    -------
         [route_filter(r) for r in routes] where routes is a list of lists of coordinates
         e.g with default `get_route_from_waypoints`,
         returns list of elements which can be added to a component
@@ -117,7 +125,6 @@ def get_bundle_udirect(
             bend=bend,
             nb_loops=path_length_match_loops,
             modify_segment_i=path_length_match_modify_segment_i,
-            # cross_section=cross_section,
             **kwargs,
         )
 
@@ -150,16 +157,16 @@ def _get_bundle_udirect_waypoints(
         )
 
     if len(ports2) != nb_ports:
+        msg = f"Number of start ports should match number of end ports.Got {len(ports1)} {len(ports2)}"
         raise ValueError(
-            "Number of start ports should match number of end ports."
-            f"Got {len(ports1)} {len(ports2)}"
+            msg,
         )
     if len({p.orientation for p in ports1 + ports2}) > 1:
         orientations1 = [p.orientation for p in ports1]
         orientations2 = [p.orientation for p in ports2]
+        msg = f"All ports should have the same orientation. Got \n{orientations1}\n{orientations2}"
         raise ValueError(
-            "All ports should have the same orientation. "
-            f"Got \n{orientations1}\n{orientations2}"
+            msg,
         )
 
     xs_end = [p.x for p in ports2]
@@ -267,6 +274,7 @@ def get_bundle_uindirect(
     r"""Returns list of routes.
 
     Args:
+    ----
         ports1: list of start ports.
         ports2: list of end ports.
         route_filter: filter to apply to the manhattan waypoints
@@ -277,6 +285,7 @@ def get_bundle_uindirect(
         end_straight_length: in um.
 
     Returns:
+    -------
         list of routes, where each route has references, ports and length.
 
 
@@ -359,16 +368,18 @@ def _get_bundle_uindirect_waypoints(
         )
 
     if len(ports2) != nb_ports:
+        msg = f"Number of start ports should match number of end ports.Got {len(ports1)} {len(ports2)}"
         raise ValueError(
-            "Number of start ports should match number of end ports."
-            "Got {} {}".format(len(ports1), len(ports2))
+            msg,
         )
 
     if len({p.orientation for p in ports1}) > 1:
-        raise ValueError(f"All start port angles should be the same. Got {ports1}")
+        msg = f"All start port angles should be the same. Got {ports1}"
+        raise ValueError(msg)
 
     if len({p.orientation for p in ports2}) > 1:
-        raise ValueError(f"All end port angles should be the same. Got {ports2}")
+        msg = f"All end port angles should be the same. Got {ports2}"
+        raise ValueError(msg)
 
     xs_end = [p.x for p in ports2]
     ys_end = [p.y for p in ports2]
@@ -474,7 +485,6 @@ def _get_bundle_uindirect_waypoints(
                     break
 
     # First part
-    # print(group1_route_directives)
     conn1, tmp_ports1 = route_ports_to_side(
         group1,
         group1_route_directives[0],
@@ -493,11 +503,15 @@ def _get_bundle_uindirect_waypoints(
 
     # Second part
     conn1, tmp_ports1 = route_ports_to_side(
-        tmp_ports1, group1_route_directives[1], **routing_param
+        tmp_ports1,
+        group1_route_directives[1],
+        **routing_param,
     )
 
     conn2, tmp_ports2 = route_ports_to_side(
-        tmp_ports2, group2_route_directives[1], **routing_param
+        tmp_ports2,
+        group2_route_directives[1],
+        **routing_param,
     )
 
     add_connections(conn1 + conn2)
@@ -512,12 +526,16 @@ def _get_bundle_uindirect_waypoints(
     conns = []
     if tmp_ports1:
         conn1 = _get_bundle_udirect_waypoints(
-            tmp_ports1, ports2[: len(tmp_ports1)], **bundle_params
+            tmp_ports1,
+            ports2[: len(tmp_ports1)],
+            **bundle_params,
         )
         conns.append(conn1)
     if tmp_ports2:
         conn2 = _get_bundle_udirect_waypoints(
-            tmp_ports2, ports2[len(tmp_ports1) :], **bundle_params
+            tmp_ports2,
+            ports2[len(tmp_ports1) :],
+            **bundle_params,
         )
         conns.append(conn2)
     if len(conns) > 1:
@@ -525,15 +543,14 @@ def _get_bundle_uindirect_waypoints(
     elif len(conns) == 1:
         add_connections(conns[0])
     else:
-        raise ValueError("No connections generated!")
+        msg = "No connections generated!"
+        raise ValueError(msg)
 
     def _merge_connections(list_of_points):
         a = [list_of_points[0]]
         a += [point[1:] for point in list_of_points[1:]]
         b = np.vstack(a)
         b = remove_identicals(b)
-        b = remove_flat_angles(b)
-        return b
+        return remove_flat_angles(b)
 
-    connections = [_merge_connections(c) for c in dict_connections.values()]
-    return connections
+    return [_merge_connections(c) for c in dict_connections.values()]

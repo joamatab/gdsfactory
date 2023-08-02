@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 character_a = """
  XXX
@@ -27,6 +30,7 @@ def pixel_array(
     """Returns a pixel component from a string representing the pixels.
 
     Args:
+    ----
         pixels: string representing the pixels
         pixel_size: width/height for each pixel
         layer: layer for each pixel
@@ -299,7 +303,7 @@ _
 """
 
 
-@lru_cache(maxsize=None)
+@cache
 def rectangular_font() -> dict[str, str]:
     """Returns a rectangular font dict The keys of the dictionary are the.
 

@@ -1,12 +1,16 @@
 """Sample AWG."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.cross_section import strip
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 
 @gf.cell
@@ -90,10 +94,16 @@ def free_propagation_region_input(inputs: int = 1, **kwargs) -> Component:
 
 @gf.cell
 def free_propagation_region_output(
-    inputs: int = 10, width1: float = 10.0, width2: float = 20.0, **kwargs
+    inputs: int = 10,
+    width1: float = 10.0,
+    width2: float = 20.0,
+    **kwargs,
 ) -> Component:
     return free_propagation_region(
-        inputs=inputs, width2=width2, width1=width1, **kwargs
+        inputs=inputs,
+        width2=width2,
+        width1=width1,
+        **kwargs,
     )
 
 
@@ -108,6 +118,7 @@ def awg(
     """Returns a basic Arrayed Waveguide grating.
 
     Args:
+    ----
         arms: number of arms.
         outputs: number of outputs.
         free_propagation_region_input_function: for input.
@@ -132,7 +143,8 @@ def awg(
 
     fpr_out_ref.x += fpr_spacing
     routes = gf.routing.get_bundle(
-        fpr_in_ref.get_ports_list(prefix="E"), fpr_out_ref.get_ports_list(prefix="E")
+        fpr_in_ref.get_ports_list(prefix="E"),
+        fpr_out_ref.get_ports_list(prefix="E"),
     )
 
     c.lengths = []
@@ -154,7 +166,5 @@ if __name__ == "__main__":
 
     PDK = get_generic_pdk()
     PDK.activate()
-    # c = free_propagation_region(inputs=2, outputs=4)
-    # print(c.ports.keys())
     c = awg()
     c.show(show_ports=True)

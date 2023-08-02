@@ -54,15 +54,12 @@ placements:
         dy: 20
 """
 
-# import pytest
-
 
 # def test_circular_import_fail():
 #     """Circular dependency should raise an error
 #     FIXME: this should raise an error
 #     """
 #     with pytest.raises(ValueError):
-#         gf.read.from_yaml(yaml_fail)
 
 
 def test_circular_import_pass() -> None:
@@ -70,7 +67,4 @@ def test_circular_import_pass() -> None:
 
 
 if __name__ == "__main__":
-    # c = test_circular_import_pass()
-    # c = test_circular_import_fail()
     c = gf.read.from_yaml(yaml_fail)
-    # c.show(show_ports=True)

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory import Port
 from gdsfactory.component import Component
 from gdsfactory.difftest import difftest
 from gdsfactory.routing.get_bundle import get_bundle
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 
 def test_get_bundle(data_regression: DataRegressionFixture, check: bool = True) -> None:
@@ -36,7 +40,10 @@ def test_get_bundle(data_regression: DataRegressionFixture, check: bool = True) 
 
     c = gf.Component("test_get_bundle")
     routes = get_bundle(
-        top_ports, bot_ports, start_straight_length=5, end_straight_length=10
+        top_ports,
+        bot_ports,
+        start_straight_length=5,
+        end_straight_length=10,
     )
     lengths = {}
     for i, route in enumerate(routes):
@@ -50,7 +57,10 @@ def test_get_bundle(data_regression: DataRegressionFixture, check: bool = True) 
 
 @pytest.mark.parametrize("config", ["A", "C"])
 def test_connect_corner(
-    config: str, data_regression: DataRegressionFixture, check: bool = True, N=6
+    config: str,
+    data_regression: DataRegressionFixture,
+    check: bool = True,
+    N=6,
 ) -> None:
     d = 10.0
     sep = 5.0
@@ -268,9 +278,12 @@ def test_connect_corner(
 
 
 def test_get_bundle_udirect(
-    data_regression: DataRegressionFixture, check: bool = True, dy=200, angle=270
+    data_regression: DataRegressionFixture,
+    check: bool = True,
+    dy=200,
+    angle=270,
 ) -> None:
-    xs1 = [-100, -90, -80, -55, -35, 24, 0] + [200, 210, 240]
+    xs1 = [-100, -90, -80, -55, -35, 24, 0, 200, 210, 240]
     axis = "X" if angle in [0, 180] else "Y"
 
     pitch = 10.0
@@ -324,7 +337,10 @@ def test_get_bundle_udirect(
 
     c = gf.Component(name="test_get_bundle_udirect")
     routes = get_bundle(
-        ports1, ports2, bend=gf.components.bend_circular, end_straight_length=30
+        ports1,
+        ports2,
+        bend=gf.components.bend_circular,
+        end_straight_length=30,
     )
     lengths = {}
     for i, route in enumerate(routes):
@@ -338,9 +354,12 @@ def test_get_bundle_udirect(
 
 @pytest.mark.parametrize("angle", [0, 90, 180, 270])
 def test_get_bundle_u_indirect(
-    data_regression: DataRegressionFixture, angle: int, check: bool = True, dy=-200
+    data_regression: DataRegressionFixture,
+    angle: int,
+    check: bool = True,
+    dy=-200,
 ) -> None:
-    xs1 = [-100, -90, -80, -55, -35] + [200, 210, 240]
+    xs1 = [-100, -90, -80, -55, -35, 200, 210, 240]
 
     axis = "X" if angle in {0, 180} else "Y"
 
@@ -442,17 +461,10 @@ def test_facing_ports(
 
 
 if __name__ == "__main__":
-    # test_get_bundle(None, check=False)
-    # test_connect_corner(config="A", data_regression=None, check=False)
-    # test_get_bundle_udirect(None, check=False)
-    # test_get_bundle_u_indirect(None, check=False, angle=90)
-    # test_get_bundle_u_indirect(None, angle=0, check=False)
-    # test_facing_ports(None, check=False)
-
     angle = 90
     dy = -200
 
-    xs1 = [-100, -90, -80, -55, -35] + [200, 210, 240]
+    xs1 = [-100, -90, -80, -55, -35, 200, 210, 240]
     axis = "X" if angle in {0, 180} else "Y"
 
     layer = (1, 0)

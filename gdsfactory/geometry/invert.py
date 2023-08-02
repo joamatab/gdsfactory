@@ -1,10 +1,14 @@
 """Based on phidl.geometry."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.geometry.boolean import boolean
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def invert(
     border around the edges.
 
     Args:
+    ----
         elements : Component(/Reference), list of Component(/Reference), or Polygon
             A Component containing the polygons to invert.
         border: Size of the border around the inverted shape (border value is the
@@ -26,7 +31,8 @@ def invert(
         precision: Desired precision for rounding vertex coordinates.
         layer: Specific layer(s) to put polygon geometry on.
 
-    Returns
+    Returns:
+    -------
         D: A Component containing the inverted version of the input shape(s) and the
         corresponding border(s).
 
@@ -52,7 +58,8 @@ def invert(
 
     # Build the rectangle around the Component D
     R = gf.components.rectangle(
-        size=(Temp.xsize + 2 * border, Temp.ysize + 2 * border), centered=True
+        size=(Temp.xsize + 2 * border, Temp.ysize + 2 * border),
+        centered=True,
     ).ref()
     R.center = Temp.center
     return boolean(
@@ -71,7 +78,6 @@ def test_invert() -> None:
 
 
 if __name__ == "__main__":
-    # test_invert()
     e1 = gf.components.ellipse(radii=(6, 6))
     c = invert(e1)
     c.show(show_ports=True)

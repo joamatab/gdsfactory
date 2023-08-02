@@ -2,13 +2,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.text import text
-from gdsfactory.typings import Anchor, ComponentSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Anchor, ComponentSpec, LayerSpec
 
 big_square = partial(rectangle, size=(1300, 2600))
 
@@ -31,6 +34,7 @@ def die_bbox(
     similar to die and bbox.
 
     Args:
+    ----
         component: to frame.
         street_width: Width of the boundary box.
         street_length: length of the boundary box.
@@ -63,7 +67,7 @@ def die_bbox(
             sx - street_width,
             sx - street_length,
             sx - street_length,
-        ]
+        ],
     )
     ypts = np.array(
         [
@@ -73,7 +77,7 @@ def die_bbox(
             sy - street_width,
             sy - street_width,
             sy,
-        ]
+        ],
     )
     D.add_polygon([+xpts, +ypts], layer=layer)
     D.add_polygon([-xpts, +ypts], layer=layer)
@@ -102,6 +106,4 @@ def die_bbox(
 
 if __name__ == "__main__":
     mask = gf.components.array(rows=10, columns=10)
-    # c = die_bbox(component=mask, die_name="chip99")
     c = die_bbox()
-    # c.show(show_ports=True)

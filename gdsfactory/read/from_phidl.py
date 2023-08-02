@@ -2,23 +2,28 @@ from __future__ import annotations
 
 import pathlib
 import tempfile
-from functools import lru_cache
-
-import gdstk
+from functools import cache
+from typing import TYPE_CHECKING
 
 from gdsfactory.component import Component, Port
 from gdsfactory.read.import_gds import import_gds
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    import gdstk
+
+    from gdsfactory.typings import Layer
 
 
-@lru_cache(maxsize=None)
+@cache
 def from_gdstk(cell: gdstk.Cell, **kwargs) -> Component:
     """Returns gdsfactory Component from a gdstk cell.
 
     Args:
+    ----
         cell: gdstk cell.
 
     Keyword Args:
+    ------------
         cellname: cell of the name to import (None) imports top cell.
         snap_to_grid_nm: snap to different nm grid (does not snap if False).
         gdsdir: optional GDS directory.
@@ -34,15 +39,17 @@ def from_gdstk(cell: gdstk.Cell, **kwargs) -> Component:
         return import_gds(filepath, **kwargs)
 
 
-@lru_cache(maxsize=None)
+@cache
 def from_phidl(component, port_layer: Layer = (1, 0), **kwargs) -> Component:
     """Returns gdsfactory Component from a phidl Device or function.
 
     Args:
+    ----
         component: phidl component.
         port_layer: to add to component ports.
 
     Keyword Args:
+    ------------
         cellname: cell of the name to import (None) imports top cell.
         snap_to_grid_nm: snap to different nm grid (does not snap if False).
         gdsdir: optional GDS directory.
@@ -71,7 +78,7 @@ def from_phidl(component, port_layer: Layer = (1, 0), **kwargs) -> Component:
                     orientation=p.orientation,
                     parent=p.parent,
                     layer=port_layer,
-                )
+                ),
             )
     component.lock()
     return component

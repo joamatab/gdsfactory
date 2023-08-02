@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -7,7 +9,9 @@ from gdsfactory.components.array_component import array
 from gdsfactory.components.straight import straight
 from gdsfactory.port import auto_rename_ports
 from gdsfactory.routing.sort_ports import sort_ports_x
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -29,6 +33,7 @@ def array_with_fanout(
     """Returns component array in X axis with west facing waveguides.
 
     Args:
+    ----
         component: to replicate.
         columns: number of components.
         pitch: for waveguides.
@@ -60,7 +65,9 @@ def array_with_fanout(
         ylength = col * waveguide_pitch + start_straight_length
         xlength = col * pitch + end_straight_length
         straight_ref = c << straight(
-            length=ylength, cross_section=cross_section, **kwargs
+            length=ylength,
+            cross_section=cross_section,
+            **kwargs,
         )
         port_s1, port_s2 = straight_ref.get_ports_list()
 
@@ -69,7 +76,9 @@ def array_with_fanout(
         bend_ref = c.add_ref(bend)
         bend_ref.connect(bend_port_name1, straight_ref.ports[port_s1.name])
         straightx_ref = c << straight(
-            length=xlength, cross_section=cross_section, **kwargs
+            length=xlength,
+            cross_section=cross_section,
+            **kwargs,
         )
         straightx_ref.connect(port_s2.name, bend_ref.ports[bend_port_name2])
         c.add_port(f"W_{col}", port=straightx_ref.ports[port_s1.name])
@@ -89,13 +98,15 @@ def array_with_fanout_2d(
     """Returns 2D array with fanout waveguides facing west.
 
     Args:
+    ----
         pitch: 2D pitch.
         pitch_x: defaults to pitch.
         pitch_y: defaults to pitch.
         columns: number of columns.
         rows: number of rows.
 
-    keyword args:
+    Keyword Args:
+    ------------
         component: to replicate.
         pitch: in um.
         waveguide_pitch: for fanout in um.
@@ -128,18 +139,5 @@ if __name__ == "__main__":
 
     PDK = get_generic_pdk()
     PDK.activate()
-    # import gdsfactory as gf
-    # c1 = gf.components.pad()
-    # c2 = array(component=c1, pitch=150, columns=2)
-    # print(c2.ports.keys())
-    # c = array_with_fanout(
-    #     columns=3,
-    #     waveguide_pitch=20,
-    #     bend=gf.components.wire_corner,
-    #     cross_section='metal_routing',
-    #     layer=(2, 0),
-    #     width=10,
-    #     radius=11,
-    # )
     c = array_with_fanout_2d()
     c.show(show_ports=True)

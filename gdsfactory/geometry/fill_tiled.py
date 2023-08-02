@@ -1,15 +1,15 @@
-from typing import Iterable, Optional
+from collections.abc import Iterable
 
 try:
     import kfactory as kf
     from kfactory import KCell, LayerEnum, kcl, kdb
     from kfactory.conf import logger
-except ImportError as e:
+except ImportError:
     print(
         "You can install `pip install gdsfactory[kfactory]` for using maskprep. "
-        "And make sure you use python >= 3.10"
+        "And make sure you use python >= 3.10",
     )
-    raise e
+    raise
 
 
 class FillOperator(kdb.TileOutputReceiver):
@@ -22,7 +22,7 @@ class FillOperator(kdb.TileOutputReceiver):
         row_step: kdb.Vector,
         column_step: kdb.Vector,
         fill_margin: kdb.Vector = kdb.Vector(0, 0),
-        remaining_polygons: Optional[kdb.Region] = None,
+        remaining_polygons: kdb.Region | None = None,
     ) -> None:
         self.kcl = kcl
         self.top_cell = top_cell
@@ -66,7 +66,7 @@ def fill_tiled(
     exclude_layers: Iterable[tuple[LayerEnum | int, int]] = [],
     exclude_regions: Iterable[tuple[kdb.Region, int]] = [],
     n_threads: int = 4,
-    tile_size: Optional[tuple[float, float]] = None,
+    tile_size: tuple[float, float] | None = None,
     x_space: float = 0,
     y_space: float = 0,
 ) -> None:
@@ -115,7 +115,8 @@ def fill_tiled(
             fc_bbox=fill_cell.bbox(),
             row_step=kdb.Vector(fill_cell.bbox().width() + int(x_space / c.kcl.dbu), 0),
             column_step=kdb.Vector(
-                0, fill_cell.bbox().height() + int(y_space / c.kcl.dbu)
+                0,
+                fill_cell.bbox().height() + int(y_space / c.kcl.dbu),
             ),
         ),
     )
@@ -125,7 +126,7 @@ def fill_tiled(
             [
                 layer_name + f".sized({int(size / c.kcl.dbu)})" if size else layer_name
                 for layer_name, (_, size) in zip(exlayer_names, exclude_layers)
-            ]
+            ],
         )
         exregions = " + ".join(
             [
@@ -133,13 +134,13 @@ def fill_tiled(
                 if size
                 else region_name
                 for region_name, (_, size) in zip(exregion_names, exclude_regions)
-            ]
+            ],
         )
         layers = " + ".join(
             [
                 layer_name + f".sized({int(size / c.kcl.dbu)})" if size else layer_name
                 for layer_name, (_, size) in zip(layer_names, fill_layers)
-            ]
+            ],
         )
         regions = " + ".join(
             [
@@ -147,20 +148,16 @@ def fill_tiled(
                 if size
                 else region_name
                 for region_name, (_, size) in zip(region_names, fill_regions)
-            ]
+            ],
         )
 
         if exlayer_names or exregion_names:
             queue_str = (
                 "var fill= "
-                + (
-                    " + ".join([layers, regions])
-                    if regions and layers
-                    else regions + layers
-                )
+                + (f"{layers} + {regions}" if regions and layers else regions + layers)
                 + "; var exclude = "
                 + (
-                    " + ".join([exlayers, exregions])
+                    f"{exlayers} + {exregions}"
                     if exregions and exlayers
                     else exregions + exlayers
                 )
@@ -169,11 +166,7 @@ def fill_tiled(
         else:
             queue_str = (
                 "var fill= "
-                + (
-                    " + ".join([layers, regions])
-                    if regions and layers
-                    else regions + layers
-                )
+                + (f"{layers} + {regions}" if regions and layers else regions + layers)
                 + "; var fill_region = _tile & _frame & fill; _output(to_fill, fill_region)"
             )
         tp.queue(queue_str)
@@ -193,19 +186,18 @@ if __name__ == "__main__":
 
     c = kf.KCell("ToFill")
     c.shapes(kf.kcl.layer(1, 0)).insert(
-        kf.kdb.DPolygon.ellipse(kf.kdb.DBox(5000, 3000), 512)
+        kf.kdb.DPolygon.ellipse(kf.kdb.DBox(5000, 3000), 512),
     )
     c.shapes(kf.kcl.layer(10, 0)).insert(
         kf.kdb.DPolygon(
-            [kf.kdb.DPoint(0, 0), kf.kdb.DPoint(5000, 0), kf.kdb.DPoint(5000, 3000)]
-        )
+            [kf.kdb.DPoint(0, 0), kf.kdb.DPoint(5000, 0), kf.kdb.DPoint(5000, 3000)],
+        ),
     )
 
     fc = kf.KCell("fill")
     fc.shapes(fc.kcl.layer(2, 0)).insert(kf.kdb.DBox(20, 40))
     fc.shapes(fc.kcl.layer(3, 0)).insert(kf.kdb.DBox(30, 15))
 
-    # fill.fill_tiled(c, fc, [(kf.kcl.layer(1,0), 0)], exclude_layers = [(kf.kcl.layer(10,0), 100), (kf.kcl.layer(2,0), 0), (kf.kcl.layer(3,0),0)], x_space=5, y_space=5)
     fill.fill_tiled(
         c,
         fc,

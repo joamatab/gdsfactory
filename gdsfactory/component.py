@@ -16,14 +16,12 @@ from collections import Counter
 from collections.abc import Iterable, Mapping
 from copy import deepcopy
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import gdstk
 import numpy as np
 import shapely
 import yaml
-from omegaconf import DictConfig
-from typing_extensions import Literal
 
 from gdsfactory.component_layout import (
     Label,
@@ -52,6 +50,8 @@ from gdsfactory.serialization import clean_dict
 from gdsfactory.technology import LayerStack, LayerView, LayerViews
 
 if TYPE_CHECKING:
+    from omegaconf import DictConfig
+
     from gdsfactory.typings import (
         Coordinate,
         CrossSectionSpec,
@@ -147,6 +147,7 @@ class Component(_GeometryHelper):
     - can return copy, mirror, flattened (no references)
 
     Args:
+    ----
         name: component_name. Use @cell decorator for auto-naming.
         with_uuid: adds unique identifier.
 
@@ -235,6 +236,7 @@ class Component(_GeometryHelper):
         """Returns shapely Polygon with bounding box.
 
         Args:
+        ----
             default: default padding in um.
             top: north padding in um.
             bottom: south padding in um.
@@ -266,6 +268,7 @@ class Component(_GeometryHelper):
         """Return a list of polygons in this cell.
 
         Args:
+        ----
             by_spec: bool or layer
                 If True, the return value is a dictionary with the
                 polygons of each individual pair (layer, datatype), which
@@ -282,13 +285,15 @@ class Component(_GeometryHelper):
             as_shapely: returns shapely polygons.
             as_shapely_merged: returns a shapely polygonize.
 
-        Returns
+        Returns:
+        -------
             out: list of array-like[N][2] or dictionary
                 List containing the coordinates of the vertices of each
                 polygon, or dictionary with with the list of polygons (if
                 `by_spec` is True).
 
         Note:
+        ----
             Instances of `FlexPath` and `RobustPath` are also included in
             the result by computing their polygonal boundary.
         """
@@ -306,6 +311,7 @@ class Component(_GeometryHelper):
         """Return a list of Components referenced by this Component.
 
         Args:
+        ----
             recursive: If True returns dependencies recursively.
 
         """
@@ -330,7 +336,8 @@ class Component(_GeometryHelper):
         """Access reference ports."""
         if key not in self.ports:
             ports = list(self.ports.keys())
-            raise ValueError(f"{key!r} not in {ports}")
+            msg = f"{key!r} not in {ports}"
+            raise ValueError(msg)
 
         return self.ports[key]
 
@@ -350,22 +357,23 @@ class Component(_GeometryHelper):
         """
         self._locked = True
 
-    def __setitem__(self, key, element):
+    def __setitem__(self, key, element) -> None:
         """Allow adding polygons and cell references.
 
         like D['arc3'] = pg.arc()
 
         Args:
+        ----
             key: Alias name.
             element: Object that will be accessible by alias name.
 
         """
-        if isinstance(element, (ComponentReference, Polygon)):
+        if isinstance(element, ComponentReference | Polygon):
             self.named_references[key] = element
         else:
+            msg = f"Tried to assign alias {key!r} in Component {self.name!r},but failed because the item was not a ComponentReference"
             raise ValueError(
-                f"Tried to assign alias {key!r} in Component {self.name!r},"
-                "but failed because the item was not a ComponentReference"
+                msg,
             )
 
     @classmethod
@@ -382,7 +390,8 @@ class Component(_GeometryHelper):
         """
         MAX_NAME_LENGTH = 99
         assert isinstance(
-            v, Component
+            v,
+            Component,
         ), f"TypeError, Got {type(v)}, expecting Component"
         assert (
             len(v.name) <= MAX_NAME_LENGTH
@@ -406,6 +415,7 @@ class Component(_GeometryHelper):
         """Adds Label to the Component.
 
         Args:
+        ----
             text: Label text.
             position: x-, y-coordinates of the Label location.
             magnification: Magnification factor for the Label text.
@@ -453,7 +463,8 @@ class Component(_GeometryHelper):
         """Returns port by indexing them clockwise."""
         m = map_ports_to_orientation_cw(self.ports, **kwargs)
         if key not in m:
-            raise KeyError(f"{key} not in {list(m.keys())}")
+            msg = f"{key} not in {list(m.keys())}"
+            raise KeyError(msg)
         key2 = m[key]
         return self.ports[key2]
 
@@ -461,7 +472,8 @@ class Component(_GeometryHelper):
         """Returns port by indexing them clockwise."""
         m = map_ports_to_orientation_ccw(self.ports, **kwargs)
         if key not in m:
-            raise KeyError(f"{key} not in {list(m.keys())}")
+            msg = f"{key} not in {list(m.keys())}"
+            raise KeyError(msg)
         key2 = m[key]
         return self.ports[key2]
 
@@ -469,6 +481,7 @@ class Component(_GeometryHelper):
         """Returns xdistance from east to west ports.
 
         Keyword Args:
+        ------------
             layer: port GDS layer.
             prefix: with in port name.
             orientation: in degrees.
@@ -484,6 +497,7 @@ class Component(_GeometryHelper):
         """Returns ydistance from east to west ports.
 
         Keyword Args:
+        ------------
             layer: port GDS layer.
             prefix: with in port name.
             orientation: in degrees.
@@ -496,11 +510,15 @@ class Component(_GeometryHelper):
         return ports_ccw[0].y - ports_cw[0].y
 
     def plot_netlist(
-        self, with_labels: bool = True, font_weight: str = "normal", **kwargs
+        self,
+        with_labels: bool = True,
+        font_weight: str = "normal",
+        **kwargs,
     ):
         """Plots a netlist graph with networkx.
 
         Args:
+        ----
             with_labels: add label to each node.
             font_weight: normal, bold.
             **kwargs: keyword arguments for the get_netlist function
@@ -517,10 +535,10 @@ class Component(_GeometryHelper):
             [
                 (",".join(k.split(",")[:-1]), ",".join(v.split(",")[:-1]))
                 for k, v in connections.items()
-            ]
+            ],
         )
         pos = {k: (v["x"], v["y"]) for k, v in placements.items()}
-        labels = {k: ",".join(k.split(",")[:1]) for k in placements.keys()}
+        labels = {k: ",".join(k.split(",")[:1]) for k in placements}
         nx.draw(
             G,
             with_labels=with_labels,
@@ -531,11 +549,15 @@ class Component(_GeometryHelper):
         return G
 
     def plot_netlist_flat(
-        self, with_labels: bool = True, font_weight: str = "normal", **kwargs
+        self,
+        with_labels: bool = True,
+        font_weight: str = "normal",
+        **kwargs,
     ):
         """Plots a netlist graph with networkx.
 
         Args:
+        ----
             flat: if true, will plot the flat netlist
             with_labels: add label to each node.
             font_weight: normal, bold.
@@ -557,7 +579,7 @@ class Component(_GeometryHelper):
         G = nx.Graph()
         G.add_edges_from(connections_list)
         pos = {k: (v["x"], v["y"]) for k, v in placements.items()}
-        labels = {k: ",".join(k.split(",")[:1]) for k in placements.keys()}
+        labels = {k: ",".join(k.split(",")[:1]) for k in placements}
         nx.draw(
             G,
             with_labels=with_labels,
@@ -592,6 +614,7 @@ class Component(_GeometryHelper):
         """From Component returns instances, connections and placements dict.
 
         Keyword Args:
+        ------------
             component: to extract netlist.
             full_settings: True returns all, false changed settings.
             tolerance: tolerance in nm to consider two ports connected.
@@ -601,6 +624,7 @@ class Component(_GeometryHelper):
                 if True, will return key: [value] pairs with [value] a list of all connected instances.
 
         Returns:
+        -------
             Netlist dict (instances, connections, placements, ports)
                 instances: Dict of instance name and settings.
                 connections: Dict of Instance1Name,portName: Instance2Name,portName.
@@ -616,6 +640,7 @@ class Component(_GeometryHelper):
         """Returns recursive netlist for a component and subcomponents.
 
         Keyword Args:
+        ------------
             component: to extract netlist.
             component_suffix: suffix to append to each component name.
                 useful if to save and reload a back-annotated netlist.
@@ -628,6 +653,7 @@ class Component(_GeometryHelper):
                 if True, will return key: [value] pairs with [value] a list of all connected instances.
 
         Returns:
+        -------
             Dictionary of netlists, keyed by the name of each component.
         """
         from gdsfactory.get_netlist import get_netlist_recursive
@@ -638,6 +664,7 @@ class Component(_GeometryHelper):
         """Returns a netlist where all subinstances are exposed and independently named.
 
         Keyword Args:
+        ------------
             component: to extract netlist.
             component_suffix: suffix to append to each component name.
                 useful if to save and reload a back-annotated netlist.
@@ -650,6 +677,7 @@ class Component(_GeometryHelper):
                 if True, will return key: [value] pairs with [value] a list of all connected instances.
 
         Returns:
+        -------
             Dictionary of netlists, keyed by the name of each component.
         """
         from gdsfactory.get_netlist_flat import get_netlist_flat
@@ -669,11 +697,13 @@ class Component(_GeometryHelper):
         ``uid`` as the original so that they can be traced back to the original if needed.
 
         Args:
+        ----
             depth : int or None
                 If not None, defines from how many reference levels to
                 retrieve Ports from.
 
         Returns:
+        -------
             port_list : list of Port List of all Ports in the Component.
         """
         port_list = [p._copy() for p in self.ports.values()]
@@ -705,6 +735,7 @@ class Component(_GeometryHelper):
         """Returns a dict of ports.
 
         Keyword Args:
+        ------------
             layer: port GDS layer.
             prefix: select ports with prefix in port name.
             suffix: select ports with port name suffix.
@@ -720,6 +751,7 @@ class Component(_GeometryHelper):
         """Returns list of ports.
 
         Keyword Args:
+        ------------
             layer: select ports with GDS layer.
             prefix: select ports with prefix in port name.
             suffix: select ports with port name suffix.
@@ -746,7 +778,8 @@ class Component(_GeometryHelper):
         ]
 
         return pd.DataFrame(
-            [port.to_dict() for port in self.get_ports_list()], columns=col_spec
+            [port.to_dict() for port in self.get_ports_list()],
+            columns=col_spec,
         )
 
     def get_ports_polars(self):
@@ -763,7 +796,8 @@ class Component(_GeometryHelper):
         }
 
         return pl.DataFrame(
-            [port.to_dict() for port in self.get_ports_list()], schema=col_spec
+            [port.to_dict() for port in self.get_ports_list()],
+            schema=col_spec,
         )
 
     def ref(
@@ -777,6 +811,7 @@ class Component(_GeometryHelper):
         """Returns Component reference.
 
         Args:
+        ----
             position: x, y position.
             port_id: name of the port.
             rotation: in degrees.
@@ -787,7 +822,8 @@ class Component(_GeometryHelper):
         _ref = ComponentReference(self)
 
         if port_id and port_id not in self.ports:
-            raise ValueError(f"port {port_id} not in {self.ports.keys()}")
+            msg = f"port {port_id} not in {self.ports.keys()}"
+            raise ValueError(msg)
 
         origin = self.ports[port_id].center if port_id else (0, 0)
         if h_mirror:
@@ -896,6 +932,7 @@ class Component(_GeometryHelper):
         with a new name add_port(port = existing_port, name = new_name)
 
         Args:
+        ----
             name: port name.
             center: x, y.
             width: in um.
@@ -912,7 +949,8 @@ class Component(_GeometryHelper):
 
         if port:
             if not isinstance(port, Port):
-                raise ValueError(f"add_port() needs a Port, got {type(port)}")
+                msg = f"add_port() needs a Port, got {type(port)}"
+                raise ValueError(msg)
             p = port.copy()
             if name is not None:
                 p.name = name
@@ -933,7 +971,8 @@ class Component(_GeometryHelper):
             p.parent = self
             name = p.name
         elif center is None:
-            raise ValueError("Port needs center parameter (x, y) um.")
+            msg = "Port needs center parameter (x, y) um."
+            raise ValueError(msg)
 
         else:
             p = Port(
@@ -951,7 +990,8 @@ class Component(_GeometryHelper):
         if name is not None:
             p.name = name
         if p.name in self.ports:
-            raise ValueError(f"add_port() Port name {p.name!r} exists in {self.name!r}")
+            msg = f"add_port() Port name {p.name!r} exists in {self.name!r}"
+            raise ValueError(msg)
 
         self.ports[p.name] = p
         return p
@@ -968,6 +1008,7 @@ class Component(_GeometryHelper):
         you can include a prefix to add to the new port names to avoid name conflicts.
 
         Args:
+        ----
             ports: list or dict of ports.
             prefix: to prepend to each port name.
             suffix: to append to each port name.
@@ -991,6 +1032,7 @@ class Component(_GeometryHelper):
         """Remove a list of layers and returns the same Component.
 
         Args:
+        ----
             layers: list of layers to remove.
             include_labels: remove labels on those layers.
             invert_selection: removes all layers except layers specified.
@@ -1019,11 +1061,10 @@ class Component(_GeometryHelper):
         from gdsfactory.pdk import get_layer
 
         if type(layers) not in (list, tuple):
-            raise ValueError(f"layers {layers!r} needs to be a list or tuple")
+            msg = f"layers {layers!r} needs to be a list or tuple"
+            raise ValueError(msg)
 
         layers = [get_layer(layer) for layer in layers]
-        # component = self.copy()
-        # component._cell.filter(spec=layers, remove=False)
 
         component = Component()
         poly_dict = self.get_polygons(by_spec=True, include_paths=False)
@@ -1041,11 +1082,14 @@ class Component(_GeometryHelper):
         return component
 
     def add_polygon(
-        self, points, layer: str | int | tuple[int, int] | np.nan = np.nan
+        self,
+        points,
+        layer: str | int | tuple[int, int] | np.nan = np.nan,
     ) -> Polygon:
         """Adds a Polygon to the Component.
 
         Args:
+        ----
             points: Coordinates of the vertices of the Polygon.
             layer: layer spec to add polygon on.
         """
@@ -1124,7 +1168,8 @@ class Component(_GeometryHelper):
             self._add_polygons(*polygons)
             return polygons
         else:
-            raise ValueError(f"Unable to add {points.ndim}-dimensional points object")
+            msg = f"Unable to add {points.ndim}-dimensional points object"
+            raise ValueError(msg)
 
     def _add_polygons(self, *polygons: list[Polygon]) -> None:
         self.is_unlocked()
@@ -1145,9 +1190,10 @@ class Component(_GeometryHelper):
 
         Parent components can access child cells settings.
         """
-        if not isinstance(component, (Component, ComponentReference)):
+        if not isinstance(component, Component | ComponentReference):
+            msg = f"{type(component)}is not a Component or ComponentReference"
             raise ValueError(
-                f"{type(component)}" "is not a Component or ComponentReference"
+                msg,
             )
 
         self._get_child_name = True
@@ -1172,17 +1218,19 @@ class Component(_GeometryHelper):
         if self._locked:
             raise MutabilityError(
                 f"Component {self.name!r} cannot be modified as it's already on cache. "
-                + mutability_error_message
+                + mutability_error_message,
             )
 
     def _add(self, element) -> None:
         """Add a new element or list of elements to this Component.
 
         Args:
+        ----
             element: Polygon, ComponentReference or iterable
                 The element or iterable of elements to be inserted in this cell.
 
         Raises:
+        ------
             MutabilityError: if component is locked.
         """
         self.is_unlocked()
@@ -1196,10 +1244,12 @@ class Component(_GeometryHelper):
         """Add a new element or list of elements to this Component.
 
         Args:
+        ----
             element: Polygon, ComponentReference or iterable
                 The element or iterable of elements to be inserted in this cell.
 
         Raises:
+        ------
             MutabilityError: if component is locked.
         """
         if isinstance(element, ComponentReference):
@@ -1222,6 +1272,7 @@ class Component(_GeometryHelper):
         """Creates a ComponentReference reference to a Component.
 
         Args:
+        ----
             component: The referenced component.
             columns: Number of columns in the array.
             rows: Number of rows in the array.
@@ -1229,11 +1280,13 @@ class Component(_GeometryHelper):
                 Distance between adjacent columns and adjacent rows.
             alias: str or None. Alias of the referenced Component.
 
-        Returns
+        Returns:
+        -------
             a: ComponentReference containing references to the Component.
         """
         if not isinstance(component, Component):
-            raise TypeError("add_array() needs a Component object.")
+            msg = "add_array() needs a Component object."
+            raise TypeError(msg)
         ref = ComponentReference(
             component=component,
             columns=int(round(columns)),
@@ -1246,11 +1299,17 @@ class Component(_GeometryHelper):
         return ref
 
     def distribute(
-        self, elements="all", direction="x", spacing=100, separation=True, edge="center"
+        self,
+        elements="all",
+        direction="x",
+        spacing=100,
+        separation=True,
+        edge="center",
     ):
         """Distributes the specified elements in the Component.
 
         Args:
+        ----
             elements : array-like of objects or 'all'
                 Elements to distribute.
             direction : {'x', 'y'}
@@ -1281,6 +1340,7 @@ class Component(_GeometryHelper):
         """Align elements in the Component.
 
         Args:
+        ----
             elements : array-like of objects, or 'all'
                 Elements in the Component to align.
             alignment : {'x', 'y', 'xmin', 'xmax', 'ymin', 'ymax'}
@@ -1301,6 +1361,7 @@ class Component(_GeometryHelper):
         If single_layer is specified, all polygons are moved to that layer.
 
         Args:
+        ----
             single_layer: move all polygons are moved to the specified (optional).
         """
         component_flat = Component()
@@ -1330,6 +1391,7 @@ class Component(_GeometryHelper):
         Transformed reference keeps the original name.
 
         Args:
+        ----
             ref: the reference to flatten into a new cell.
 
         """
@@ -1340,15 +1402,20 @@ class Component(_GeometryHelper):
         self.add_ref(new_component, alias=ref.name)
 
     def add_ref(
-        self, component: Component, alias: str | None = None, **kwargs
+        self,
+        component: Component,
+        alias: str | None = None,
+        **kwargs,
     ) -> ComponentReference:
         """Add ComponentReference to the current Component.
 
         Args:
+        ----
             component: Component.
             alias: named_references.
 
         Keyword Args:
+        ------------
             columns: Number of columns in the array.
             rows: Number of rows in the array.
             spacing: Distances between adjacent columns and adjacent rows.
@@ -1366,14 +1433,17 @@ class Component(_GeometryHelper):
 
         """
         if not isinstance(component, Component):
-            raise TypeError(f"type = {type(Component)} needs to be a Component.")
+            msg = f"type = {type(Component)} needs to be a Component."
+            raise TypeError(msg)
         ref = ComponentReference(component, **kwargs)
         self._add(ref)
         self._register_reference(reference=ref, alias=alias)
         return ref
 
     def _register_reference(
-        self, reference: ComponentReference, alias: str | None = None
+        self,
+        reference: ComponentReference,
+        alias: str | None = None,
     ) -> None:
         component = reference.parent
         reference.owner = self
@@ -1453,7 +1523,9 @@ class Component(_GeometryHelper):
         component = self.copy()
         component.name = self.name
         add_pins_triangle(
-            component=component, layer=port_marker_layer, layer_label=layer_label
+            component=component,
+            layer=port_marker_layer,
+            layer_label=layer_label,
         )
         return component
 
@@ -1465,6 +1537,7 @@ class Component(_GeometryHelper):
         """Returns ipython widget for klayout visualization.
 
         Args:
+        ----
             show_ports: shows component with port markers and labels.
             port_marker_layer: for the ports.
         """
@@ -1477,7 +1550,7 @@ class Component(_GeometryHelper):
             from gplugins.widget.interactive import LayoutWidget
         except ImportError:
             print(
-                "You need install kfactory plugin with `pip install gdsfactory[kfactory]`"
+                "You need install kfactory plugin with `pip install gdsfactory[kfactory]`",
             )
             self.plot_klayout()
             return
@@ -1495,8 +1568,6 @@ class Component(_GeometryHelper):
         kcl.read(gdspath)
         top_cell = kcl.top_cell()
         c = kcl.dup()[top_cell.name]
-        # c = kf.KCell(top_cell.name, all)
-        # c.copy_tree(top_cell)
 
         layer_views = get_layer_views()
         layer_views.to_lyp(filepath=lyp_path)
@@ -1515,11 +1586,11 @@ class Component(_GeometryHelper):
         If it fails to import klayout defaults to matplotlib.
 
         Args:
+        ----
             show_ports: shows component with port markers and labels.
             port_marker_layer: for the ports.
             show_labels: shows labels.
         """
-
         component = (
             self.add_pins_triangle(port_marker_layer=port_marker_layer)
             if show_ports
@@ -1527,10 +1598,12 @@ class Component(_GeometryHelper):
         )
 
         try:
-            import klayout.db as db  # noqa: F401
-            import klayout.lay as lay
             from IPython.display import display
             from ipywidgets import Image
+            from klayout import (
+                db,  # noqa: F401
+                lay,
+            )
 
             from gdsfactory.pdk import get_layer_views
 
@@ -1603,6 +1676,7 @@ class Component(_GeometryHelper):
         """Plot component using matplotlib.
 
         Keyword Args:
+        ------------
             show_ports: Sets whether ports are drawn.
             show_subports: Sets whether subports (ports that belong to references) are drawn.
             label_aliases: Sets whether aliases are labeled with a text name.
@@ -1628,36 +1702,38 @@ class Component(_GeometryHelper):
         We recommend using klayout.
 
         Args:
+        ----
             plotter: plot backend ('matplotlib', 'widget', 'klayout', 'kweb').
         """
         plotter = plotter or CONF.display_type
 
         if plotter not in valid_plotters:
-            raise ValueError(f"{plotter!r} not in {valid_plotters}")
+            msg = f"{plotter!r} not in {valid_plotters}"
+            raise ValueError(msg)
 
         if plotter == "klayout":
             self.plot_klayout()
-            return
+            return None
         elif plotter == "kweb":
             return self.plot_kweb()
         elif plotter == "widget":
             self.plot_widget()
-            return
+            return None
 
         elif plotter == "matplotlib":
             from gdsfactory.quickplotter import quickplot
 
             quickplot(self, **kwargs)
-            return
+            return None
 
         elif plotter == "holoviews":
             try:
                 import holoviews as hv
 
                 hv.extension("bokeh")
-            except ImportError as e:
+            except ImportError:
                 print("you need to `pip install holoviews`")
-                raise e
+                raise
             return self.plot_holoviews(**kwargs)
 
         elif plotter == "qt":
@@ -1669,7 +1745,8 @@ class Component(_GeometryHelper):
             from gdsfactory.quickplotter import quickplot2
 
             quickplot2(self)
-            return
+            return None
+        return None
 
     def plot_holoviews(
         self,
@@ -1681,12 +1758,14 @@ class Component(_GeometryHelper):
         """Plot component in holoviews.
 
         Args:
+        ----
             layers_excluded: list of layers to exclude.
             layer_views: layer_views colors loaded from Klayout.
             min_aspect: minimum aspect ratio.
             padding: around bounding box.
 
         Returns:
+        -------
             Holoviews Overlay to display all polygons.
         """
         from gdsfactory.add_pins import get_pin_triangle_polygon_tip
@@ -1705,12 +1784,12 @@ class Component(_GeometryHelper):
             import holoviews as hv
 
             hv.extension("bokeh")
-        except ImportError as e:
+        except ImportError:
             print("you need to `pip install holoviews`")
-            raise e
+            raise
 
         self._bb_valid = False  # recompute the bounding box
-        b = self.bbox + ((-padding, -padding), (padding, padding))
+        b = (*self.bbox, (-padding, -padding), (padding, padding))
         b = np.array(b.flat)
         center = np.array((np.sum(b[::2]) / 2, np.sum(b[1::2]) / 2))
         size = np.array((np.abs(b[2] - b[0]), np.abs(b[3] - b[1])))
@@ -1718,7 +1797,7 @@ class Component(_GeometryHelper):
             (
                 np.maximum(min_aspect * size[1], size[0]) / 2,
                 np.maximum(size[1], min_aspect * size[0]) / 2,
-            )
+            ),
         )
         b = np.hstack((center - dx, center + dx))
 
@@ -1747,7 +1826,7 @@ class Component(_GeometryHelper):
                     fill_alpha=layer_view.get_alpha() or "",
                     line_alpha=layer_view.get_alpha() or "",
                     tools=["hover"],
-                )
+                ),
             )
         for name, port in self.ports.items():
             name = str(name)
@@ -1764,11 +1843,14 @@ class Component(_GeometryHelper):
                     line_alpha=layer_view.get_alpha() or "",
                     tools=["hover"],
                 )
-                * hv.Text(ptip[0], ptip[1], name)
+                * hv.Text(ptip[0], ptip[1], name),
             )
 
         return hv.Overlay(plots_to_overlay).opts(
-            show_legend=True, shared_axes=False, ylim=(b[1], b[3]), xlim=(b[0], b[2])
+            show_legend=True,
+            shared_axes=False,
+            ylim=(b[1], b[3]),
+            xlim=(b[0], b[2]),
         )
 
     def show(
@@ -1785,11 +1867,13 @@ class Component(_GeometryHelper):
         the ports from the references (show_subports=True)
 
         Args:
+        ----
             show_ports: shows component with port markers and labels.
             show_subports: add ports markers and labels to references.
             port_marker_layer: for the ports.
 
         Keyword Args:
+        ------------
             gdspath: GDS file path to write to.
             gdsdir: directory for the GDS file. Defaults to /tmp/.
             unit: unit size for objects in library. 1um by default.
@@ -1801,7 +1885,8 @@ class Component(_GeometryHelper):
 
         component = (
             self.add_pins_triangle(
-                port_marker_layer=port_marker_layer, layer_label=port_marker_layer
+                port_marker_layer=port_marker_layer,
+                layer_label=port_marker_layer,
             )
             if show_ports
             else self
@@ -1834,6 +1919,7 @@ class Component(_GeometryHelper):
         """Write component to GDS or OASIS and returns gdspath.
 
         Args:
+        ----
             gdspath: GDS file path to write to.
             gdsdir: directory for the GDS file. Defaults to /tmp/randomFile/gdsfactory.
             timestamp: Defaults to 2019-10-25 for consistent hash.
@@ -1843,6 +1929,7 @@ class Component(_GeometryHelper):
             with_metadata: writes metadata in YAML format.
 
         Keyword Args:
+        ------------
             Keyword arguments will override the active PDK's default GdsWriteSettings and OasisWriteSettings.
 
             Gds settings:
@@ -1866,7 +1953,6 @@ class Component(_GeometryHelper):
                 standard_properties: Store standard OASIS properties in the file.
 
         """
-
         from gdsfactory.pdk import get_active_pdk
 
         if gdspath and gdsdir:
@@ -1893,7 +1979,8 @@ class Component(_GeometryHelper):
         oasis_settings = default_oasis_settings.copy(update=explicit_oas_settings)
 
         _check_uncached_components(
-            component=self, mode=write_settings.on_uncached_component
+            component=self,
+            mode=write_settings.on_uncached_component,
         )
 
         if write_settings.flatten_invalid_refs:
@@ -1920,8 +2007,9 @@ class Component(_GeometryHelper):
                 cell_names.remove(cell_name)
 
             if write_settings.on_duplicate_cell == "error":
+                msg = f"Duplicated cell names in {top_cell.name!r}: {cell_names!r}"
                 raise ValueError(
-                    f"Duplicated cell names in {top_cell.name!r}: {cell_names!r}"
+                    msg,
                 )
             elif write_settings.on_duplicate_cell in {"warn", "overwrite"}:
                 if write_settings.on_duplicate_cell == "warn":
@@ -1932,11 +2020,12 @@ class Component(_GeometryHelper):
                 cells_dict = {cell.name: cell._cell for cell in cells}
                 cells = cells_dict.values()
             elif write_settings.on_duplicate_cell is not None:
+                msg = f"on_duplicate_cell: {write_settings.on_duplicate_cell!r} not in (None, warn, error, overwrite)"
                 raise ValueError(
-                    f"on_duplicate_cell: {write_settings.on_duplicate_cell!r} not in (None, warn, error, overwrite)"
+                    msg,
                 )
 
-        all_cells = [top_cell._cell] + sorted(cells, key=lambda cc: cc.name)
+        all_cells = [top_cell._cell, *sorted(cells, key=lambda cc: cc.name)]
 
         no_name_cells = [
             cell.name for cell in all_cells if cell.name.startswith("Unnamed")
@@ -1949,7 +2038,6 @@ class Component(_GeometryHelper):
             )
 
         # for cell in all_cells:
-        #     print(cell.name, type(cell))
 
         lib = gdstk.Library(
             name=write_settings.lib_name,
@@ -1963,7 +2051,9 @@ class Component(_GeometryHelper):
             lib.write_oas(gdspath, **oasis_settings.dict())
         else:
             lib.write_gds(
-                gdspath, timestamp=timestamp, max_points=write_settings.max_points
+                gdspath,
+                timestamp=timestamp,
+                max_points=write_settings.max_points,
             )
         if logging:
             logger.info(f"Wrote to {str(gdspath)!r}")
@@ -1984,10 +2074,12 @@ class Component(_GeometryHelper):
         """Write component to GDS and returns gdspath.
 
         Args:
+        ----
             gdspath: GDS file path to write to.
             gdsdir: directory for the GDS file. Defaults to /tmp/randomFile/gdsfactory.
 
         Keyword Args:
+        ------------
             unit: unit size for objects in library. 1um by default.
             precision: for dimensions in the library (m). 1nm by default.
             logging: disable GDS path logging, for example for showing it in KLayout.
@@ -2001,9 +2093,11 @@ class Component(_GeometryHelper):
                 Polygons with more vertices that this are automatically fractured.
             with_metadata: writes metadata in YAML format.
         """
-
         return self._write_library(
-            gdspath=gdspath, gdsdir=gdsdir, with_oasis=False, **kwargs
+            gdspath=gdspath,
+            gdsdir=gdsdir,
+            with_oasis=False,
+            **kwargs,
         )
 
     def write_oas(
@@ -2015,10 +2109,12 @@ class Component(_GeometryHelper):
         """Write component to GDS and returns gdspath.
 
         Args:
+        ----
             gdspath: GDS file path to write to.
             gdsdir: directory for the GDS file. Defaults to /tmp/randomFile/gdsfactory.
 
         Keyword Args:
+        ------------
             unit: unit size for objects in library. 1um by default.
             precision: for dimensions in the library (m). 1nm by default.
             logging: disable GDS path logging, for example for showing it in KLayout.
@@ -2035,7 +2131,7 @@ class Component(_GeometryHelper):
             detect_trapezoids: Store trapezoids in compressed format.
             circle_tolerance: Tolerance for detecting circles. If less or equal to 0, no detection is performed.
                 Circles are stored in compressed format.
-            validation ("crc32", "checksum32", None) – type of validation to include in the saved file.
+            validation ("crc32", "checksum32", None) - type of validation to include in the saved file.
             standard_properties: Store standard OASIS properties in the file.
         """
         return self._write_library(
@@ -2068,6 +2164,7 @@ class Component(_GeometryHelper):
         """Returns Dict representation of a component.
 
         Args:
+        ----
             ignore_components_prefix: for components to ignore when exporting.
             ignore_functions_prefix: for functions to ignore when exporting.
             with_cells: write cells recursively.
@@ -2094,6 +2191,7 @@ class Component(_GeometryHelper):
         """Write Dict representation of a component in YAML format.
 
         Args:
+        ----
             ignore_components_prefix: for components to ignore when exporting.
             ignore_functions_prefix: for functions to ignore when exporting.
             with_cells: write cells recursively.
@@ -2105,6 +2203,7 @@ class Component(_GeometryHelper):
         """Rename ports by orientation NSEW (north, south, east, west).
 
         Keyword Args:
+        ------------
             function: to rename ports.
             select_ports_optical: to select optical ports.
             select_ports_electrical: to select electrical ports.
@@ -2136,6 +2235,7 @@ class Component(_GeometryHelper):
         """Rename ports by orientation NSEW (north, south, east, west).
 
         Keyword Args:
+        ------------
             function: to rename ports.
             select_ports_optical: to select ports.
             select_ports_electrical:
@@ -2166,6 +2266,7 @@ class Component(_GeometryHelper):
         component.
 
         Args:
+        ----
             origin: of component.
             destination: x, y.
             axis: x or y.
@@ -2176,6 +2277,7 @@ class Component(_GeometryHelper):
         """Returns new Component with a mirrored reference.
 
         Args:
+        ----
             p1: first point to define mirror axis.
             p2: second point to define mirror axis.
         """
@@ -2187,6 +2289,7 @@ class Component(_GeometryHelper):
         """Returns new component with a rotated reference to the original.
 
         Args:
+        ----
             angle: in degrees.
         """
         from gdsfactory.functions import rotate
@@ -2197,6 +2300,7 @@ class Component(_GeometryHelper):
         """Returns same component with padding.
 
         Keyword Args:
+        ------------
             component: for padding.
             layers: list of layers.
             suffix for name.
@@ -2216,14 +2320,18 @@ class Component(_GeometryHelper):
         Destroys the reference in the process but keeping the polygon geometry.
 
         Args:
+        ----
             reference: ComponentReference to be absorbed into the Component.
         """
         if reference not in self.references:
+            msg = "The reference you asked to absorb does not exist in this Component."
             raise ValueError(
-                "The reference you asked to absorb does not exist in this Component."
+                msg,
             )
         ref_polygons = reference.get_polygons(
-            by_spec=False, include_paths=False, as_array=False
+            by_spec=False,
+            include_paths=False,
+            as_array=False,
         )
         self._add_polygons(*ref_polygons)
 
@@ -2237,6 +2345,7 @@ class Component(_GeometryHelper):
         CellReferences, ComponentReferences and Labels.
 
         Args:
+        ----
             items: list of Items to be removed from the Component.
         """
         if not hasattr(items, "__iter__"):
@@ -2266,6 +2375,7 @@ class Component(_GeometryHelper):
         the polygons.  Similarly, the layers are sorted by (layer, datatype).
 
         Args:
+        ----
             precision: Rounding precision for the the objects in the Component.
                 For instance, a precision of 1e-2 will round a point at
                 (0.124, 1.748) to (0.12, 1.75).
@@ -2288,11 +2398,15 @@ class Component(_GeometryHelper):
         return final_hash.hexdigest()
 
     def get_labels(
-        self, apply_repetitions=True, depth: int | None = None, layer=None
+        self,
+        apply_repetitions=True,
+        depth: int | None = None,
+        layer=None,
     ) -> list[Label]:
         """Return labels.
 
         Args:
+        ----
             apply_repetitions:.
             depth: None returns all labels and 0 top level.
             layer: layerspec.
@@ -2319,11 +2433,13 @@ class Component(_GeometryHelper):
         """Gathers the .info dictionaries from every sub-Component and returns them in a list.
 
         Args:
+        ----
             depth: int or None
                 If not None, defines from how many reference levels to
                 retrieve Ports from.
 
         Returns:
+        -------
             list of dictionaries
                 List of the ".info" property dictionaries from all sub-Components
         """
@@ -2331,11 +2447,15 @@ class Component(_GeometryHelper):
         return [D.info.copy() for D in D_list]
 
     def remap_layers(
-        self, layermap, include_labels: bool = True, include_paths: bool = True
+        self,
+        layermap,
+        include_labels: bool = True,
+        include_paths: bool = True,
     ) -> Component:
         """Returns a copy of the component with remapped layers.
 
         Args:
+        ----
             layermap: Dictionary of values in format {layer_from : layer_to}.
             include_labels: Selects whether to move Labels along with polygons.
             include_paths: Selects whether to move Paths along with polygons.
@@ -2367,7 +2487,7 @@ class Component(_GeometryHelper):
                     new_datatypes = list(path.datatypes)
                     for layer_number in range(len(new_layers)):
                         original_layer = _parse_layer(
-                            (new_layers[layer_number], new_datatypes[layer_number])
+                            (new_layers[layer_number], new_datatypes[layer_number]),
                         )
                         if original_layer in layermap:
                             new_layer = layermap[original_layer]
@@ -2386,6 +2506,7 @@ class Component(_GeometryHelper):
         """Return Component 3D trimesh Scene.
 
         Args:
+        ----
             component: to extrude in 3D.
             layer_views: layer colors from Klayout Layer Properties file.
                 Defaults to active PDK.layer_views.
@@ -2413,6 +2534,7 @@ class Component(_GeometryHelper):
         """Returns a pixelated numpy array from Component polygons.
 
         Args:
+        ----
             component: Component.
             nm_per_pixel: you can go from 20 (coarse) to 4 (fine).
             layers: to convert. Order matters (latter overwrite former).
@@ -2439,6 +2561,7 @@ class Component(_GeometryHelper):
         """Write a Component to STL for 3D printing.
 
         Args:
+        ----
             filepath: to write STL to.
             layer_stack: contains thickness and zmin for each layer.
             exclude_layers: layers to exclude.
@@ -2480,12 +2603,14 @@ class Component(_GeometryHelper):
         """Returns a gmsh msh of the component for finite element simulation.
 
         Arguments:
+        ---------
             type: one of "xy", "uz", or "3D". Determines the type of mesh to return.
             z: used to define z-slice for xy meshing
             xsection_bounds: used to define in-plane line for uz meshing
             wafer_padding: padding beyond bbox to add to WAFER layers.
 
         Keyword Args:
+        ------------
             Arguments for the target meshing function in gplugins.gmsh
         """
         # Add WAFER layer:
@@ -2502,41 +2627,47 @@ class Component(_GeometryHelper):
         padded_component.add_ports(self.get_ports_list())
 
         if layer_stack is None:
+            msg = 'A LayerStack must be provided through argument "layer_stack".'
             raise ValueError(
-                'A LayerStack must be provided through argument "layer_stack".'
+                msg,
             )
         if type == "xy":
             if z is None:
+                msg = 'For xy-meshing, a z-value must be provided via the float argument "z".'
                 raise ValueError(
-                    'For xy-meshing, a z-value must be provided via the float argument "z".'
+                    msg,
                 )
             from gplugins.gmsh.xy_xsection_mesh import xy_xsection_mesh
 
             return xy_xsection_mesh(padded_component, z, layer_stack, **kwargs)
         elif type == "uz":
             if xsection_bounds is None:
+                msg = "For uz-meshing, you must provide a line in the xy-plane via the Tuple argument [[x1,y1], [x2,y2]] xsection_bounds."
                 raise ValueError(
-                    "For uz-meshing, you must provide a line in the xy-plane "
-                    "via the Tuple argument [[x1,y1], [x2,y2]] xsection_bounds."
+                    msg,
                 )
             from gplugins.gmsh.uz_xsection_mesh import uz_xsection_mesh
 
             return uz_xsection_mesh(
-                padded_component, xsection_bounds, layer_stack, **kwargs
+                padded_component,
+                xsection_bounds,
+                layer_stack,
+                **kwargs,
             )
         elif type == "3D":
             spec = importlib.util.find_spec("meshwell")
             if spec is None:
                 print(
-                    "3D meshing requires meshwell, see https://github.com/simbilod/meshwell or run pip install meshwell."
+                    "3D meshing requires meshwell, see https://github.com/simbilod/meshwell or run pip install meshwell.",
                 )
 
             from gplugins.gmsh.xyz_mesh import xyz_mesh
 
             return xyz_mesh(padded_component, layer_stack, **kwargs)
         else:
+            msg = 'Required argument "type" must be one of "xy", "uz", or "3D".'
             raise ValueError(
-                'Required argument "type" must be one of "xy", "uz", or "3D".'
+                msg,
             )
 
     def offset(
@@ -2552,6 +2683,7 @@ class Component(_GeometryHelper):
         """Returns new Component with polygons eroded or dilated by an offset.
 
         Args:
+        ----
             distance: Distance to offset polygons. Positive values expand, negative shrink.
             precision: Desired precision for rounding vertex coordinates.
             join: {'miter', 'bevel', 'round'} Type of join used to create polygon offset
@@ -2594,11 +2726,11 @@ def copy(
     """Returns a Component copy.
 
     Args:
+    ----
         D: component to copy.
     """
     D_copy = Component()
     D_copy.info = D.info
-    # D_copy._cell = D._cell.copy(name=D_copy.name)
 
     for ref in references if references is not None else D.references:
         D_copy.add(copy_reference(ref))
@@ -2665,7 +2797,6 @@ def test_get_layers() -> None:
         add_bbox=None,
     )
     assert c1.get_layers() == {(2, 0), (111, 0)}, c1.get_layers()
-    # return c1
     c2 = c1.remove_layers([(111, 0)])
     assert c2.get_layers() == {(2, 0)}, c2.get_layers()
 
@@ -2674,7 +2805,9 @@ def _filter_polys(polygons, layers_excl):
     return [
         polygon
         for polygon, layer, datatype in zip(
-            polygons.polygons, polygons.layers, polygons.datatypes
+            polygons.polygons,
+            polygons.layers,
+            polygons.datatypes,
         )
         if (layer, datatype) not in layers_excl
     ]
@@ -2688,6 +2821,7 @@ def recurse_structures(
     """Recurse component and components references recursively.
 
     Args:
+    ----
         component: component to recurse.
         ignore_components_prefix: list of prefix to ignore.
         ignore_functions_prefix: list of prefix to ignore.
@@ -2729,6 +2863,7 @@ def flatten_invalid_refs_recursive(
     should not be mixed with other cells, or you will likely experience issues with duplicate cells
 
     Args:
+    ----
         component: the component to fix (in place).
         grid_size: the GDS grid size, in um, defaults to active PDK.get_grid_size()
             any translations with higher resolution than this are considered invalid.
@@ -2786,8 +2921,9 @@ def _check_uncached_components(component, mode):
     if mode == "ignore":
         return
     elif mode not in valid_modes:
+        msg = f"{mode} is not a valid value for on_uncached_component. Try one of these: {valid_modes}."
         raise ValueError(
-            f"{mode} is not a valid value for on_uncached_component. Try one of these: {valid_modes}."
+            msg,
         )
 
     for sub_component in component.get_dependencies(recursive=True):
@@ -2826,7 +2962,6 @@ def test_netlist_simple() -> None:
     c.add_port("o1", port=c1.ports["o1"])
     c.add_port("o2", port=c2.ports["o2"])
     netlist = c.get_netlist()
-    # print(netlist.pretty())
     assert len(netlist["instances"]) == 2
 
 
@@ -2850,7 +2985,6 @@ def test_netlist_complex() -> None:
 
     c = gf.components.mzi_arms()
     netlist = c.get_netlist()
-    # print(netlist.pretty())
     assert len(netlist["instances"]) == 4, len(netlist["instances"])
 
 
@@ -2916,10 +3050,4 @@ if __name__ == "__main__":
     c = gf.c.mzi()
     c.pprint_ports()
 
-    # c = gf.Component()
-    # p = c.add_polygon(
-    #     [(-8, 6, 7, 9), (-6, 8, 17, 5)], layer=(1, 0)
     # )  # GDS layers are tuples of ints (but if we use only one number it assumes the other number is 0)
-    # c.write_gds("hi.gds")
-    # c.show()
-    # print(CONF.last_saved_files)

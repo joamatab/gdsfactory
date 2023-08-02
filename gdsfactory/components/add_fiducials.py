@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.pad import pad_array
-from gdsfactory.typings import ComponentSpec, Coordinates, Float2, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Coordinates, Float2, Optional
 
 
 @cell
@@ -13,14 +17,15 @@ def add_fiducials(
     gap: float = 50,
     left: Optional[ComponentSpec] = "cross",
     right: Optional[ComponentSpec] = "cross",
-    top: Optional[ComponentSpec] = None,
-    bottom: Optional[ComponentSpec] = None,
+    top: Optional[ComponentSpec] | None = None,
+    bottom: Optional[ComponentSpec] | None = None,
     offset: Float2 = (0, 0),
     **kwargs,
 ) -> Component:
     """Return component with fiducials.
 
     Args:
+    ----
         component: component to add to the new component.
         gap: from component to fiducial edge.
         left: optional left fiducial.
@@ -69,6 +74,7 @@ def add_fiducials_offsets(
     """Returns new component with fiducials from a list of offsets.
 
     Args:
+    ----
         component: add reference to component to the new Component.
         fiducial: function to return fiducial.
         offsets: list of offsets.
@@ -92,6 +98,5 @@ if __name__ == "__main__":
 
     PDK = get_generic_pdk()
     PDK.activate()
-    # c = add_fiducials(top='cross')
     c = add_fiducials_offsets()
     c.show(show_ports=True)

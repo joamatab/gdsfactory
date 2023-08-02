@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
-from gdsfactory.typings import ComponentSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, LayerSpec
 
 
 @cell
@@ -19,6 +23,7 @@ def align_wafer(
     """Returns cross inside a frame to align wafer.
 
     Args:
+    ----
         width: in um.
         spacing: in um.
         cross_length: for the cross.
@@ -80,6 +85,7 @@ def add_frame(
     """Returns component with a frame around it.
 
     Args:
+    ----
         component: Component to frame.
         width: of the frame.
         spacing: of component to frame.
@@ -118,7 +124,5 @@ if __name__ == "__main__":
 
     PDK = get_generic_pdk()
     PDK.activate()
-    # c = gf.components.straight()
-    # c = add_frame(component=c)
     c = align_wafer()
     c.show(show_ports=True)

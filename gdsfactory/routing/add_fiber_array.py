@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -11,12 +11,16 @@ from gdsfactory.port import select_ports_optical
 from gdsfactory.routing.get_input_labels import get_input_labels_dash
 from gdsfactory.routing.route_fiber_array import route_fiber_array
 from gdsfactory.routing.sort_ports import sort_ports_x
-from gdsfactory.typings import (
-    ComponentSpec,
-    ComponentSpecOrList,
-    CrossSectionSpec,
-    LayerSpec,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import (
+        ComponentSpec,
+        ComponentSpecOrList,
+        CrossSectionSpec,
+        LayerSpec,
+    )
 
 
 @gf.cell
@@ -37,6 +41,7 @@ def add_fiber_array(
     You can also use pads or other terminations instead of grating couplers.
 
     Args:
+    ----
         component: component spec to connect to grating couplers.
         grating_coupler: spec for route terminations.
         gc_port_name: grating coupler input port name.
@@ -48,6 +53,7 @@ def add_fiber_array(
         layer_label: optional layer for grating coupler label.
 
     Keyword Args:
+    ------------
         bend: bend spec.
         straight: straight spec.
         taper: taper spec.
@@ -87,15 +93,13 @@ def add_fiber_array(
     get_input_labels_function = None if gc_port_labels else get_input_labels_function
     component = gf.get_component(component)
 
-    if isinstance(grating_coupler, list):
-        gc = grating_coupler[0]
-    else:
-        gc = grating_coupler
+    gc = grating_coupler[0] if isinstance(grating_coupler, list) else grating_coupler
     gc = gf.get_component(gc)
 
     if gc_port_name not in gc.ports:
         gc_ports = list(gc.ports.keys())
-        raise ValueError(f"gc_port_name = {gc_port_name!r} not in {gc_ports}")
+        msg = f"gc_port_name = {gc_port_name!r} not in {gc_ports}"
+        raise ValueError(msg)
 
     orientation = gc.ports[gc_port_name].orientation
 
@@ -106,17 +110,18 @@ def add_fiber_array(
     )
 
     if int(orientation) != 180:
+        msg = f"add_fiber_array requires a grating coupler port facing west (orientation = 180). Got orientation = {orientation} degrees for port {gc_port_name!r}"
         raise ValueError(
-            "add_fiber_array requires a grating coupler port facing west "
-            f"(orientation = 180). "
-            f"Got orientation = {orientation} degrees for port {gc_port_name!r}"
+            msg,
         )
 
     if gc_port_name not in gc.ports:
-        raise ValueError(f"gc_port_name={gc_port_name!r} not in {gc.ports.keys()}")
+        msg = f"gc_port_name={gc_port_name!r} not in {gc.ports.keys()}"
+        raise ValueError(msg)
 
     component_name = component_name or component.metadata_child.get(
-        "name", component.name
+        "name",
+        component.name,
     )
     component_new = Component()
     component_new.component = component
@@ -124,7 +129,8 @@ def add_fiber_array(
     optical_ports = select_ports(component.ports)
     optical_ports_names = list(optical_ports.keys())
     if not optical_ports:
-        raise ValueError(f"No optical ports found in {component.name!r}")
+        msg = f"No optical ports found in {component.name!r}"
+        raise ValueError(msg)
 
     (
         elements,
@@ -163,11 +169,14 @@ def add_fiber_array(
         for gc_port_label, port in zip(gc_port_labels, ports):
             if layer_label:
                 component_new.add_label(
-                    text=gc_port_label, layer=layer_label, position=port.center
+                    text=gc_port_label,
+                    layer=layer_label,
+                    position=port.center,
                 )
 
     for port_component, port_grating in zip(
-        ports_component, ports_grating_input_waveguide
+        ports_component,
+        ports_grating_input_waveguide,
     ):
         grating_ref = port_grating.parent
         component_new.add_port(
@@ -191,10 +200,12 @@ def demo_te_and_tm():
     c = gf.Component()
     w = gf.components.straight()
     wte = add_fiber_array(
-        component=w, grating_coupler=gf.components.grating_coupler_elliptical_te
+        component=w,
+        grating_coupler=gf.components.grating_coupler_elliptical_te,
     )
     wtm = add_fiber_array(
-        component=w, grating_coupler=gf.components.grating_coupler_elliptical_tm
+        component=w,
+        grating_coupler=gf.components.grating_coupler_elliptical_tm,
     )
     c.add_ref(wte)
     wtm_ref = c.add_ref(wtm)
@@ -205,51 +216,16 @@ def demo_te_and_tm():
 if __name__ == "__main__":
     from gdsfactory.routing.get_input_labels import get_input_labels_dash
 
-    # test_type0()
     gcte = gf.components.grating_coupler_te
     gctm = gf.components.grating_coupler_tm
     strip = partial(
         gf.cross_section.cross_section,
         width=1,
         layer=(2, 0),
-        # bbox_layers=((61, 0), (62, 0)),
-        # bbox_offsets=(3, 3)
-        # cladding_layers=((61, 0), (62, 0)),
-        # cladding_offsets=(3, 3)
     )
 
-    # from pprint import pprint
-    # layer_label = gf.LAYER.TEXT
-    # layer_label = (66, 5)
-
-    # cc = demo_tapers()
-    # cc = test_type1()
-    # pprint(cc.get_json())
-    # c = gf.components.coupler(gap=0.2, length=5.6)
-    # c = gf.components.straight()
     c = gf.components.mmi2x2()
-    # c = gf.components.ring_single()
-    # c = gf.components.straight_heater_metal()
-    # c = gf.components.spiral(direction="NORTH")
 
-    # c = gf.components.bend_euler(info=dict(doe="bends"))
     cc = add_fiber_array(c, layer_label="TEXT", layer_label_loopback="TEXT")
 
-    # cc = add_fiber_array(
-    #     component=c,
-    #     # optical_routing_type=0,
-    #     # optical_routing_type=1,
-    #     # optical_routing_type=2,
-    #     # layer_label=layer_label,
-    #     # get_route_factory=route_fiber_single,
-    #     # get_route_factory=route_fiber_array,
-    #     grating_coupler=gctm,
-    #     # grating_coupler=[gcte, gctm, gcte, gctm],
-    #     # grating_coupler=gf.functions.rotate(gcte, angle=180),
-    #     auto_widen=True,
-    #     # layer=(2, 0),
-    #     # gc_port_labels=["loop_in", "in", "out", "loop_out"],
-    #     cross_section=strip,
-    #     info=dict(a=1),
-    # )
     cc.show(show_ports=False)

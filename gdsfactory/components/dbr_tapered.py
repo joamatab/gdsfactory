@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory import Component
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 
 def _generate_fins(
@@ -69,6 +73,7 @@ def dbr_tapered(
     periodic straight structure with varying width (1-D photonic crystal).
 
     Args:
+    ----
        length: Length of the DBR region.
        period: Period of the repeated unit.
        dc: Duty cycle of the repeated unit (must be a float between 0 and 1.0).
@@ -80,6 +85,7 @@ def dbr_tapered(
        cross_section: cross_section spec.
 
     Keyword Args:
+    ------------
         cross_section kwargs.
 
     .. code::
@@ -105,7 +111,8 @@ def dbr_tapered(
     )
 
     straight = c << gf.components.straight(
-        length=length, cross_section=xs.copy(width=w1)
+        length=length,
+        cross_section=xs.copy(width=w1),
     )
 
     output_taper = c << gf.components.taper(
@@ -125,7 +132,9 @@ def dbr_tapered(
     input_taper.move(input_taper.center, (-length / 2 - taper_length / 2, 0))
     output_taper.move(output_taper.center, (length / 2 + taper_length / 2, 0))
     periodic_structures = c << gf.components.array(
-        gf.components.rectangle((period * dc, w2)), (period, 0), num
+        gf.components.rectangle((period * dc, w2)),
+        (period, 0),
+        num,
     )
     periodic_structures.move(periodic_structures.center, (0, 0))
 
@@ -146,6 +155,5 @@ def dbr_tapered(
 
 
 if __name__ == "__main__":
-    # c = dbr_tapered(length=10, period=0.85, dc=0.5, w2=1, w1=0.4, taper_length=20, fins=True)
     c = dbr_tapered()
     c.show(show_ports=True)

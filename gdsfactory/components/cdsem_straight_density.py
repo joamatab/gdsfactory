@@ -2,13 +2,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
 from gdsfactory.components.text_rectangular import text_rectangular
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Floats, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Floats, Optional
 
 text_rectangular_mini = partial(text_rectangular, size=1)
 
@@ -28,6 +31,7 @@ def cdsem_straight_density(
     """Returns sweep of dense straight lines.
 
     Args:
+    ----
         widths: list of widths.
         gaps: list of gaps.
         length: of the lines.
@@ -41,7 +45,9 @@ def cdsem_straight_density(
     ymin = 0
     for width, gap in zip(widths, gaps):
         tooth_ref = c << straight(
-            length=length, cross_section=cross_section, width=width
+            length=length,
+            cross_section=cross_section,
+            width=width,
         )
         tooth_ref.ymin = ymin
         ymin += width + gap

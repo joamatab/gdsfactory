@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.routing.get_bundle import get_bundle_same_axis_no_grouping
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_link_optical_ports_no_grouping(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     c = gf.Component("test_link_optical_ports_no_grouping")
     w = c << gf.components.straight_array(n=4, spacing=200)
@@ -25,7 +29,6 @@ def test_link_optical_ports_no_grouping(
     ]
 
     routes = get_bundle_same_axis_no_grouping(ports1, ports2, sort_ports=True)
-    # routes = gf.routing.get_bundle(ports1, ports2, sort_ports=True)
 
     lengths = {}
     for i, route in enumerate(routes):

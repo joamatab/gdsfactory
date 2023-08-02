@@ -1,12 +1,16 @@
 """Route for electrical based on phidl.routing.route_quad."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.geometry.manhattanize import manhattanize_polygon
-from gdsfactory.port import Port
+
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
 
 
 def _get_rotated_basis(theta):
@@ -29,6 +33,7 @@ def route_quad(
     """Routes a basic quadrilateral polygon directly between two ports.
 
     Args:
+    ----
         port1: Port to start route.
         port2 : Port objects to end route.
         width1: Width of quadrilateral at ports. If None, uses port widths.
@@ -118,35 +123,4 @@ def test_manhattan_route_quad() -> None:
 
 
 if __name__ == "__main__":
-    # c = gf.Component()
-    # mzi = c << gf.components.mzi_phase_shifter()
-    # pads = c << gf.components.array(component=gf.components.pad, columns=3)
-    # pads.ymin = mzi.ymax + 30
-
-    # pads.movex(-pads.size_info.sc[0])
-    # mzi.movex(-mzi.size_info.sc[0])
-
-    # route_gnd = c << route_quad(
-    #     mzi.ports["e1"],
-    #     pads.ports["e4_1_1"],
-    #     width1=None,
-    #     width2=None,
-    # )
-
-    # c.show(show_ports=True)
-
-    # c = gf.Component("route")
-    # pad1 = c << gf.components.pad(size=(50, 50))
-    # pad2 = c << gf.components.pad(size=(10, 10))
-    # pad2.movex(100)
-    # pad2.movey(50)
-    # route_gnd = c << route_quad(
-    #     pad1.ports["e2"],
-    #     pad2.ports["e4"],
-    #     width1=None,
-    #     width2=None,
-    #     manhattan_min_step=0.1,
-    # )
-    # c.show()
-
     test_manhattan_route_quad()

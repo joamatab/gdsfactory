@@ -3,10 +3,13 @@ from __future__ import annotations
 import pathlib
 import tempfile
 import uuid
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentOrPath
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrPath
 
 valid_operations = ("xor", "not", "and", "or")
 
@@ -23,6 +26,7 @@ def boolean_klayout(
     """Returns a boolean operation between two components Uses KLayout python API.
 
     Args:
+    ----
         gdspath1: path to GDS or Component.
         gdspath2: path to GDS or Component.
         layer1: tuple for gdspath1.
@@ -33,7 +37,8 @@ def boolean_klayout(
     import klayout.db as pya
 
     if operation not in valid_operations:
-        raise ValueError(f"{operation} not in {valid_operations}")
+        msg = f"{operation} not in {valid_operations}"
+        raise ValueError(msg)
 
     if isinstance(gdspath1, Component):
         gdspath1.flatten()
@@ -129,7 +134,6 @@ def _show_shapes() -> None:
 
 
 if __name__ == "__main__":
-    # _show_shapes()
     c1 = gf.components.ellipse(radii=[8, 8], layer=(1, 0))
     c2 = gf.components.ellipse(radii=[11, 4], layer=(1, 0))
     c = boolean_klayout(c1, c2, operation="not")

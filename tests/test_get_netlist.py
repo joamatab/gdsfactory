@@ -9,7 +9,10 @@ from gdsfactory.get_netlist import get_netlist_recursive
 
 def test_get_netlist_cell_array() -> None:
     c = gf.components.array(
-        gf.components.straight(length=10), spacing=(0, 100), columns=1, rows=5
+        gf.components.straight(length=10),
+        spacing=(0, 100),
+        columns=1,
+        rows=5,
     )
     n = c.get_netlist()
     assert len(c.ports) == 10
@@ -20,7 +23,10 @@ def test_get_netlist_cell_array() -> None:
 
 def test_get_netlist_cell_array_connecting() -> None:
     c = gf.components.array(
-        gf.components.straight(length=100), spacing=(100, 0), columns=5, rows=1
+        gf.components.straight(length=100),
+        spacing=(100, 0),
+        columns=5,
+        rows=1,
     )
     with pytest.raises(ValueError):
         # because the component-array has automatic external ports, we assume no internal self-connections
@@ -183,10 +189,6 @@ def test_get_netlist_tiny() -> None:
     netlist = c.get_netlist(tolerance=5)
     connections = netlist["connections"]
     assert len(connections) == 3
-    # cpairs = list(connections.items())
-    # extracted_port_pair = set(cpairs[0])
-    # expected_port_pair = {'i2,o2', 'i1,o1'}
-    # assert extracted_port_pair == expected_port_pair
 
 
 def test_get_netlist_rotated() -> None:
@@ -306,21 +308,5 @@ def test_get_netlist_transformed() -> None:
 
 
 if __name__ == "__main__":
-    # c = gf.c.array()
-    # n = c.get_netlist()
-    # print(len(n.keys()))
-    # c = test_get_netlist_cell_array()
-    # c = test_get_netlist_cell_array_connecting()
-    # c = test_get_netlist_simple()
-    # c = test_get_netlist_promoted()
-    # c = test_get_netlist_close_enough()
-    # c = test_get_netlist_close_enough_orthogonal()
-    # c = test_get_netlist_close_enough_fails()
-    # c = test_get_netlist_close_enough_orthogonal_fails()
-    # c = test_get_netlist_close_enough_both()
-    # c = test_get_netlist_close_enough_rotated()
-    # c = test_get_netlist_throws_error_bad_rotation()
-    # c = test_get_netlist_tiny()
-    # c = test_get_netlist_metal()
     c = test_get_netlist_electrical_different_widths()
     c.show()

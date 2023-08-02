@@ -55,15 +55,3 @@ def test_get_ports_sort_counter_clockwise() -> None:
 if __name__ == "__main__":
     test_get_ports_sort_counter_clockwise()
     test_get_ports_sort_clockwise()
-
-    # c = gf.Component()
-    # nxn = gf.components.nxn(west=2, north=2, east=2, south=2)
-    # ref = c << nxn
-    # p = ref.get_ports_list(clockwise=False)
-    # p1 = p[0]
-    # p8 = p[-1]
-
-    # assert p1.name == "o6", p1.name
-    # assert p1.orientation == 0, p1.orientation
-    # assert p8.name == "o7", p8.name
-    # assert p8.orientation == 270, p8.orientation

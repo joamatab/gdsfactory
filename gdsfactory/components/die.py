@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.components.text import text
-from gdsfactory.typings import ComponentSpec, Float2, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Float2, LayerSpec
 
 
 @gf.cell
@@ -28,6 +32,7 @@ def die(
     chip/die and a label with the name of the die.
 
     Args:
+    ----
         size: x, y dimensions of the die.
         street_width: Width of the corner marks for die-sawing.
         street_length: Length of the corner marks for die-sawing.
@@ -56,7 +61,7 @@ def die(
                 sy - street_width,
                 sy - street_width,
                 sy,
-            ]
+            ],
         )
         c.add_polygon([xpts, ypts], layer=layer)
         c.add_polygon([-xpts, ypts], layer=layer)
@@ -91,8 +96,6 @@ def die(
 
 
 if __name__ == "__main__":
-    # c = die(size=(3000, 5000), draw_dicing_lane=True)
-    # c = die()
     c = gf.components.die(
         size=(13000, 3000),  # Size of die
         street_width=100,  # Width of corner marks for die-sawing
@@ -104,5 +107,3 @@ if __name__ == "__main__":
         bbox_layer=(3, 0),
     )
     c.show()
-    # c.show(show_ports=True)
-    # c.plot()

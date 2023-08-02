@@ -22,5 +22,4 @@ def test_validator_error() -> None:
 
 
 if __name__ == "__main__":
-    # test_raise_error_args()
     test_validator_error()

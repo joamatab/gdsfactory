@@ -60,11 +60,6 @@ def test_missing_zmin_or_thickness() -> None:
 
 
 if __name__ == "__main__":
-    # test_no_polygons_defined()
-    # test_exclude_layers()
-    # test_invisible_layers()
-    # c = gf.components.rectangle(layer=(0,0))
-    # to_3d(c, layer_views=None, layer_stack=None)
     c = gf.components.rectangle()
     layer_stack = get_layer_stack()
     to_3d(c, layer_stack=layer_stack)

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_circular import bend_circular
 from gdsfactory.components.straight import straight
 from gdsfactory.cross_section import strip
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -20,6 +24,7 @@ def ring_crow(
     """Coupled ring resonators.
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -60,7 +65,9 @@ def ring_crow(
 
     # Input bus
     input_straight = gf.get_component(
-        straight, length=2 * radius[0], cross_section=input_straight_cross_section
+        straight,
+        length=2 * radius[0],
+        cross_section=input_straight_cross_section,
     )
     input_straight_cross_section = gf.get_cross_section(input_straight_cross_section)
     input_straight_width = input_straight_cross_section.width
@@ -73,7 +80,7 @@ def ring_crow(
     cum_y_dist = input_straight_width / 2
 
     for index, (gap, r, bend, cross_section) in enumerate(
-        zip(gaps, radius, bends, ring_cross_sections)
+        zip(gaps, radius, bends, ring_cross_sections),
     ):
         gap = gf.snap.snap_to_grid(gap, nm=2)
         ring = Component(f"ring{index}")
@@ -114,14 +121,9 @@ def ring_crow(
 
 if __name__ == "__main__":
     c = ring_crow(
-        input_straight_cross_section="rib", ring_cross_sections=["rib", "strip", "rib"]
+        input_straight_cross_section="rib",
+        ring_cross_sections=["rib", "strip", "rib"],
     )
     # c = ring_crow(gaps = [0.3, 0.4, 0.5, 0.2],
-    #     radius = [20.0, 5.0, 15.0],
-    #     input_straight_cross_section = strip,
-    #     output_straight_cross_section = strip,
-    #     bends = [bend_circular] * 3,
-    #     ring_cross_sections = [strip] * 3,
-    # )
 
     c.show(show_ports=True, show_subports=False)

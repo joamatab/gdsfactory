@@ -29,7 +29,7 @@ You can customize them your fab or use them as an inspiration to build your own.
 
 Parametric cells
 =============================
-"""
+""",
     )
 
     for name in sorted(gf.components.cells.keys()):
@@ -39,11 +39,11 @@ Parametric cells
         sig = inspect.signature(gf.components.cells[name])
         kwargs = ", ".join(
             [
-                f"{p}={repr(clean_value_json(sig.parameters[p].default))}"
+                f"{p}={clean_value_json(sig.parameters[p].default)!r}"
                 for p in sig.parameters
-                if isinstance(sig.parameters[p].default, (int, float, str, tuple))
+                if isinstance(sig.parameters[p].default, int | float | str | tuple)
                 and p not in skip_settings
-            ]
+            ],
         )
         if name in skip_plot:
             f.write(
@@ -54,7 +54,7 @@ Parametric cells
 
 .. autofunction:: gdsfactory.components.{name}
 
-"""
+""",
             )
         else:
             f.write(
@@ -73,5 +73,5 @@ Parametric cells
   c = gf.components.{name}({kwargs})
   c.plot_matplotlib()
 
-"""
+""",
             )

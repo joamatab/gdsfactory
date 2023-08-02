@@ -6,11 +6,13 @@ from gdsfactory.typings import Component, ComponentReference, Optional
 
 
 def is_valid_transformation(
-    ref: ComponentReference, grid_size: Optional[float] = None
+    ref: ComponentReference,
+    grid_size: Optional[float] | None = None,
 ) -> bool:
     """Returns True if the component has valid transformations.
 
     Args:
+    ----
         component: the component reference to check.
         grid_size: the GDS grid size, in um, defaults to active PDK.get_grid_size()
             any translations with higher resolution than this are considered invalid.
@@ -30,7 +32,10 @@ def has_valid_transformations(component: Component) -> bool:
     return all(is_valid_transformation(ref) for ref in refs)
 
 
-def flatten_invalid_refs(component: Component, grid_size: Optional[float] = None):
+def flatten_invalid_refs(
+    component: Component,
+    grid_size: Optional[float] | None = None,
+):
     """Flattens component references which have invalid transformations.
 
     (i.e. non-90 deg rotations or sub-grid translations).
@@ -41,6 +46,7 @@ def flatten_invalid_refs(component: Component, grid_size: Optional[float] = None
     Deprecated Use Component.write_gds(flatten_invalid_refs=True)
 
     Args:
+    ----
         component: the component to fix (in place).
         grid_size: the GDS grid size, in um, defaults to active PDK.get_grid_size()
             any translations with higher resolution than this are considered invalid.
@@ -52,7 +58,7 @@ def flatten_invalid_refs(component: Component, grid_size: Optional[float] = None
     return component
 
 
-def is_invalid_ref(ref, grid_size: Optional[float] = None) -> bool:
+def is_invalid_ref(ref, grid_size: Optional[float] | None = None) -> bool:
     from gdsfactory.pdk import get_grid_size
 
     grid_size = grid_size or get_grid_size()
@@ -82,5 +88,3 @@ def test_flatten_invalid_refs() -> None:
 
 if __name__ == "__main__":
     test_flatten_invalid_refs()
-    # c = _demo_non_manhattan(decorator=flatten_invalid_refs)
-    # c.show()

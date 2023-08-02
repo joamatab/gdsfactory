@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.grating_coupler_elliptical import grating_coupler_elliptical
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def grating_coupler_array(
     """Array of grating couplers.
 
     Args:
+    ----
         grating_coupler: ComponentSpec.
         pitch: x spacing.
         n: number of grating couplers.
@@ -37,8 +42,11 @@ def grating_coupler_array(
 
     if with_loopback:
         if rotation != 90:
-            raise ValueError(
+            msg = (
                 "with_loopback is currently only programmed to work with rotation = 90"
+            )
+            raise ValueError(
+                msg,
             )
         if grating_coupler.get_ports_list()[0].cross_section is None:
             routing_xs = gf.cross_section.cross_section(
@@ -48,7 +56,7 @@ def grating_coupler_array(
             )
         else:
             routing_xs = gf.get_cross_section(
-                grating_coupler.get_ports_list()[0].cross_section
+                grating_coupler.get_ports_list()[0].cross_section,
             )
         radius = routing_xs.radius
 

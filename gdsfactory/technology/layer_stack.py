@@ -1,9 +1,8 @@
 import copy
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
-from typing_extensions import Literal
 
 from gdsfactory.technology.layer_views import LayerViews
 
@@ -11,7 +10,8 @@ from gdsfactory.technology.layer_views import LayerViews
 class LayerLevel(BaseModel):
     """Level for 3D LayerStack.
 
-    Parameters:
+    Parameters
+    ----------
         layer: (GDSII Layer number, GDSII datatype).
         thickness: layer thickness in um.
         thickness_tolerance: layer thickness tolerance in um.
@@ -41,35 +41,36 @@ class LayerLevel(BaseModel):
         info: simulation_info and other types of metadata.
     """
 
-    layer: Optional[Tuple[int, int]]
+    layer: tuple[int, int] | None
     thickness: float
-    thickness_tolerance: Optional[float] = None
+    thickness_tolerance: float | None = None
     zmin: float
-    zmin_tolerance: Optional[float] = None
-    material: Optional[str] = None
+    zmin_tolerance: float | None = None
+    material: str | None = None
     sidewall_angle: float = 0.0
-    sidewall_angle_tolerance: Optional[float] = None
+    sidewall_angle_tolerance: float | None = None
     width_to_z: float = 0.0
-    z_to_bias: Optional[Tuple[List[float], List[float]]] = None
+    z_to_bias: tuple[list[float], list[float]] | None = None
     mesh_order: int = 3
     layer_type: Literal["grow", "etch", "implant", "background"] = "grow"
-    mode: Optional[Literal["octagon", "taper", "round"]] = None
-    into: Optional[List[str]] = None
-    doping_concentration: Optional[float] = None
-    resistivity: Optional[float] = None
-    bias: Optional[Union[Tuple[float, float], float]] = None
-    derived_layer: Optional[Tuple[int, int]] = None
-    info: Dict[str, Any] = {}
+    mode: Literal["octagon", "taper", "round"] | None = None
+    into: list[str] | None = None
+    doping_concentration: float | None = None
+    resistivity: float | None = None
+    bias: tuple[float, float] | float | None = None
+    derived_layer: tuple[int, int] | None = None
+    info: dict[str, Any] = {}
 
 
 class LayerStack(BaseModel):
     """For simulation and 3D rendering.
 
-    Parameters:
+    Parameters
+    ----------
         layers: dict of layer_levels.
     """
 
-    layers: Optional[Dict[str, LayerLevel]] = Field(default_factory=dict)
+    layers: dict[str, LayerLevel] | None = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         """Add LayerLevels automatically for subclassed LayerStacks."""
@@ -80,7 +81,7 @@ class LayerStack(BaseModel):
             if isinstance(val, LayerLevel):
                 self.layers[field] = val
 
-    def get_layer_to_thickness(self) -> Dict[Tuple[int, int], float]:
+    def get_layer_to_thickness(self) -> dict[tuple[int, int], float]:
         """Returns layer tuple to thickness (um)."""
         layer_to_thickness = {}
 
@@ -177,15 +178,16 @@ class LayerStack(BaseModel):
     def get_component_with_net_layers(
         self,
         component,
-        portnames: List[str],
+        portnames: list[str],
         delimiter: str = "#",
-        new_layers_init: Tuple[int, int] = (10010, 0),
+        new_layers_init: tuple[int, int] = (10010, 0),
     ):
         """Returns component with new layers that combine port names and original layers, and modifies the layerstack accordingly.
 
         Uses port's "layer" attribute to decide which polygons need to be renamed. New layers are named "layername{delimiter}portname".
 
-        Arguments
+        Arguments:
+        ---------
             component: to process
             portnames: list of portnames to process into new layers.
             delimiter: the new layer created is called "layername{delimiter}portname"
@@ -218,13 +220,13 @@ class LayerStack(BaseModel):
 
         return net_component
 
-    def get_layer_to_zmin(self) -> Dict[Tuple[int, int], float]:
+    def get_layer_to_zmin(self) -> dict[tuple[int, int], float]:
         """Returns layer tuple to z min position (um)."""
         return {
             level.layer: level.zmin for level in self.layers.values() if level.thickness
         }
 
-    def get_layer_to_material(self) -> Dict[Tuple[int, int], str]:
+    def get_layer_to_material(self) -> dict[tuple[int, int], str]:
         """Returns layer tuple to material name."""
         return {
             level.layer: level.material
@@ -232,7 +234,7 @@ class LayerStack(BaseModel):
             if level.thickness
         }
 
-    def get_layer_to_sidewall_angle(self) -> Dict[Tuple[int, int], str]:
+    def get_layer_to_sidewall_angle(self) -> dict[tuple[int, int], str]:
         """Returns layer tuple to material name."""
         return {
             level.layer: level.sidewall_angle
@@ -240,35 +242,37 @@ class LayerStack(BaseModel):
             if level.thickness
         }
 
-    def get_layer_to_info(self) -> Dict[Tuple[int, int], Dict]:
+    def get_layer_to_info(self) -> dict[tuple[int, int], dict]:
         """Returns layer tuple to info dict."""
         return {level.layer: level.info for level in self.layers.values()}
 
-    def get_layer_to_layername(self) -> Dict[Tuple[int, int], str]:
+    def get_layer_to_layername(self) -> dict[tuple[int, int], str]:
         """Returns layer tuple to layername."""
         return {level.layer: level_name for level_name, level in self.layers.items()}
 
-    def to_dict(self) -> Dict[str, Dict[str, Any]]:
+    def to_dict(self) -> dict[str, dict[str, Any]]:
         return {level_name: dict(level) for level_name, level in self.layers.items()}
 
     def __getitem__(self, key) -> LayerLevel:
         """Access layer stack elements."""
         if key not in self.layers:
             layers = list(self.layers.keys())
-            raise ValueError(f"{key!r} not in {layers}")
+            msg = f"{key!r} not in {layers}"
+            raise ValueError(msg)
 
         return self.layers[key]
 
     def get_klayout_3d_script(
         self,
-        layer_views: Optional[LayerViews] = None,
-        dbu: Optional[float] = 0.001,
+        layer_views: LayerViews | None = None,
+        dbu: float | None = 0.001,
     ) -> str:
         """Returns script for 2.5D view in KLayout.
 
         You can include this information in your tech.lyt
 
         Args:
+        ----
             layer_views: optional layer_views.
             dbu: Optional database unit. Defaults to 1nm.
         """
@@ -299,7 +303,7 @@ class LayerStack(BaseModel):
                 f"{layer_name} = input({level.layer[0]}, {level.layer[1]})"
                 for layer_name, level in self.layers.items()
                 if level.layer
-            ]
+            ],
         )
         out += "\n"
         out += "\n"
@@ -417,9 +421,7 @@ class LayerStack(BaseModel):
                     if props.color.fill == props.color.frame:
                         txt += f"color: {props.color.fill}"
                     else:
-                        txt += (
-                            f"fill: {props.color.fill}, " f"frame: {props.color.frame}"
-                        )
+                        txt += f"fill: {props.color.fill}, frame: {props.color.frame}"
             txt += ")"
             out += f"{txt}\n"
 
@@ -450,47 +452,12 @@ if __name__ == "__main__":
 
     layer_stack = LAYER_STACK
 
-    # c = gf.components.straight_heater_metal()
-
     c = layer_stack.get_component_with_net_layers(
-        gf.components.straight_heater_metal(), portnames=["r_e2", "l_e4"]
+        gf.components.straight_heater_metal(),
+        portnames=["r_e2", "l_e4"],
     )
     print(layer_stack.layers.keys())
 
     c.show()
 
-    # import gdsfactory as gf
-    # from gdsfactory.generic_tech import LAYER_STACK
-    # component = c = gf.components.grating_coupler_elliptical_trenches()
-    # component = c = gf.components.taper_strip_to_ridge_trenches()
-    # script = LAYER_STACK.get_klayout_3d_script()
-    # print(script)
-    # ls = layer_stack = LAYER_STACK
-    # layer_to_thickness = layer_stack.get_layer_to_thickness()
-    # c = layer_stack.get_component_with_derived_layers(component)
-    # c.show(show_ports=True)
-    # import pathlib
-    # filepath = pathlib.Path(
     #     "/home/jmatres/gdslib/sp/temp/write_sparameters_meep_mpi.json"
-    # )
-    # ls_json = filepath.read_bytes()
-    # ls2 = LayerStack.parse_raw(ls_json)
-    # from gdsfactory.generic_tech import LAYER_STACK
-    # from gdsfactory.technology.klayout_tech import KLayoutTechnology
-
-    # lyp = LayerViews.from_lyp(str(PATH.klayout_lyp))
-
-    # # str_xml = open(PATH.klayout_tech / "tech.lyt").read()
-    # # new_tech = db.Technology.technology_from_xml(str_xml)
-    # # generic_tech = KLayoutTechnology(layer_views=lyp)
-    # connectivity = [("M1", "VIA1", "M2"), ("M2", "VIA2", "M3")]
-
-    # c = generic_tech = KLayoutTechnology(
-    #     name="generic_tech", layer_views=lyp, connectivity=connectivity
-    # )
-    # tech_dir = PATH.klayout_tech
-    # # tech_dir = pathlib.Path("/home/jmatres/.klayout/salt/gdsfactory/tech/")
-    # tech_dir.mkdir(exist_ok=True, parents=True)
-    # generic_tech.write_tech(tech_dir=tech_dir, layer_stack=LAYER_STACK)
-
-    # yaml_test()

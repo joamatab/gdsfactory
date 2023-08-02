@@ -13,13 +13,16 @@ import gdsfactory as gf
 
 @gf.cell
 def lidar(
-    noutputs=2**2, antenna_pitch=2.0, splitter_tree_spacing=(50.0, 70.0)
+    noutputs=2**2,
+    antenna_pitch=2.0,
+    splitter_tree_spacing=(50.0, 70.0),
 ) -> gf.Component:
     c = gf.Component("lidar")
 
     # power Splitter
     splitter_tree = c << gf.components.splitter_tree(
-        noutputs=noutputs, spacing=splitter_tree_spacing
+        noutputs=noutputs,
+        spacing=splitter_tree_spacing,
     )
 
     # phase Shifters
@@ -27,7 +30,7 @@ def lidar(
     phase_shifter_optical_ports = []
 
     for i, port in enumerate(
-        splitter_tree.get_ports_list(orientation=0, port_type="optical")
+        splitter_tree.get_ports_list(orientation=0, port_type="optical"),
     ):
         ref = c.add_ref(phase_shifter, alias=f"ps{i}")
         ref.connect("o1", port)
@@ -36,7 +39,10 @@ def lidar(
 
     # antennas
     antennas = c << gf.components.array(
-        gf.components.dbr(n=200), rows=noutputs, columns=1, spacing=(0, antenna_pitch)
+        gf.components.dbr(n=200),
+        rows=noutputs,
+        columns=1,
+        spacing=(0, antenna_pitch),
     )
     antennas.xmin = ref.xmax + 50
     antennas.y = 0

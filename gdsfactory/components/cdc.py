@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory import Component
 from gdsfactory.cross_section import strip
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 
 def _generate_fins(c, x, fin_size, bend):
@@ -21,7 +25,7 @@ def _generate_fins(c, x, fin_size, bend):
         )
         rectangle.movex(
             destination=bend.ports["o1"].x
-            - (1 - bend.ports["o1"].orientation / 90.0) * fin_size[0] / 2.0
+            - (1 - bend.ports["o1"].orientation / 90.0) * fin_size[0] / 2.0,
         )
 
         rectangle.movey(
@@ -39,7 +43,8 @@ def _generate_bends(c, x_top, x_bot, dx, dy, gap):
     )
 
     input_bend_bottom = c << gf.components.bend_s(
-        size=(dx, dy), cross_section=x_bot
+        size=(dx, dy),
+        cross_section=x_bot,
     ).mirror().mirror(p1=(1, 0))
 
     dy = input_bend_bottom.ports["o2"].y - input_bend_top.ports["o2"].y
@@ -47,7 +52,7 @@ def _generate_bends(c, x_top, x_bot, dx, dy, gap):
     input_bend_top.movey(destination=dy / 2.0 + gap / 2.0)
 
     input_bend_bottom.movey(
-        destination=-dy / 2.0 - (x_bot.width / 2.0 + x_top.width / 2.0 + gap / 2.0)
+        destination=-dy / 2.0 - (x_bot.width / 2.0 + x_top.width / 2.0 + gap / 2.0),
     )
 
     return (c, input_bend_top, input_bend_bottom)
@@ -81,7 +86,7 @@ def _generate_gratings(c, length, period, dc, gap, x, bottom_straight, x_bot):
         )
         rectangle.movex(destination=x_start)
         rectangle.movey(
-            destination=bottom_straight.ports["o1"].y + x_bot.width / 2.0 + gap / 2.0
+            destination=bottom_straight.ports["o1"].y + x_bot.width / 2.0 + gap / 2.0,
         )
 
     return c
@@ -111,6 +116,7 @@ def cdc(
     """Grating-Assisted Contra-Directional Coupler.
 
     Args:
+    ----
        length : Length of the coupling region.
        gap: Distance between the two straights.
        period: Period of the grating.
@@ -138,7 +144,12 @@ def cdc(
 
     c, input_bend_top, input_bend_bottom = _generate_bends(c, x_top, x_bot, dx, dy, gap)
     c, top_straight, bottom_straight = _generate_straights(
-        c, length, x_top, x_bot, input_bend_top, input_bend_bottom
+        c,
+        length,
+        x_top,
+        x_bot,
+        input_bend_top,
+        input_bend_bottom,
     )
 
     bend_output_top = c << input_bend_top.parent.mirror()

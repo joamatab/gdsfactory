@@ -17,6 +17,5 @@ if __name__ == "__main__":
         get_input_labels_function=None,
         with_loopback=False,
         straight_separation=15,
-        # bend='wire_corner'
     )
     c.show()

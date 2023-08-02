@@ -8,4 +8,5 @@ if __name__ == "__main__":
         for error_file in error_files:
             error = error_file.read_text()
             print(error)
-        raise ValueError(f"{len(error_files)} errors in notebooks")
+        msg = f"{len(error_files)} errors in notebooks"
+        raise ValueError(msg)

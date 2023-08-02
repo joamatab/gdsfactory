@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.difftest import difftest
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
+    from gdsfactory.component import Component
 
 
 def type0() -> Component:
@@ -32,7 +37,7 @@ def tapers():
 components = [type0, type1, type2, tapers]
 
 
-@pytest.fixture(params=components, scope="function")
+@pytest.fixture(params=components)
 def component(request) -> Component:
     return request.param()
 
@@ -50,6 +55,4 @@ def test_settings(component: Component, data_regression: DataRegressionFixture) 
 if __name__ == "__main__":
     c = type1()
     c.pprint()
-    # c = test_type2()
-    # c = test_tapers()
     c.show(show_ports=True)

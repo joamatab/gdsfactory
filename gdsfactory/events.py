@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class Event:
@@ -22,6 +25,7 @@ class Event:
         """Adds a handler that will be executed when this event is fired.
 
         Args:
+        ----
             handler: a function which matches the signature fired by this event
 
         """

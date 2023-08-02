@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
@@ -7,7 +9,9 @@ from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.array_component import array
 from gdsfactory.components.rectangle import rectangle
-from gdsfactory.typings import Float2, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Float2, LayerSpec
 
 
 @cell
@@ -26,6 +30,7 @@ def rectangle_with_slits(
     Metal slits reduce stress.
 
     Args:
+    ----
         size: (tuple) Width and height of rectangle.
         layer: Specific layer to put polygon geometry on.
         layer_slit: does a boolean NOT when None.
@@ -80,6 +85,5 @@ def rectangle_with_slits(
 
 
 if __name__ == "__main__":
-    # c = rectangle_with_slits(layer_slit=None)
     c = rectangle_with_slits(layer_slit=(2, 0), slit_size=(10, 10))
     c.show(show_ports=True)

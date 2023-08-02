@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -9,7 +9,9 @@ from gdsfactory.components.grating_coupler_elliptical_arbitrary import (
     grating_coupler_elliptical_arbitrary,
 )
 from gdsfactory.config import PATH
-from gdsfactory.typings import Floats, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Floats, LayerSpec
 
 parameters = (
     -2.4298362615732447,
@@ -98,6 +100,7 @@ def grating_coupler_elliptical_lumerical(
         efficiency=0.55 # 5.2 dB
 
     Args:
+    ----
         parameters: xinput, gap1, width1, gap2, width2 ...
         layer: for waveguide.
         layer_slab: for slab.
@@ -107,7 +110,8 @@ def grating_coupler_elliptical_lumerical(
         info: optional simulation settings.
         bias_gap: gap/trenches bias (um) to compensate for etching bias.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         taper_length: taper length from input in um.
         taper_angle: grating flare angle in degrees.
         wavelength: grating transmission central wavelength (um).
@@ -160,7 +164,9 @@ def _compare() -> Component:
 
     c = Component()
     c1 = c << grating_coupler_elliptical_lumerical_etch70(
-        layer=(2, 0), layer_slab=None, fiber_angle=5
+        layer=(2, 0),
+        layer_slab=None,
+        fiber_angle=5,
     )
     c2 = c << gf.import_gds(PATH.gdsdir / "gc.gds")
     c2.xmin = 0
@@ -169,6 +175,5 @@ def _compare() -> Component:
 
 
 if __name__ == "__main__":
-    # c = _compare()
     c = grating_coupler_elliptical_lumerical_etch70()
     c.show(show_ports=False)

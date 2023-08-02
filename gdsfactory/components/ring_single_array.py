@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.ring_single import ring_single
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentFactory, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentFactory, CrossSectionSpec
 
 _list_of_dicts = (
     dict(length_x=10.0, radius=5.0),
@@ -23,6 +27,7 @@ def ring_single_array(
     """Ring of single bus connected with straights.
 
     Args:
+    ----
         ring: ring function.
         spacing: between rings.
         list_of_dicts: settings for each ring.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -12,7 +13,9 @@ from gdsfactory.components.wire import wire_corner
 from gdsfactory.cross_section import strip
 from gdsfactory.path import euler
 from gdsfactory.route_info import route_info_from_cs
-from gdsfactory.typings import CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec, Optional
 
 
 @gf.cell
@@ -20,7 +23,7 @@ def bend_euler(
     angle: float = 90.0,
     p: float = 0.5,
     with_arc_floorplan: bool = True,
-    npoints: Optional[int] = None,
+    npoints: Optional[int] | None = None,
     direction: str = "ccw",
     with_bbox: bool = True,
     cross_section: CrossSectionSpec = "strip",
@@ -38,6 +41,7 @@ def bend_euler(
     https://www.osapublishing.org/oe/fulltext.cfm?uri=oe-25-8-9150&id=362937
 
     Args:
+    ----
         angle: total angle of the curve.
         p: Proportion of the curve that is an Euler curve.
         with_arc_floorplan: If False: `radius` is the minimum radius of curvature
@@ -66,7 +70,11 @@ def bend_euler(
 
     c = Component()
     p = euler(
-        radius=radius, angle=angle, p=p, use_eff=with_arc_floorplan, npoints=npoints
+        radius=radius,
+        angle=angle,
+        p=p,
+        use_eff=with_arc_floorplan,
+        npoints=npoints,
     )
     ref = c << p.extrude(x)
     c.add_ports(ref.ports)
@@ -76,7 +84,9 @@ def bend_euler(
     c.info["radius"] = radius
     c.info["width"] = x.width
     c.info["route_info"] = route_info_from_cs(
-        cross_section, length=c.info["length"], n_bend_90=abs(angle / 90.0)
+        cross_section,
+        length=c.info["length"],
+        n_bend_90=abs(angle / 90.0),
     )
 
     if x.info:
@@ -115,6 +125,7 @@ def bend_euler_s(**kwargs) -> Component:
     r"""Sbend made of 2 euler bends.
 
     Keyword Args:
+    ------------
         angle: total angle of the curve.
         p: Proportion of the curve that is an Euler curve.
         with_arc_floorplan: If False: `radius` is the minimum radius of curvature
@@ -166,6 +177,7 @@ def bend_straight_bend(
     """Sbend made of 2 euler bends and straight section in between.
 
     Args:
+    ----
         straight_length: in um.
         angle: total angle of the curve.
         p: Proportion of the curve that is an Euler curve.
@@ -233,36 +245,7 @@ def _compare_bend_euler90():
 
 
 if __name__ == "__main__":
-    # PDK = get_generic_pdk()
-    # PDK.activate()
-    # c = bend_euler_s()
-    # c = bend_euler(cross_section="rib", angle=180)
-    # c = bend_euler(bbox_layers=[(2, 0), (3, 0)], bbox_offsets=[3, 3])
-
-    # c = gf.Component()
-    # ps = np.arange(0, 1.1, 0.2)
     # for p in ps:
-    #     b = bend_euler(p=p, radius=10)
-    #     print(p, b.info["radius_min"])
     #     c << b
 
-    # c.show(show_ports=True)
-
-    # c = bend_euler(direction="cw")
     c = bend_euler()
-    # c.pprint()
-    # p = euler()
-    # c = bend_straight_bend()
-    # c = _compare_bend_euler90()
-
-    # c = gf.Component()
-    # b1 = c << bend_euler()
-    # b2 = c << bend_euler()
-    # b2.connect("o1", b1.ports["o2"])
-    # c.show(show_ports=False)
-
-    # _compare_bend_euler180()
-    # import gdsfactory as gf
-    # c = bend_euler(radius=10)
-    # c << gf.components.bend_circular(radius=10)
-    # c.pprint()

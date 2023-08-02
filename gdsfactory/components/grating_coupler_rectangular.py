@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
 
 
 @gf.cell
@@ -33,6 +37,7 @@ def grating_coupler_rectangular(
     For a focusing grating take a look at grating_coupler_elliptical.
 
     Args:
+    ----
         n_periods: number of grating teeth.
         period: grating pitch.
         fill_factor: ratio of grating width vs gap.
@@ -94,7 +99,7 @@ def grating_coupler_rectangular(
     for i in range(n_periods):
         xsize = gf.snap.snap_to_grid(period * fill_factor)
         cgrating = c.add_ref(
-            rectangle(size=(xsize, width_grating), layer=layer, port_type=None)
+            rectangle(size=(xsize, width_grating), layer=layer, port_type=None),
         )
         cgrating.xmin = gf.snap.snap_to_grid(x0 + i * period)
         cgrating.y = 0
@@ -136,8 +141,6 @@ def grating_coupler_rectangular(
 
 
 if __name__ == "__main__":
-    # c = grating_coupler_rectangular(name='gcu', partial_etch=True)
-    # c = grating_coupler_rectangular()
     c = gf.routing.add_fiber_array(grating_coupler=grating_coupler_rectangular)
     print(c.ports)
     c.show(show_ports=True)

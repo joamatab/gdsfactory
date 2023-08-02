@@ -1,6 +1,7 @@
 """Write DRC rule decks in KLayout.
 
-TODO:
+Todo:
+----
 - define derived layers (composed rules)
 
 More DRC examples:
@@ -8,16 +9,20 @@ More DRC examples:
 - http://klayout.de/doc/manual/drc_basic.html
 - https://github.com/usnistgov/SOEN-PDK/tree/master/tech/OLMAC
 - https://github.com/google/globalfoundries-pdk-libs-gf180mcu_fd_pr/tree/main/rules/klayout
+
 """
 
 from __future__ import annotations
 
 import pathlib
 from dataclasses import asdict, is_dataclass
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.install import get_klayout_path
-from gdsfactory.typings import CrossSectionSpec, Dict, Layer, PathType
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec, Dict, Layer, PathType
 
 layer_name_to_min_width: Dict[str, float]
 
@@ -61,7 +66,7 @@ print "run time #{(time_end-time_start).round(3)} seconds \n"
 def rule_not_inside(layer: str, not_inside: str) -> str:
     """Checks for that a layer is not inside another layer."""
     error = f"{layer} not inside {not_inside}"
-    return f"{layer}.not_inside({not_inside})" f".output({error!r}, {error!r})"
+    return f"{layer}.not_inside({not_inside}).output({error!r}, {error!r})"
 
 
 def rule_width(value: float, layer: str, angle_limit: float = 90) -> str:
@@ -91,7 +96,10 @@ def rule_separation(value: float, layer1: str, layer2: str) -> str:
 
 
 def rule_enclosing(
-    value: float, layer1: str, layer2: str, angle_limit: float = 90
+    value: float,
+    layer1: str,
+    layer2: str,
+    angle_limit: float = 90,
 ) -> str:
     """Checks if layer1 encloses (is bigger than) layer2 by value."""
     error = f"{layer1} enclosing {layer2} by {value}um"
@@ -154,11 +162,13 @@ end
 
 
 def connectivity_checks(
-    WG_cross_sections: list[CrossSectionSpec], pin_widths: list[float] | float
+    WG_cross_sections: list[CrossSectionSpec],
+    pin_widths: list[float] | float,
 ) -> str:
     """Return script for photonic port connectivity check. Assumes the photonic port pins are inside the Component.
 
     Args:
+    ----
         WG_cross_sections: list of waveguide layers to run check for.
         pin_widths: list of port pin widths or a single port pin width/
     """
@@ -171,7 +181,7 @@ def connectivity_checks(
 {layer_name}_PIN2 = {layer_name}_PIN2.rectangles.without_area({layer} * {pin_widths if isinstance(pin_widths, float) else pin_widths[i]}) - {layer_name}_PIN2.rectangles.with_area({layer} * 2 * {pin_widths if isinstance(pin_widths, float) else pin_widths[i]})\n
 {layer_name}_PIN2.output(\"port alignment error\")\n
 {layer_name}_PIN2 = {layer_name}_PIN.sized(0.0).merged\n
-{layer_name}_PIN2.non_rectangles.output(\"port width check\")\n\n"""
+{layer_name}_PIN2.non_rectangles.output(\"port width check\")\n\n""",
         )
 
     return connectivity_check
@@ -181,6 +191,7 @@ def write_layer_definition(layers: Dict[str, Layer]) -> list[str]:
     """Returns layers definition script for KLayout.
 
     Args:
+    ----
         layers: layer definitions can be dict, dataclass or pydantic BaseModel.
 
     """
@@ -195,6 +206,7 @@ def write_drc_deck(rules: list[str], layers: Dict[str, Layer] | None = None) -> 
     based on https://github.com/klayoutmatthias/si4all
 
     Args:
+    ----
         rules: list of rules.
         layers: layer definitions can be dict, dataclass or pydantic BaseModel.
 
@@ -226,6 +238,7 @@ def write_drc_deck_macro(
     You can customize the shortcut to run the DRC macro from the Klayout GUI.
 
     Args:
+    ----
         rules: list of rules.
         layers: layer definitions can be dict or dataclass.
         name: drc rule deck name.
@@ -291,7 +304,8 @@ def write_drc_deck_macro(
 
     """
     if mode not in modes:
-        raise ValueError(f"{mode!r} not in {modes}")
+        msg = f"{mode!r} not in {modes}"
+        raise ValueError(msg)
 
     script = get_drc_script_start(name=name, shortcut=shortcut)
 

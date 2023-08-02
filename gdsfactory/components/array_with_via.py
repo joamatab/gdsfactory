@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -12,7 +13,9 @@ from gdsfactory.components.pad import pad
 from gdsfactory.components.straight import straight
 from gdsfactory.components.via_stack import via_stack as via_stack_factory
 from gdsfactory.cross_section import metal2
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
 
 
 @cell
@@ -32,6 +35,7 @@ def array_with_via(
     """Returns an array of vias in X axis with fanout waveguides facing west.
 
     Args:
+    ----
         component: to replicate in the array.
         columns: number of components.
         spacing: for the array in um.
@@ -65,8 +69,9 @@ def array_with_via(
             xlength = columns * via_spacing - (col * via_spacing) + straight_length
 
         else:
+            msg = f"Invalid port_orientation = {port_orientation}"
             raise ValueError(
-                f"Invalid port_orientation = {port_orientation}",
+                msg,
                 "180: west, 0: east, 90: north, 270: south",
             )
 
@@ -77,10 +82,13 @@ def array_with_via(
         if cross_section:
             port_name = f"e{col}"
             straightx_ref = c << straight(
-                length=xlength, cross_section=cross_section, **kwargs
+                length=xlength,
+                cross_section=cross_section,
+                **kwargs,
             )
             straightx_ref.connect(
-                "e2", via_stack_ref.get_ports_list(orientation=port_orientation)[0]
+                "e2",
+                via_stack_ref.get_ports_list(orientation=port_orientation)[0],
             )
             c.add_port(port_name, port=straightx_ref.ports["e1"])
             if port_offset:
@@ -98,11 +106,13 @@ def array_with_via_2d(
     """Returns 2D array with fanout waveguides facing west.
 
     Args:
+    ----
         spacing: 2D spacing x,y in um.
         columns: number of columns.
         rows: number of rows.
 
     Keyword Args:
+    ------------
         component: to replicate
         columns: number of components
         spacing: float
@@ -120,7 +130,6 @@ if __name__ == "__main__":
     PDK = get_generic_pdk()
     PDK.activate()
     via_stack_big = partial(via_stack_factory, size=(30, 20))
-    # c = array_with_via(columns=3, width=10, via_spacing=20, port_orientation=90)
     c = array_with_via_2d(
         columns=2,
         rows=3,
@@ -132,5 +141,4 @@ if __name__ == "__main__":
         via_stack_dy=-50 + 10,
         port_offset=(0, 10),
     )
-    # c.auto_rename_ports()
     c.show(show_ports=True)

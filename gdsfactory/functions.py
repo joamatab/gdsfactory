@@ -9,6 +9,7 @@ There are two types of functions:
 from __future__ import annotations
 
 from functools import lru_cache, partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 from omegaconf import OmegaConf
@@ -20,16 +21,18 @@ from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
 from gdsfactory.components.text_rectangular import text_rectangular_multi_layer
 from gdsfactory.port import auto_rename_ports
-from gdsfactory.typings import (
-    Anchor,
-    Axis,
-    ComponentSpec,
-    Float2,
-    LayerSpec,
-    List,
-    Optional,
-    Strs,
-)
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import (
+        Anchor,
+        Axis,
+        ComponentSpec,
+        Float2,
+        LayerSpec,
+        List,
+        Optional,
+        Strs,
+    )
 
 cache = lru_cache(maxsize=None)
 
@@ -51,6 +54,7 @@ def add_text(
     """Return component inside a new component with text geometry.
 
     Args:
+    ----
         component: component spec.
         text: text string.
         text_offset: relative to component anchor. Defaults to center (cc).
@@ -82,11 +86,13 @@ def add_texts(
     """Return a list of Component with text labels.
 
     Args:
+    ----
         components: list of component specs.
         prefix: Optional prefix for the labels.
         index0: defaults to 0 (0, for first component, 1 for second ...).
 
-    keyword Args:
+    Keyword Args:
+    ------------
         text_offset: relative to component size info anchor. Defaults to center.
         text_anchor: relative to component (ce cw nc ne nw sc se sw center cc).
         text_factory: function to add text labels.
@@ -100,7 +106,9 @@ def add_texts(
 
 @cell
 def rotate(
-    component: ComponentSpec, angle: float = 90, recenter: bool = False
+    component: ComponentSpec,
+    angle: float = 90,
+    recenter: bool = False,
 ) -> Component:
     """Return rotated component inside a new component.
 
@@ -108,6 +116,7 @@ def rotate(
     This rotate function just encapsulates the rotated reference into a new component.
 
     Args:
+    ----
         component: spec.
         angle: to rotate in degrees.
         recenter: recenter component after rotating.
@@ -142,11 +151,14 @@ rotate180 = partial(rotate, angle=180)
 
 @cell
 def mirror(
-    component: ComponentSpec, p1: Float2 = (0, 1), p2: Float2 = (0, 0)
+    component: ComponentSpec,
+    p1: Float2 = (0, 1),
+    p2: Float2 = (0, 0),
 ) -> Component:
     """Return new Component with a mirrored reference.
 
     Args:
+    ----
         component: component spec.
         p1: first point to define mirror axis.
         p2: second point to define mirror axis.
@@ -169,11 +181,12 @@ def move(
     component: Component,
     origin=(0, 0),
     destination=None,
-    axis: Optional[Axis] = None,
+    axis: Optional[Axis] | None = None,
 ) -> Component:
     """Return new Component with a moved reference to the original component.
 
     Args:
+    ----
         component: to move.
         origin: of component.
         destination: Optional x, y.
@@ -193,6 +206,7 @@ def transformed(ref: ComponentReference):
     """Returns flattened cell with reference transformations applied.
 
     Args:
+    ----
         ref: the reference to flatten into a new cell.
 
     """
@@ -214,8 +228,9 @@ def move_port_to_zero(component: Component, port_name: str = "o1"):
 
     """
     if port_name not in component.ports:
+        msg = f"port_name = {port_name!r} not in {list(component.ports.keys())}"
         raise ValueError(
-            f"port_name = {port_name!r} not in {list(component.ports.keys())}"
+            msg,
         )
     return move(component, -component.ports[port_name].center)
 
@@ -230,12 +245,13 @@ def update_info(component: Component, **kwargs) -> Component:
 def add_settings_label(
     component: ComponentSpec = straight,
     layer_label: LayerSpec = (66, 0),
-    settings: Optional[Strs] = None,
+    settings: Optional[Strs] | None = None,
     ignore: Optional[Strs] = ("decorator",),
 ) -> Component:
     """Add a settings label to a component. Use it as a decorator.
 
     Args:
+    ----
         component: spec.
         layer_label: for label.
         settings: list of settings to include. if None, adds all changed settings.
@@ -275,37 +291,6 @@ if __name__ == "__main__":
         length_mmi=10,
         decorator=partial(add_settings_label, settings=["name", "length_mmi"]),
     )
-    # c.show(show_ports=True)
-
-    # cr = rotate(component=c)
-    # cr.show()
 
     cr = transformed(c.ref())
     cr.show()
-
-    # cr = c.rotate()
-    # cr.pprint()
-    # cr.show()
-
-    # cm = move(c, destination=(20, 20))
-    # cm.show()
-
-    # cm = mirror(c)
-    # cm.show()
-
-    # cm = c.mirror()
-    # cm.show()
-
-    # cm2 = move_port_to_zero(cm)
-    # cm2.show()
-
-    # cm3 = add_text(c, "hi")
-    # cm3.show()
-
-    # cr = rotate(component=c)
-    # cr.show()
-    # print(component_rotated)
-
-    # component_rotated.pprint
-    # component_netlist = component.get_netlist()
-    # component.pprint_netlist()

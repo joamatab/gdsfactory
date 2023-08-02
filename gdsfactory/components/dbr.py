@@ -10,11 +10,15 @@ Period: 318nm, width: 500nm, dw: 20 ~ 120 nm.
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 period = 318e-3
 w0 = 0.5
@@ -35,6 +39,7 @@ def dbr_cell(
     """Distributed Bragg Reflector unit cell.
 
     Args:
+    ----
         w1: thin width in um.
         l1: thin length in um.
         w2: thick width in um.
@@ -80,6 +85,7 @@ def dbr(
     """Distributed Bragg Reflector.
 
     Args:
+    ----
         w1: thin width in um.
         l1: thin length in um.
         w2: thick width in um.
@@ -111,8 +117,5 @@ def dbr(
 
 
 if __name__ == "__main__":
-    # c = dbr(w1=0.5, w2=0.6, l1=0.2, l2=0.3, n=10)
     c = dbr()
-    # c = dbr_cell(cross_section="rib")
-    # c.assert_ports_on_grid()
     c.show(show_ports=True)

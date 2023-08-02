@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.port import Port
-from gdsfactory.typings import ComponentSpec, Strs
+
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
+    from gdsfactory.typings import ComponentSpec, Strs
 
 
 @cell
@@ -16,6 +20,7 @@ def extend_ports_list(
     """Returns a component with the extensions for a list of ports.
 
     Args:
+    ----
         ports: list of ports.
         extension: function for extension.
         extension_port_name: to connect extension.
@@ -26,7 +31,7 @@ def extend_ports_list(
     c = Component()
     extension = get_component(extension)
 
-    extension_port_name = extension_port_name or list(extension.ports.keys())[0]
+    extension_port_name = extension_port_name or next(iter(extension.ports.keys()))
     ignore_ports = ignore_ports or []
 
     for i, port in enumerate(ports):
@@ -51,13 +56,5 @@ if __name__ == "__main__":
     c << e
     c.show(show_ports=True)
 
-    # c = gf.Component("mmi_extended")
-    # m = gf.components.mmi1x2()
-    # t = partial(gf.components.taper, width2=0.1)
-    # e = extend_ports_list(
-    #     ports=m.get_ports_list(), extension=t, extension_port_name="o1"
-    # )
-
     # c << m
     # c << e
-    # c.show(show_ports=True)

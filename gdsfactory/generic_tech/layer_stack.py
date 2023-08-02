@@ -29,6 +29,7 @@ def get_layer_stack(
     based on paper https://www.degruyter.com/document/doi/10.1515/nanoph-2013-0034/html
 
     Args:
+    ----
         thickness_wg: waveguide thickness in um.
         thickness_slab_deep_etch: for deep etched slab.
         thickness_shallow_etch: thickness for the etch.
@@ -49,7 +50,6 @@ def get_layer_stack(
         box_thickness: bottom oxide thickness in um.
         undercut_thickness: thickness of the silicon undercut.
     """
-
     thickness_deep_etch = thickness_wg - thickness_slab_deep_etch
     thickness_shallow_etch = thickness_wg - thickness_slab_shallow_etch
 
@@ -98,7 +98,6 @@ def get_layer_stack(
             derived_layer=LAYER.SLAB90,
         )
         clad = LayerLevel(
-            # layer=LAYER.WGCLAD,
             layer=LAYER.WAFER,
             zmin=0.0,
             material="sio2",
@@ -202,9 +201,6 @@ def get_layer_stack(
 LAYER_STACK = get_layer_stack()
 
 if __name__ == "__main__":
-    # ls = get_layer_stack(substrate_thickness=50.0)
     ls = get_layer_stack()
     script = ls.get_klayout_3d_script()
     print(script)
-    # print(ls.get_layer_to_material())
-    # print(ls.get_layer_to_thickness())

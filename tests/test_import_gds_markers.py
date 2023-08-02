@@ -5,7 +5,7 @@ from gdsfactory.read.import_gds import import_gds
 
 
 def test_import_ports_inside(data_regression) -> None:
-    """Make sure you can import the ports"""
+    """Make sure you can import the ports."""
     c0 = gf.components.straight(decorator=gf.add_pins.add_pins)
     gdspath = c0.write_gds()
 
@@ -17,7 +17,7 @@ def test_import_ports_inside(data_regression) -> None:
 
 
 def test_import_ports_center(data_regression) -> None:
-    """Make sure you can import the ports"""
+    """Make sure you can import the ports."""
     c0 = gf.components.straight(decorator=gf.add_pins.add_pins_center)
     gdspath = c0.write_gds()
 
@@ -29,9 +29,10 @@ def test_import_ports_center(data_regression) -> None:
 
 
 def test_import_ports_siepic(data_regression) -> None:
-    """Make sure you can import the ports"""
+    """Make sure you can import the ports."""
     c0 = gf.components.straight(
-        decorator=gf.add_pins.add_pins_siepic, cross_section="strip_no_pins"
+        decorator=gf.add_pins.add_pins_siepic,
+        cross_section="strip_no_pins",
     )
     gdspath = c0.write_gds()
 
@@ -43,19 +44,6 @@ def test_import_ports_siepic(data_regression) -> None:
 
 
 if __name__ == "__main__":
-    # c = test_import_ports_center(None)
-    # c = test_import_ports_siepic(None)
     c = test_import_ports_inside(None)
     c.pprint_ports()
     c.show(show_ports=True)
-
-    # c0 = gf.components.straight(
-    #     decorator=gf.add_pins.add_pins_siepic, cross_section="strip_no_pins"
-    # )
-    # gdspath = c0.write_gds()
-    # c0.show()
-
-    # gf.clear_cache()
-    # c1 = import_gds(gdspath, decorator=gf.add_ports.add_ports_from_siepic_pins)
-    # c1.pprint_ports()
-    # c1.show()

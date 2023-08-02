@@ -19,7 +19,7 @@ Assumes two ports are connected when they have same width, x, y
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import omegaconf
@@ -29,7 +29,11 @@ from gdsfactory.component import Component, ComponentReference
 from gdsfactory.name import clean_name
 from gdsfactory.serialization import clean_dict, clean_value_json
 from gdsfactory.snap import snap_to_grid
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import LayerSpec
 
 
 def get_default_connection_validators():
@@ -45,6 +49,7 @@ def get_instance_name_from_alias(
     If no label returns to instanceName_x_y.
 
     Args:
+    ----
         component: with labels.
         reference: reference that needs naming.
     """
@@ -61,6 +66,7 @@ def get_instance_name_from_label(
     If no label returns to instanceName_x_y.
 
     Args:
+    ----
         component: with labels.
         reference: reference that needs naming.
         layer_label: ignores layer_label[1].
@@ -81,7 +87,6 @@ def get_instance_name_from_label(
         xl = snap_to_grid(label.position[0])
         yl = snap_to_grid(label.position[1])
         if x == xl and y == yl and label.layer == layer_label[0]:
-            # print(label.text, xl, yl, x, y)
             return label.text
 
     return text
@@ -102,7 +107,7 @@ def get_netlist_yaml(
             tolerance=tolerance,
             exclude_port_types=exclude_port_types,
             **kwargs,
-        )
+        ),
     )
 
 
@@ -138,6 +143,7 @@ def get_netlist(
 
 
     Args:
+    ----
         component: to extract netlist.
         full_settings: True returns all, false changed settings.
         tolerance: tolerance in nm to consider two ports connected.
@@ -147,6 +153,7 @@ def get_netlist(
             if True, will return key: [value] pairs with [value] a list of all connected instances.
 
     Returns:
+    -------
         instances: Dict of instance name and settings.
         connections: Dict of Instance1Name,portName: Instance2Name,portName.
         placements: Dict of instance names and placements (x, y, rotation).
@@ -326,12 +333,14 @@ def _extract_connections_two_sweep(
     warnings = defaultdict(list)
     if raise_error_for_warnings is None:
         raise_error_for_warnings = DEFAULT_CRITICAL_CONNECTION_ERROR_TYPES.get(
-            port_type, []
+            port_type,
+            [],
         )
 
     unconnected_port_names = list(port_names)
     if tolerance < 0:
-        raise ValueError(f"Cannot have a tolerance less than zero. Got {tolerance}")
+        msg = f"Cannot have a tolerance less than zero. Got {tolerance}"
+        raise ValueError(msg)
     elif tolerance <= 1:
         # if tolerance is 0 or 1, do only one sweep with that tolerance
         grids = [("fine", tolerance)]
@@ -364,19 +373,21 @@ def _extract_connections_two_sweep(
 
             elif not allow_multiple:
                 warnings["multiple_connections"].append(ports_at_xy)
-                raise ValueError(f"Found multiple connections at {xy}:{ports_at_xy}")
+                msg = f"Found multiple connections at {xy}:{ports_at_xy}"
+                raise ValueError(msg)
 
             else:
                 # Iterates over the list of multiple ports to create related two-port connectivity
                 num_ports = len(ports_at_xy)
                 for portindex1, portindex2 in zip(
-                    range(-1, num_ports - 1), range(num_ports)
+                    range(-1, num_ports - 1),
+                    range(num_ports),
                 ):
                     port1 = ports[ports_at_xy[portindex1]]
                     port2 = ports[ports_at_xy[portindex2]]
                     connection_validator(port1, port2, ports_at_xy, warnings)
                     connections.append(
-                        [ports_at_xy[portindex1], ports_at_xy[portindex2]]
+                        [ports_at_xy[portindex1], ports_at_xy[portindex2]],
                     )
 
     if unconnected_port_names:
@@ -392,7 +403,7 @@ def _extract_connections_two_sweep(
                     ports=unconnected_non_top_level,
                     values=unconnected_xys,
                     message=f"{len(unconnected_non_top_level)} unconnected {port_type} ports!",
-                )
+                ),
             )
 
     critical_warnings = {
@@ -400,8 +411,9 @@ def _extract_connections_two_sweep(
     }
 
     if critical_warnings:
+        msg = f"Found critical warnings while extracting netlist: {critical_warnings}"
         raise ValueError(
-            f"Found critical warnings while extracting netlist: {critical_warnings}"
+            msg,
         )
     return connections, dict(warnings)
 
@@ -431,7 +443,8 @@ def validate_optical_connection(
     is_top_level = [("," not in pname) for pname in port_names]
 
     if all(is_top_level):
-        raise ValueError(f"Two top-level ports appear to be connected: {port_names}")
+        msg = f"Two top-level ports appear to be connected: {port_names}"
+        raise ValueError(msg)
 
     if abs(port1.width - port2.width) > width_tolerance:
         warnings["width_mismatch"].append(
@@ -440,7 +453,7 @@ def validate_optical_connection(
                 values=[port1.width, port2.width],
                 message=f"Widths of ports {port_names[0]} and {port_names[1]} not equal. "
                 f"Difference of {abs(port1.width - port2.width)} um",
-            )
+            ),
         )
     if port1.shear_angle and not port2.shear_angle:
         warnings["shear_angle_mismatch"].append(
@@ -449,7 +462,7 @@ def validate_optical_connection(
                 values=[port1.shear_angle, port2.shear_angle],
                 message=f"{port_names[0]} has a shear angle but {port_names[1]} "
                 f"does not! Shear angle is {port1.shear_angle} deg",
-            )
+            ),
         )
     elif not port1.shear_angle and port2.shear_angle:
         warnings["shear_angle_mismatch"].append(
@@ -458,21 +471,20 @@ def validate_optical_connection(
                 values=[port1.shear_angle, port2.shear_angle],
                 message=f"{port_names[1]} has a shear angle but {port_names[0]} "
                 f"does not! Shear angle is {port2.shear_angle} deg",
-            )
+            ),
         )
-    elif port1.shear_angle:
-        if (
-            abs(difference_between_angles(port1.shear_angle, port2.shear_angle))
-            > angle_tolerance
-        ):
-            warnings["shear_angle_mismatch"].append(
-                _make_warning(
-                    port_names,
-                    values=[port1.shear_angle, port2.shear_angle],
-                    message=f"Shear angle of {port_names[0]} and {port_names[1]} "
-                    f"differ by {abs(port1.shear_angle - port2.shear_angle)} deg",
-                )
-            )
+    elif port1.shear_angle and (
+        abs(difference_between_angles(port1.shear_angle, port2.shear_angle))
+        > angle_tolerance
+    ):
+        warnings["shear_angle_mismatch"].append(
+            _make_warning(
+                port_names,
+                values=[port1.shear_angle, port2.shear_angle],
+                message=f"Shear angle of {port_names[0]} and {port_names[1]} "
+                f"differ by {abs(port1.shear_angle - port2.shear_angle)} deg",
+            ),
+        )
 
     if any(is_top_level):
         if (
@@ -486,11 +498,11 @@ def validate_optical_connection(
                     values=[port1.orientation, port2.orientation],
                     message=f"{lower_port} was promoted to {top_port} but orientations"
                     f"do not match! Difference of {(abs(port1.orientation - port2.orientation))} deg",
-                )
+                ),
             )
     else:
         angle_misalignment = abs(
-            abs(difference_between_angles(port1.orientation, port2.orientation)) - 180
+            abs(difference_between_angles(port1.orientation, port2.orientation)) - 180,
         )
         if angle_misalignment > angle_tolerance:
             warnings["orientation_mismatch"].append(
@@ -498,7 +510,7 @@ def validate_optical_connection(
                     port_names,
                     values=[port1.orientation, port2.orientation],
                     message=f"{port_names[0]} and {port_names[1]} are misaligned by {angle_misalignment} deg",
-                )
+                ),
             )
 
     offset_mismatch = np.sqrt(np.sum(np.square(port2.center - port1.center)))
@@ -508,7 +520,7 @@ def validate_optical_connection(
                 port_names,
                 values=[port1.center, port2.center],
                 message=f"{port_names[0]} and {port_names[1]} are offset by {offset_mismatch} um",
-            )
+            ),
         )
 
 
@@ -535,7 +547,7 @@ def _get_references_to_netlist(component: Component) -> list[ComponentReference]
                 origin=ref["origin"],
                 rotation=ref["rotation"],
                 x_reflection=ref["x_reflection"],
-            )
+            ),
         ]
     return references
 
@@ -550,18 +562,21 @@ def get_netlist_recursive(
     """Returns recursive netlist for a component and subcomponents.
 
     Args:
+    ----
         component: to extract netlist.
         component_suffix: suffix to append to each component name.
             useful if to save and reload a back-annotated netlist.
         get_netlist_func: function to extract individual netlists.
 
     Keyword Args:
+    ------------
         full_settings: True returns all, false changed settings.
         tolerance: tolerance in nm to consider two ports connected.
         exclude_port_types: optional list of port types to exclude from netlisting.
         get_instance_name: function to get instance name.
 
     Returns:
+    -------
         Dictionary of netlists, keyed by the name of each component.
 
     """
@@ -625,7 +640,7 @@ def _demo_mzi_lattice() -> None:
 DEFAULT_CONNECTION_VALIDATORS = get_default_connection_validators()
 
 DEFAULT_CRITICAL_CONNECTION_ERROR_TYPES = {
-    "optical": ["width_mismatch", "shear_angle_mismatch", "orientation_mismatch"]
+    "optical": ["width_mismatch", "shear_angle_mismatch", "orientation_mismatch"],
 }
 
 

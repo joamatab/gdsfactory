@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -9,7 +11,9 @@ from gdsfactory.components.mzi import mzi2x2_2x2 as mmi_coupler_function
 from gdsfactory.components.mzi import mzi_coupler
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @cell
@@ -24,13 +28,15 @@ def mzi_lattice(
     r"""Mzi lattice filter.
 
     Args:
+    ----
         coupler_lengths: list of length for each coupler.
         coupler_gaps: list of coupler gaps.
         delta_lengths: list of length differences.
         mzi: function for the mzi.
         splitter: splitter function.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         length_y: vertical length for both and top arms.
         length_x: horizontal length.
         bend: 90 degrees bend library.
@@ -55,15 +61,14 @@ def mzi_lattice(
 
     """
     if len(coupler_lengths) != len(coupler_gaps):
+        msg = f"Got {len(coupler_lengths)} coupler_lengths and {len(coupler_gaps)} coupler_gaps"
         raise ValueError(
-            f"Got {len(coupler_lengths)} coupler_lengths and "
-            f"{len(coupler_gaps)} coupler_gaps"
+            msg,
         )
     if len(coupler_lengths) != len(delta_lengths) + 1:
+        msg = f"Got {len(coupler_lengths)} coupler_lengths and {len(delta_lengths)} delta_lengths. You need one more coupler_length than delta_lengths "
         raise ValueError(
-            f"Got {len(coupler_lengths)} coupler_lengths and "
-            f"{len(delta_lengths)} delta_lengths. "
-            "You need one more coupler_length than delta_lengths "
+            msg,
         )
 
     c = Component()
@@ -87,7 +92,9 @@ def mzi_lattice(
     stages = []
 
     for length, gap, delta_length in zip(
-        coupler_lengths[2:], coupler_gaps[2:], delta_lengths[1:]
+        coupler_lengths[2:],
+        coupler_gaps[2:],
+        delta_lengths[1:],
     ):
         splitter_settings = dict(gap=coupler_gaps[1], length=coupler_lengths[1])
         combiner_settings = dict(length=length, gap=gap)
@@ -109,7 +116,6 @@ def mzi_lattice(
 
     for stage in stages:
         stage.connect("o1", sprevious.ports["o4"])
-        # stage.connect('o2', sprevious.ports['o1'])
         sprevious = stage
 
     for port in cp1.get_ports_list(orientation=180, port_type="optical"):
@@ -159,6 +165,7 @@ def mzi_lattice_mmi(
     r"""Mzi lattice filter, with MMI couplers.
 
     Args:
+    ----
         coupler_widths: (for each MMI coupler, list of) input and output straight width.
         coupler_widths_tapers: (for each MMI coupler, list of) interface between input straights and mmi region.
         coupler_lengths_tapers: (for each MMI coupler, list of) into the mmi region.
@@ -172,7 +179,8 @@ def mzi_lattice_mmi(
         mzi: function for the mzi.
         splitter: splitter function.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         length_y: vertical length for both and top arms.
         length_x: horizontal length.
         bend: 90 degrees bend library.
@@ -210,12 +218,12 @@ def mzi_lattice_mmi(
             cross_sections_mmis,
         ]
     ):
-        raise ValueError("All MMI-related argument lists must be the same length.")
+        msg = "All MMI-related argument lists must be the same length."
+        raise ValueError(msg)
     if len(coupler_widths) != len(delta_lengths) + 1:
+        msg = f"Got {len(coupler_widths)} coupler_widths and {len(delta_lengths)} delta_lengths. You need one more coupler_width than delta_lengths "
         raise ValueError(
-            f"Got {len(coupler_widths)} coupler_widths and "
-            f"{len(delta_lengths)} delta_lengths. "
-            "You need one more coupler_width than delta_lengths "
+            msg,
         )
 
     c = Component()
@@ -321,7 +329,6 @@ def mzi_lattice_mmi(
 
     for stage in stages:
         stage.connect("o1", sprevious.ports["o4"])
-        # stage.connect('o2', sprevious.ports['o1'])
         sprevious = stage
 
     for port in cp1.get_ports_list(orientation=180, port_type="optical"):
@@ -338,16 +345,6 @@ if __name__ == "__main__":
     cpl = [10, 20, 30]
     cpg = [0.1, 0.2, 0.3]
     dl0 = [100, 200]
-
-    # cpl = [10, 20, 30, 40]
-    # cpg = [0.2, 0.3, 0.5, 0.5]
-    # dl0 = [0, 50, 100]
-
-    # c = mzi_lattice(
-    #     coupler_lengths=cpl, coupler_gaps=cpg, delta_lengths=dl0, length_x=1
-    # )
-    # c = mzi_lattice(delta_lengths=(20,))
-    # c.show(show_ports=True)
 
     c = mzi_lattice_mmi(
         coupler_widths=(None,) * 5,

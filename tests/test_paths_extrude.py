@@ -21,7 +21,11 @@ def test_path_port_types() -> None:
         port_types=("electrical", "electrical"),
     )
     X = gf.CrossSection(
-        width=0.5, offset=0, layer=LAYER.SLAB90, port_names=["o1", "o2"], sections=[s]
+        width=0.5,
+        offset=0,
+        layer=LAYER.SLAB90,
+        port_names=["o1", "o2"],
+        sections=[s],
     )
     P = gf.path.straight(npoints=100, length=10)
     c = gf.path.extrude(P, X)
@@ -40,8 +44,6 @@ def test_extrude_transition() -> None:
     transition = gf.path.transition(cs1, cs2)
     p = gf.path.straight(length)
     c = gf.path.extrude(p, transition)
-    # assert c.ports["o1"].cross_section == cs1
-    # assert c.ports["o2"].cross_section == cs2
     assert c.ports["o1"].width == w1
     assert c.ports["o2"].width == w2
 
@@ -69,7 +71,9 @@ def dummy_cladded_wg_cs(intent_layer, core_layer, core_width, clad_layer, clad_w
         Section(width=clad_width, offset=0, layer=clad_layer, name="clad"),
     )
     return gf.cross_section.cross_section(
-        width=core_width, sections=sections, layer=intent_layer
+        width=core_width,
+        sections=sections,
+        layer=intent_layer,
     )
 
 
@@ -110,7 +114,6 @@ def test_transition_cross_section_different_layers() -> None:
     # area of a trapezoid
     expected_area = (w1 + w2) / 2 * length
     # TODO: restore and replace after area() function is fixed
-    # assert c.area() == expected_area
     assert c._cell.area(True)[gf.get_layer("WGCLAD")] == expected_area
 
 

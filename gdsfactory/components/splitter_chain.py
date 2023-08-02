@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_s import bend_s
 from gdsfactory.components.mmi1x2 import mmi1x2
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec
 
 
 @gf.cell
@@ -16,6 +20,7 @@ def splitter_chain(
     """Chain of splitters.
 
     Args:
+    ----
         splitter: splitter to chain.
         columns: number of splitters to chain.
         bend: bend to connect splitters.
@@ -59,6 +64,5 @@ def splitter_chain(
 
 
 if __name__ == "__main__":
-    # component = splitter_chain(splitter=gf.components.mmi1x2, columns=4)
     component = splitter_chain()
     component.show()

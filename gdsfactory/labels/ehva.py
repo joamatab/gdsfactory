@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import flatdict
 import pydantic
@@ -8,7 +9,9 @@ import pydantic
 import gdsfactory as gf
 from gdsfactory.name import clean_name
 from gdsfactory.snap import snap_to_grid as snap
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Layer
 
 
 class Dft(pydantic.BaseModel):
@@ -52,6 +55,7 @@ def add_label_ehva(
     """Returns Component with measurement labels.
 
     Args:
+    ----
         component: to add labels to.
         die: string.
         port_types: list of port types to label.
@@ -76,7 +80,7 @@ CIRCUIT NAME:{component.name}
         info += [
             f"CIRCUITINFO NAME: {k}, VALUE: {v}"
             for k, v in metadata.items()
-            if k not in metadata_ignore and isinstance(v, (int, float, str))
+            if k not in metadata_ignore and isinstance(v, int | float | str)
         ]
 
     metadata = flatdict.FlatDict(component.metadata["full"])
@@ -133,9 +137,6 @@ if __name__ == "__main__":
         grating_coupler=gf.c.grating_coupler_te,
         decorator=add_label_ehva_demo,
     )
-
-    # add_label_ehva(c, die="demo_die", metadata_include_child=["width_mmi"])
-    # add_label_ehva(c, die="demo_die", metadata_include_child=[])
 
     print(c.labels[0])
     c.show(show_ports=True)

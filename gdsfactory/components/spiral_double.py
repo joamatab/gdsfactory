@@ -17,6 +17,7 @@ def spiral_double(
     """Returns a spiral double (spiral in, and then out).
 
     Args:
+    ----
         min_bend_radius: inner radius of the spiral.
         separation: separation between the loops.
         number_of_loops: number of loops per spiral.
@@ -27,7 +28,10 @@ def spiral_double(
     component = gf.Component()
 
     bend = gf.get_component(
-        bend, radius=min_bend_radius / 2, angle=180, cross_section=cross_section
+        bend,
+        radius=min_bend_radius / 2,
+        angle=180,
+        cross_section=cross_section,
     )
     bend1 = component.add_ref(bend).mirror()
     bend2 = component.add_ref(bend)

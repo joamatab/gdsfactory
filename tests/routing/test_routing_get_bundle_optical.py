@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_get_bundle_optical(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
 
@@ -36,7 +40,8 @@ def test_get_bundle_optical(
 
 
 def test_get_bundle_optical2(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
 
@@ -60,5 +65,4 @@ def test_get_bundle_optical2(
 
 
 if __name__ == "__main__":
-    # test_get_bundle_optical(None, check=False)
     test_get_bundle_optical2(None, check=False)

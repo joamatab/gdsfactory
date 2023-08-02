@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import float64, ndarray
@@ -13,7 +13,6 @@ from gdsfactory.components.taper import taper as taper_function
 from gdsfactory.components.via_corner import via_corner
 from gdsfactory.components.wire import wire_corner
 from gdsfactory.cross_section import strip
-from gdsfactory.port import Port
 from gdsfactory.routing.manhattan import (
     RouteError,
     get_route_error,
@@ -22,15 +21,20 @@ from gdsfactory.routing.manhattan import (
 )
 from gdsfactory.routing.path_length_matching import path_length_matched_points
 from gdsfactory.routing.utils import get_list_ports_angle
-from gdsfactory.typings import (
-    ComponentSpec,
-    Coordinate,
-    Coordinates,
-    CrossSectionSpec,
-    MultiCrossSectionAngleSpec,
-    Number,
-    Route,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.port import Port
+    from gdsfactory.typings import (
+        ComponentSpec,
+        Coordinate,
+        Coordinates,
+        CrossSectionSpec,
+        MultiCrossSectionAngleSpec,
+        Number,
+        Route,
+    )
 
 
 def _is_vertical(segment: Coordinate, tol: float = 1e-5) -> bool:
@@ -50,10 +54,12 @@ def _segment_sign(s: Coordinate) -> Number:
 
     if _is_horizontal(s):
         return np.sign(p1[0] - p0[0])
+    return None
 
 
 def get_ports_x_or_y_distances(
-    list_ports: list[Port], ref_point: Coordinate
+    list_ports: list[Port],
+    ref_point: Coordinate,
 ) -> list[Number]:
     if not list_ports:
         return []
@@ -99,6 +105,7 @@ def get_bundle_from_waypoints(
     Take a look at get_bundle_from_steps for easier definition.
 
     Args:
+    ----
         ports1: list of ports.
         ports2: list of ports.
         waypoints: list of points defining a route.
@@ -119,12 +126,12 @@ def get_bundle_from_waypoints(
 
     """
     if len(ports2) != len(ports1):
+        msg = f"Number of start ports should match number of end ports.        Got {len(ports1)} {len(ports2)}"
         raise ValueError(
-            f"Number of start ports should match number of end ports.\
-        Got {len(ports1)} {len(ports2)}"
+            msg,
         )
 
-    waypoints = [ports1[0].center] + list(waypoints) + [ports2[0].center]
+    waypoints = [ports1[0].center, *list(waypoints), ports2[0].center]
     for p in ports1:
         # if ports1 orientation is None, guess it from the first two waypoints
         if p.orientation is None:
@@ -199,9 +206,7 @@ def get_bundle_from_waypoints(
     except RouteError:
         return [on_route_error(waypoints)]
 
-    # bends90 = [
     #     gf.get_component(bend, cross_section=cross_section, **kwargs) for p in ports1
-    # ]
 
     if taper and not isinstance(cross_section, list):
         x = gf.get_cross_section(cross_section, **kwargs)
@@ -241,7 +246,9 @@ def get_bundle_from_waypoints(
 
 
 get_bundle_from_waypoints_electrical = partial(
-    get_bundle_from_waypoints, bend=wire_corner, cross_section="metal_routing"
+    get_bundle_from_waypoints,
+    bend=wire_corner,
+    cross_section="metal_routing",
 )
 
 get_bundle_from_waypoints_electrical_multilayer = partial(
@@ -260,7 +267,8 @@ def snap_route_to_end_point_x(route, x):
 
 
 def snap_route_to_end_point_y(
-    route: list[ndarray | tuple[float64, float64]], y: float64
+    route: list[ndarray | tuple[float64, float64]],
+    y: float64,
 ) -> list[ndarray | tuple[float64, float64]]:
     x1, x2 = (p[0] for p in route[-2:])
     return route[:-2] + [(x1, y), (x2, y)]
@@ -276,6 +284,7 @@ def _generate_manhattan_bundle_waypoints(
     """Returns waypoints for bundle.
 
     Args:
+    ----
         ports1: list of ports must face the same direction.
         ports2: list of ports must face the same direction.
         waypoints: from one point within the ports1 bank
@@ -308,7 +317,8 @@ def _generate_manhattan_bundle_waypoints(
             # if the reference port is last, reverse the whole list
             offsets_mid.reverse()
         else:
-            raise ValueError("Expected offset = 0 at either start or end of route.")
+            msg = "Expected offset = 0 at either start or end of route."
+            raise ValueError(msg)
 
     # if there is only one route, we should skip this step as it is irrelevant
     else:
@@ -322,7 +332,8 @@ def _generate_manhattan_bundle_waypoints(
         elif _is_vertical(s):
             dp = (sv * sign_seg * a, 0)
         else:
-            raise RouteError(f"Segment should be manhattan, got {s}")
+            msg = f"Segment should be manhattan, got {s}"
+            raise RouteError(msg)
 
         return [np.array(p) + dp for p in s]
 
@@ -349,8 +360,9 @@ def _generate_manhattan_bundle_waypoints(
             else:
                 s2_dir = "u"
 
+            msg = f"s1 / s2 should be h/v or v/h. Got {s1_dir} {s2_dir} {s1} {s2}"
             raise ValueError(
-                f"s1 / s2 should be h/v or v/h. Got {s1_dir} {s2_dir} {s1} {s2}"
+                msg,
             )
         return sv[0][0], sh[0][1]
 

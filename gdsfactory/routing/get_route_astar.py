@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from warnings import warn
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory import Port
-from gdsfactory.component import Component
 from gdsfactory.components.wire import wire_corner
 from gdsfactory.routing import get_route_from_waypoints
 from gdsfactory.routing.manhattan import route_manhattan
-from gdsfactory.typings import CrossSectionSpec, LayerSpec, Route
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec, LayerSpec, Route
 
 
 class Node:
@@ -37,6 +40,7 @@ def get_route_astar(
     """A* routing function. Finds a route between two ports avoiding obstacles.
 
     Args:
+    ----
         component: Component the route, and ports belong to.
         port1: input.
         port2: output.
@@ -128,7 +132,9 @@ def get_route_astar(
                 return get_route_from_waypoints(points, cross_section=cross_section)
             else:
                 return get_route_from_waypoints(
-                    points, cross_section=cross_section, bend=wire_corner
+                    points,
+                    cross_section=cross_section,
+                    bend=wire_corner,
                 )
 
         # Generate neighbours
@@ -148,9 +154,8 @@ def get_route_astar(
 
             # Compute f, g, h
             neighbour.g = current_node.g + resolution
-            # print(neighbour.g)
             neighbour.h = np.sqrt(
-                (neighbour.position[0] - end_node.position[0]) ** 2
+                (neighbour.position[0] - end_node.position[0]) ** 2,
             ) + ((neighbour.position[1] - end_node.position[1]) ** 2)
             neighbour.f = neighbour.g + neighbour.h
 
@@ -206,7 +211,7 @@ def _generate_grid(
     )  # discretize component space
     x, y = x[0], y[:, 0]  # weed out copies
     grid = np.zeros(
-        (len(x), len(y))
+        (len(x), len(y)),
     )  # mapping from gdsfactory's x-, y- coordinate to grid vertex
 
     # assign 1 for obstacles
@@ -291,35 +296,6 @@ def _generate_neighbours(
 
 
 if __name__ == "__main__":
-    # cross_section = gf.get_cross_section("metal1", width=3)
-
-    # c = gf.Component("get_route_astar")
-    # w = gf.components.straight(cross_section=cross_section)
-
-    # left = c << w
-    # right = c << w
-    # right.move((100, 80))
-
-    # obstacle = gf.components.rectangle(size=(100, 3), layer="M1")
-    # obstacle1 = c << obstacle
-    # obstacle2 = c << obstacle
-    # obstacle1.ymin = 40
-    # obstacle2.xmin = 25
-
-    # port1 = left.ports["e2"]
-    # port2 = right.ports["e2"]
-
-    # routes = get_route_astar(
-    #     component=c,
-    #     port1=port1,
-    #     port2=port2,
-    #     cross_section=cross_section,
-    #     resolution=5,
-    #     distance=6.5,
-    #     avoid_layers=("M1",),
-    # )
-    # c.add(routes.references)
-
     c = gf.Component("get_route_astar_avoid_layers")
     cross_section = gf.get_cross_section("metal1", width=3)
     w = gf.components.straight(cross_section=cross_section)

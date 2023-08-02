@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
 from gdsfactory.components.text_rectangular import text_rectangular
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 text_rectangular_mini = partial(text_rectangular, size=1)
 
@@ -25,6 +28,7 @@ def cdsem_straight(
     """Returns straight waveguide lines width sweep.
 
     Args:
+    ----
         widths: for the sweep.
         length: for the line.
         cross_section: for the lines.

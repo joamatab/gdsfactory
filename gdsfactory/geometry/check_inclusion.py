@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from gdsfactory.typings import ComponentOrPath
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrPath
 
 
 def check_inclusion(
@@ -19,6 +22,7 @@ def check_inclusion(
     inclusion if 0 no area violates exclusion.
 
     Args:
+    ----
         gdspath: path to GDS.
         layer_in: tuple.
         layer_out: tuple.
@@ -46,7 +50,8 @@ def check_inclusion(
 
     valid_metrics = ["Square", "Euclidean"]
     if metrics not in valid_metrics:
-        raise ValueError("metrics = {metrics!r} not in {valid_metrics}")
+        msg = "metrics = {metrics!r} not in {valid_metrics}"
+        raise ValueError(msg)
     metrics = getattr(pya.Region, metrics)
 
     d = b.inside_check(
@@ -68,7 +73,6 @@ if __name__ == "__main__":
     inclusion = 0.1
     w2 = w1 - inclusion
     min_inclusion = 0.11
-    # min_inclusion = 0.01
     dbu = 1000
     layer = (1, 0)
     c = gf.Component()
@@ -83,12 +87,4 @@ if __name__ == "__main__":
     print(check_inclusion(c, min_inclusion=min_inclusion))
 
     # if isinstance(gdspath, gf.Component):
-    #     gdspath.flatten()
-    #     gdspath = gdspath.write_gds()
-    # layout = pya.Layout()
-    # layout.read(str(gdspath))
-    # cell = layout.top_cell()
     # region = pya.Region(cell.begin_shapes_rec(layout.layer(layer[0], layer[1])))
-
-    # d = region.space_check(min_inclusion * dbu)
-    # print(d.polygons().area())

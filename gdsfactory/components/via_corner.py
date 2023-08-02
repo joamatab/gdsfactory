@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from numpy import floor
 
 import gdsfactory as gf
@@ -7,7 +9,9 @@ from gdsfactory.components.compass import compass
 from gdsfactory.components.via import via1
 from gdsfactory.cross_section import metal2, metal3
 from gdsfactory.port import select_ports
-from gdsfactory.typings import ComponentSpec, MultiCrossSectionAngleSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, MultiCrossSectionAngleSpec
 
 
 @gf.cell
@@ -25,6 +29,7 @@ def via_corner(
     Use in place of wire_corner to route between two layers.
 
     Args:
+    ----
         cross_section: list of cross_section, orientation pairs.
         vias: vias to use to fill the rectangles.
         layers_labels: Labels to use for each layer.
@@ -58,7 +63,8 @@ def via_corner(
             elif (0 in orientations) or (180 in orientations):
                 orientation = 180
             else:
-                raise ValueError(f"Port orientation {orientations} not valid.")
+                msg = f"Port orientation {orientations} not valid."
+                raise ValueError(msg)
             ports = ref.ports
             ports = select_ports(ports, orientation=orientation)
             c.add_ports(ports, prefix=f"{layers_labels[i]}_")
@@ -76,7 +82,10 @@ def via_corner(
         nb_vias_x = int(floor(nb_vias_x)) or 1
         nb_vias_y = int(floor(nb_vias_y)) or 1
         ref = c.add_array(
-            via, columns=nb_vias_x, rows=nb_vias_y, spacing=(pitch_x, pitch_y)
+            via,
+            columns=nb_vias_x,
+            rows=nb_vias_y,
+            spacing=(pitch_x, pitch_y),
         )
 
         cw = (min_width - (nb_vias_x - 1) * pitch_x - w) / 2
@@ -88,7 +97,5 @@ def via_corner(
 
 
 if __name__ == "__main__":
-    # v = via_corner(cross_section=[(metal2, (0, 180)), (metal3, (90, 270))])
     v = via_corner()
-    # v.plot()
     v.show()

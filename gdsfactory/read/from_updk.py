@@ -7,11 +7,12 @@ from __future__ import annotations
 
 import io
 import pathlib
-from typing import IO
+from typing import IO, TYPE_CHECKING
 
 from omegaconf import OmegaConf
 
-from gdsfactory.typings import PathType
+if TYPE_CHECKING:
+    from gdsfactory.typings import PathType
 
 
 def from_updk(
@@ -25,17 +26,17 @@ def from_updk(
     """Read uPDK definition and returns a gdsfactory script.
 
     Args:
+    ----
         filepath: uPDK filepath definition.
         filepath_out: optional filepath to save script. if None only returns script and does not save it.
         layer_bbox: layer to draw bounding boxes.
         optical_xsections: Optional list of names of xsections that will add optical ports.
         electrical_xsections: Optional list of names of xsections that will add electrical ports.
     """
-
     optical_xsections = optical_xsections or []
     electrical_xsections = electrical_xsections or []
 
-    if isinstance(filepath, (str, pathlib.Path, IO)):
+    if isinstance(filepath, str | pathlib.Path | IO):
         filepath = (
             io.StringIO(filepath)
             if isinstance(filepath, str) and "\n" in filepath
@@ -43,7 +44,7 @@ def from_updk(
         )
 
         conf = OmegaConf.load(
-            filepath
+            filepath,
         )  # nicer loader than conf = yaml.safe_load(filepath)
     else:
         conf = OmegaConf.create(filepath)
@@ -62,7 +63,7 @@ layer_bbox = {layer_bbox}
     for xsection_name, xsection in conf.xsections.items():
         script += f"{xsection_name} = gf.CrossSection(width={xsection.width})\n"
 
-    xs = ",".join([f"{name}={name}" for name in conf.xsections.keys()])
+    xs = ",".join([f"{name}={name}" for name in conf.xsections])
     script += "\n"
     script += f"cross_sections = dict({xs})"
     script += "\n"
@@ -71,7 +72,7 @@ layer_bbox = {layer_bbox}
         parameters = block.parameters
         parameters_string = (
             ", ".join(
-                [f"{p_name}:{p.type}={p.value}" for p_name, p in parameters.items()]
+                [f"{p_name}:{p.type}={p.value}" for p_name, p in parameters.items()],
             )
             if parameters
             else ""
@@ -81,7 +82,7 @@ layer_bbox = {layer_bbox}
                 [
                     f"  {p_name}: {p.doc} (min: {p.min}, max: {p.max}, {p.unit})."
                     for p_name, p in parameters.items()
-                ]
+                ],
             )
             if parameters
             else ""
@@ -92,7 +93,7 @@ layer_bbox = {layer_bbox}
                 [
                     f"    c.add_label(text=f'{p_name}:{{{p_name}}}', position=(xc, yc-{i}/{len(parameters)}*ysize/2), layer=layer_label)"
                     for i, p_name in enumerate(parameters)
-                ]
+                ],
             )
             if layer_label and parameters
             else ""

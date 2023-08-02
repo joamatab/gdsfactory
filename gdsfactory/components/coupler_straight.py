@@ -14,6 +14,7 @@ def coupler_straight(
     """Coupler_straight with two parallel straights.
 
     Args:
+    ----
         length: of straight.
         gap: between straights.
         kwargs: cross_section settings.
@@ -23,9 +24,6 @@ def coupler_straight(
 
     top = component << straight_component
     bot = component << straight_component
-
-    # bot.ymax = 0
-    # top.ymin = gap
 
     top.movey(straight_component.info["width"] + gap)
 

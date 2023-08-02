@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell

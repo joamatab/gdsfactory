@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.components.straight import straight
 from gdsfactory.difftest import difftest
-from gdsfactory.port import Port
 from gdsfactory.typings import ComponentSpec, Routes
+
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
 
 
 def get_routes_straight(
@@ -15,6 +19,7 @@ def get_routes_straight(
     """Returns routes made by 180 degree straights.
 
     Args:
+    ----
         ports: List or dict of ports.
         straight: function for straight.
         kwargs: waveguide settings.

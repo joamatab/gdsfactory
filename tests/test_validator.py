@@ -20,20 +20,15 @@ def test_validator_pass() -> None:
 
 
 # def test_validator_fail_empty():
-#     component = gf.Component()
 #     with pytest.raises(pydantic.ValidationError):
-#         component_with_straight(component=component)
 
 
 def test_validator_fail_name_too_long() -> None:
     component = gf.Component(name="a" * 200)
 
-    # component_with_straight(component=component)
     with pytest.raises(pydantic.ValidationError):
         component_with_straight(component=component)
 
 
 if __name__ == "__main__":
-    # test_validator_pass()
-    # test_validator_fail_empty()
     test_validator_fail_name_too_long()

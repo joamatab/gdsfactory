@@ -1,16 +1,21 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Layer
 
 
 def _union_polygons(polygons, precision: float = 1e-4):
     """Performs union of polygons within PolygonSet or list of polygons.
 
     Args:
+    ----
         polygons : PolygonSet or list of polygons
             A set containing the input polygons.
         precision : float
@@ -19,6 +24,7 @@ def _union_polygons(polygons, precision: float = 1e-4):
             The maximum number of vertices within the resulting polygon.
 
     Returns:
+    -------
         unioned: polygon The result of the union of all the polygons
             within the input PolygonSet.
     """
@@ -43,6 +49,7 @@ def union(
     based on phidl.geometry.union
 
     Args:
+    ----
         component: Component(/Reference), list of Component(/Reference), or Polygon
             A containing the polygons to perform union and inversion on.
         by_Layer: performs the union operation layer-wise so each layer can be

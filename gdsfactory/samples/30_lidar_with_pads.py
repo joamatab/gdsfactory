@@ -13,12 +13,12 @@ import gdsfactory as gf
 if __name__ == "__main__":
     c = gf.Component("lidar")
     elements = 2**2
-    # elements = 2**4
     antenna_pitch = 2.0
     splitter_tree_spacing = (50.0, 70.0)
 
     splitter_tree = c << gf.components.splitter_tree(
-        noutputs=elements, spacing=splitter_tree_spacing
+        noutputs=elements,
+        spacing=splitter_tree_spacing,
     )
     phase_shifter = gf.components.straight_heater_meander()
 
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     phase_shifter_electrical_ports_east = []
 
     for i, port in enumerate(
-        splitter_tree.get_ports_list(orientation=0, port_type="optical")
+        splitter_tree.get_ports_list(orientation=0, port_type="optical"),
     ):
         ref = c.add_ref(phase_shifter, alias=f"ps{i}")
         ref.connect("o1", port)
@@ -37,7 +37,10 @@ if __name__ == "__main__":
         phase_shifter_electrical_ports_east.append(ref.ports["e2"])
 
     antennas = c << gf.components.array(
-        gf.components.dbr(n=200), rows=elements, columns=1, spacing=(0, antenna_pitch)
+        gf.components.dbr(n=200),
+        rows=elements,
+        columns=1,
+        spacing=(0, antenna_pitch),
     )
     antennas.xmin = ref.xmax + 50
     antennas.y = 0
@@ -56,7 +59,9 @@ if __name__ == "__main__":
     pads1.y = 0
     ports1 = pads1.get_ports_list(orientation=0)
     routes = gf.routing.get_bundle_electrical(
-        ports1=ports1, ports2=phase_shifter_electrical_ports_west, separation=20
+        ports1=ports1,
+        ports2=phase_shifter_electrical_ports_west,
+        separation=20,
     )
     for route in routes:
         c.add(route.references)

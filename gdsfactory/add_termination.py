@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.port import Port
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
+    from gdsfactory.typings import ComponentSpec
 
 terminator_function = partial(taper_function, width2=0.1)
 
@@ -24,6 +27,7 @@ def add_termination(
     """Returns component with terminator on some ports.
 
     Args:
+    ----
         component: to add terminator.
         ports: optional list of ports to terminate (defaults to all).
         terminator: factory for the terminator.
@@ -55,5 +59,4 @@ def add_termination(
 if __name__ == "__main__":
     c = gf.components.straight(length=50)
     cc = add_termination(component=c)
-    # cc = add_termination(component=c, orientation=0)
     cc.show(show_ports=True)

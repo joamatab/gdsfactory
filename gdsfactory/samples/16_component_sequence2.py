@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.straight import straight
 from gdsfactory.components.taper import taper_strip_to_ridge
 
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+
 
 @gf.cell
 def cutback_phase(
-    straight_length: float = 100.0, bend_radius: float = 12.0, n: int = 2
+    straight_length: float = 100.0,
+    bend_radius: float = 12.0,
+    n: int = 2,
 ) -> Component:
     """Modulator sections connected by bends."""
     # Define sub components
@@ -40,7 +46,8 @@ def cutback_phase(
     heater_seq = "-H-H-H-H-"
     sequence = repeated_sequence * n + "SIPO" + heater_seq
     return component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component
+        sequence=sequence,
+        symbol_to_component=symbol_to_component,
     )
 
 

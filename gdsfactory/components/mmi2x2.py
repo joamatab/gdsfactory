@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
-from gdsfactory.component import Component
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
 
 
 @gf.cell
 def mmi2x2(
-    width: Optional[float] = None,
+    width: Optional[float] | None = None,
     width_taper: float = 1.0,
     length_taper: float = 10.0,
     length_mmi: float = 5.5,
@@ -24,6 +28,7 @@ def mmi2x2(
     r"""Mmi 2x2.
 
     Args:
+    ----
         width: input and output straight width.
         width_taper: interface between input straights and mmi region.
         length_taper: into the mmi region.
@@ -131,7 +136,6 @@ def mmi2x2(
 
 
 if __name__ == "__main__":
-    # c = mmi2x2(gap_mmi=0.252, cross_section="metal1")
     c = mmi2x2(gap_mmi=0.252)
     c.show(show_ports=True)
     c.pprint()

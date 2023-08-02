@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 from functools import partial
-
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_get_bundle_udirect_pads(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     c = gf.Component("test_get_bundle_udirect_pads")
 

@@ -16,5 +16,4 @@ def test_settings_different() -> None:
 
 
 if __name__ == "__main__":
-    # test_waveguide_setting()
     test_settings_different()

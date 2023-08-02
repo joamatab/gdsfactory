@@ -11,6 +11,7 @@ def from_dphox(device, foundry) -> Component:
     https://dphox.readthedocs.io/en/latest/index.html
 
     Args:
+    ----
         device: Dphox device.
         foundry: Dphox foundry object.
 

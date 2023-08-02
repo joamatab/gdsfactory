@@ -64,7 +64,9 @@ def remove_flat_angles(points: ndarray) -> ndarray:
 
 
 def remove_identicals(
-    pts: ndarray, grids_per_unit: int = 1000, closed: bool = True
+    pts: ndarray,
+    grids_per_unit: int = 1000,
+    closed: bool = True,
 ) -> ndarray:
     if len(pts) > 1:
         identicals = np.prod(abs(pts - np.roll(pts, -1, 0)) < 0.5 / grids_per_unit, 1)
@@ -91,6 +93,7 @@ def curvature(points: ndarray, t: ndarray) -> ndarray:
         t: numpy.array of size n
 
     Return:
+    ------
         The curvature at each point.
 
     Computes the curvature at every point excluding the first and last point.
@@ -121,6 +124,7 @@ def path_length(points: ndarray) -> float64:
     """Returns: The path length.
 
     Args:
+    ----
         points: With shape (N, 2) representing N points with coordinates x, y.
     """
     dpts = points[1:, :] - points[:-1, :]
@@ -172,6 +176,7 @@ def extrude_path(
     Extrude a path of `width` along a curve defined by `points`.
 
     Args:
+    ----
         points: numpy 2D array of shape (N, 2).
         width: of the path to extrude.
         with_manhattan_facing_angles: snaps to manhattan angles.
@@ -181,6 +186,7 @@ def extrude_path(
         grid: in um.
 
     Returns:
+    -------
         numpy 2D array of shape (2*N, 2).
     """
     from gdsfactory.pdk import get_grid_size
@@ -225,9 +231,7 @@ def extrude_path(
     else:
         pts = np.vstack((points + offsets, points_back))
 
-    pts = np.round(pts / grid) * grid
-
-    return pts
+    return np.round(pts / grid) * grid
 
 
 def polygon_grow(polygon: ndarray, offset: float) -> ndarray:

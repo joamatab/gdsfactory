@@ -1,4 +1,4 @@
-"""Polygon
+"""Polygon.
 
 Adapted from PHIDL https://github.com/amccaugh/phidl/ by Adam McCaughan
 """
@@ -17,6 +17,7 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
     """Polygonal geometric object.
 
     Args:
+    ----
         points: array-like[N][2] Coordinates of the vertices of the Polygon.
         gds_layer: int GDSII layer of the Polygon.
         gds_datatype: int GDSII datatype of the Polygon.
@@ -26,7 +27,7 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
         """Returns path points."""
         return f"Polygon(layer=({self.layer}, {self.datatype}), points={self.points})"
 
-    def __init__(self, points, layer):
+    def __init__(self, points, layer) -> None:
         from gdsfactory.pdk import get_layer
 
         layer, datatype = get_layer(layer)
@@ -38,11 +39,14 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
         return self.bounding_box()
 
     def rotate(
-        self, angle: float = 45, center: tuple[float, float] = (0, 0)
+        self,
+        angle: float = 45,
+        center: tuple[float, float] = (0, 0),
     ) -> Polygon:
         """Rotates a Polygon by the specified angle.
 
         Args:
+        ----
             angle: Angle to rotate the Polygon in degrees.
             center: Midpoint of the Polygon.
         """
@@ -60,6 +64,7 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
         or a key corresponding to one of the Ports in this device.
 
         Args:
+        ----
             origin: Origin point of the move.
             destination : Destination point of the move.
             axis: {'x', 'y'} Direction of move.
@@ -76,6 +81,7 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
         [1,2] or array-like[N][2], and will return in kind.
 
         Args:
+        ----
             p1: First point of the line.
             p2: Second point of the line.
         """
@@ -87,18 +93,18 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
         Ramer-Douglas-Peucker algorithm.
 
         Args:
+        ----
             tolerance: float
                 Tolerance value for the simplification algorithm.  All points that
                 can be removed without changing the resulting polygon by more than
                 the value listed here will be removed. Also known as `epsilon` here
                 https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
         """
-
         points = _simplify(self.points, tolerance=tolerance)
         return Polygon(points, (self.layer, self.datatype))
 
     def snap(self, nm: int = 1) -> sp.Polygon:
-        """Returns new polygon snap points to grid"""
+        """Returns new polygon snap points to grid."""
         points = snap_to_grid(self.points, nm=nm)
         return Polygon(points, (self.layer, self.datatype))
 
@@ -111,8 +117,7 @@ class Polygon(gdstk.Polygon, _GeometryHelper):
 
         layer, datatype = get_layer(layer)
         points_on_grid = np.round(polygon.exterior.coords, 3)
-        polygon = Polygon(points_on_grid, (layer, datatype))
-        return polygon
+        return Polygon(points_on_grid, (layer, datatype))
 
 
 if __name__ == "__main__":

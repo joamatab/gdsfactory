@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.taper_cross_section import taper_cross_section
-from gdsfactory.typings import CrossSectionSpec, LayerSpecs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec, LayerSpecs
 
 
 @gf.cell
@@ -20,6 +23,7 @@ def terminator(
     """Returns doped taper to terminate waveguides.
 
     Args:
+    ----
         length: distance between input and narrow tapered end.
         cross_section_input: input cross-section.
         cross_section_tip: cross-section at the end of the termination.
@@ -31,7 +35,8 @@ def terminator(
     c = Component()
 
     cross_section_tip = cross_section_tip or gf.get_cross_section(
-        cross_section_input, width=tapered_width
+        cross_section_input,
+        width=tapered_width,
     )
 
     taper = c << gf.get_component(
@@ -43,7 +48,10 @@ def terminator(
 
     for layer in doping_layers:
         c << gf.components.bbox(
-            bbox=taper.bbox, layer=layer, top=doping_offset, bottom=doping_offset
+            bbox=taper.bbox,
+            layer=layer,
+            top=doping_offset,
+            bottom=doping_offset,
         )
 
     c.add_port(name="o1", port=taper.ports["o1"])

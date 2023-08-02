@@ -35,7 +35,9 @@ def test_different_pin_layers() -> None:
 # Tests that the function works with different pin lengths
 def test_different_pin_lengths() -> None:
     script = write_connectivity_checks(
-        pin_widths=[0.5, 0.9, 0.45], pin_layer=(1, 10), pin_length=2 * nm
+        pin_widths=[0.5, 0.9, 0.45],
+        pin_layer=(1, 10),
+        pin_length=2 * nm,
     )
     assert isinstance(script, str)
     assert "pin = input(1, 10)" in script
@@ -46,7 +48,8 @@ def test_different_pin_lengths() -> None:
 def test_invalid_pin_layer() -> None:
     with pytest.raises(ValueError):
         write_connectivity_checks(
-            pin_widths=[0.5, 0.9, 0.45], pin_layer="wrong_layer_name"
+            pin_widths=[0.5, 0.9, 0.45],
+            pin_layer="wrong_layer_name",
         )
 
 
@@ -61,13 +64,4 @@ def test_invalid_device_layer() -> None:
 
 
 if __name__ == "__main__":
-    # s = write_connectivity_checks(pin_widths=[0.5, 0.9, 0.45], pin_layer='wrong')
-    # print(s)
-    # script = write_connectivity_checks(
-    #     pin_widths=[0.5, 0.9, 0.45], pin_layer=(1, 10), pin_length=2 * nm
-    # )
-    # print(script)
-    # test_default_values()
-    # test_different_pin_widths()
-    # test_different_pin_layers()
     test_different_pin_lengths()

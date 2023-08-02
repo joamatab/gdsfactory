@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.difftest import difftest
 from gdsfactory.generic_tech.containers import containers
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 component = gf.components.mzi2x2_2x2(straight_x_top="straight_heater_metal")
 
@@ -33,8 +36,6 @@ def test_gds(container_type: str) -> None:
 # Special test cases for exotic components
 # def test_add_gratings_and_loopback(data_regression: DataRegressionFixture) -> None:
 #     """This container requires all ports to face the same direction."""
-#     c = add_gratings_and_loopback(component=spiral_inner_io())
-#     data_regression.check(c.settings)
 
 
 add_gratings_with_loopback = (
@@ -54,17 +55,12 @@ spiral_loopback = partial(
 
 # def test_container_double_decorator(test=True) -> None:
 #     """Avoid regressions when exporting settings."""
-#     c = spiral()
 #     if test:
-#         difftest(c)
 
-#     c = spiral_loopback()
 #     if test:
-#         difftest(c)
 
 
 if __name__ == "__main__":
     c = spiral()
     c.show()
     # for i in container_names:
-    #     print(i)

@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.fiber import circle
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def fiber_array(
     """Returns a fiber array.
 
     Args:
+    ----
         n: number of fibers.
         pitch: spacing.
         core_diameter: 10um.

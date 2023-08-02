@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 yaml_str = """
 name: component_yaml_ports
@@ -47,7 +50,8 @@ instances:
 
 
 def test_component_from_yaml_ports(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     if check:
         c = gf.read.from_yaml(yaml_str)
@@ -55,5 +59,4 @@ def test_component_from_yaml_ports(
 
 
 if __name__ == "__main__":
-    # test_component_from_yaml_ports(None, check=False)
     c = gf.read.from_yaml(yaml_str)

@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.path import transition_exponential
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -19,6 +23,7 @@ def taper_parabolic(
     """Returns a parabolic_taper.
 
     Args:
+    ----
         length: in um.
         width1: in um.
         width2: in um.
@@ -42,7 +47,6 @@ def taper_parabolic(
 
 
 if __name__ == "__main__":
-    # c = taper_parabolic(width2=6, length=40, exp=0.6)
     c = taper_parabolic()
     print(c.name)
     c.show(show_ports=True)

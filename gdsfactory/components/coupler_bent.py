@@ -114,9 +114,10 @@ def coupler_bent(
     length_straight: float = 10,
 ) -> gf.Component:
     """Returns Broadband SOI curved / straight directional coupler.
-    based on: https://doi.org/10.1038/s41598-017-07618-6
+    based on: https://doi.org/10.1038/s41598-017-07618-6.
 
     Args:
+    ----
         gap: gap.
         radius: radius coupling.
         length: coupler_length.

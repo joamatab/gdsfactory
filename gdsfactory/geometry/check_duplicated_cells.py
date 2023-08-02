@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def check_duplicated_cells(gdspath: Path | str):
@@ -9,6 +12,7 @@ def check_duplicated_cells(gdspath: Path | str):
     klayout will fail to load the layout if it finds any duplicated cells.
 
     Args:
+    ----
         gdspath: path to GDS or Component
 
     """

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -9,7 +10,9 @@ from gdsfactory.components.coupler_ring import coupler_ring
 from gdsfactory.components.straight import straight
 from gdsfactory.components.taper import taper
 from gdsfactory.snap import assert_on_2nm_grid
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 taper2 = partial(taper, width2=3)
 
@@ -33,6 +36,7 @@ def ring_single_dut(
     the middle to extract loss from quality factor.
 
     Args:
+    ----
         component: device under test.
         gap: in um.
         length: in um.
@@ -45,6 +49,7 @@ def ring_single_dut(
         kwargs: cross_section settings.
 
     Args:
+    ----
         with_component: if False changes component for just a straight.
 
     .. code::
@@ -61,7 +66,11 @@ def ring_single_dut(
     assert_on_2nm_grid(gap)
 
     coupler = gf.get_component(
-        coupler, gap=gap, length_x=length_x, radius=radius, **kwargs
+        coupler,
+        gap=gap,
+        length_x=length_x,
+        radius=radius,
+        **kwargs,
     )
 
     component_xsize = component.get_ports_xsize()

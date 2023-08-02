@@ -10,12 +10,16 @@ The actual chain of components is supplied by a string or a list
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components import bend_circular
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.straight import straight
 from gdsfactory.components.straight_pin import straight_pn
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -40,7 +44,8 @@ def cutback_pn() -> Component:
 
     sequence = "AB-H-H-H-H-BA"
     return component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component
+        sequence=sequence,
+        symbol_to_component=symbol_to_component,
     )
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import float64
@@ -17,7 +18,9 @@ from gdsfactory.components.bezier import (
 from gdsfactory.components.ellipse import ellipse
 from gdsfactory.components.taper import taper
 from gdsfactory.geometry.functions import path_length
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
 
 
 def snap_to_grid(p: float, grid_per_unit: int = 1000) -> float64:
@@ -37,6 +40,7 @@ def crossing_arm(
     """Returns crossing arm.
 
     Args:
+    ----
         r1: ellipse radius1.
         r2: ellipse radius2.
         w: width in um.
@@ -97,6 +101,7 @@ def crossing(
     """Waveguide crossing.
 
     Args:
+    ----
         arm: arm spec.
         cross_section: spec.
     """
@@ -138,6 +143,7 @@ def crossing_from_taper(taper=lambda: taper(width2=2.5, length=3.0)) -> Componen
     The default is a dummy taper.
 
     Args:
+    ----
         taper: taper function.
     """
     taper = gf.get_component(taper)
@@ -169,6 +175,7 @@ def crossing_etched(
     Then we etch the ellipses down to 150nm slabs and we keep linear taper at 220nm.
 
     Args:
+    ----
         width: input waveguides width.
         r1: radii.
         r2: radii.
@@ -207,12 +214,6 @@ def crossing_etched(
 
     c.add_polygon(taper_cross_pts, layer=layer_wg)
 
-    # tapers_poly = c.add_polygon(taper_cross_pts, layer=layer_wg)
-    # b = a - 0.1  # To make sure we get 4 distinct polygons when doing bool ops
-    # tmp_polygon = [(-b, b), (b, b), (b, -b), (-b, -b)]
-    # polys_etch = gdstk.fast_boolean([tmp_polygon], tapers_poly, "not", layer=layer_slab)
-    # c.add(polys_etch)
-
     positions = [(a, 0), (0, a), (-a, 0), (0, -a)]
     angles = [0, 90, 180, 270]
 
@@ -241,6 +242,7 @@ def crossing45(
     r"""Returns 45deg crossing with bends.
 
     Args:
+    ----
         crossing: crossing function.
         port_spacing: target I/O port spacing.
         dx: target length.
@@ -262,7 +264,8 @@ def crossing45(
 
     """
     crossing = gf.get_component(
-        crossing, cross_section=cross_section_bends or cross_section
+        crossing,
+        cross_section=cross_section_bends or cross_section,
     )
 
     c = Component()
@@ -300,7 +303,7 @@ def crossing45(
 
     tol = 1e-2
     assert abs(bend.info["start_angle"] - start_angle) < tol, print(
-        f"{bend.info['start_angle']} differs from {start_angle}"
+        f"{bend.info['start_angle']} differs from {start_angle}",
     )
     assert abs(bend.info["end_angle"] - end_angle) < tol, bend.info["end_angle"]
 
@@ -310,7 +313,6 @@ def crossing45(
     b_br = bend.ref(position=p_s, port_id="o1", v_mirror=True)
 
     for cmp_ref in [b_tr, b_br, b_tl, b_bl]:
-        # cmp_ref = _cmp.ref()
         c.add(cmp_ref)
         c.absorb(cmp_ref)
     c.absorb(x)
@@ -350,6 +352,7 @@ def compensation_path(
     with input and output ports having same y coordinates
 
     Args:
+    ----
         crossing45: component that we want to match in path length.
             needs to have .info["components"] with bends and crossing.
         direction: the direction in which the bend should go "top" / "bottom".
@@ -430,10 +433,15 @@ def compensation_path(
     crossing0 = c << gf.get_component(crossing)
 
     sbend_left = sbend.ref(
-        position=crossing0.ports["o1"], port_id="o2", v_mirror=v_mirror
+        position=crossing0.ports["o1"],
+        port_id="o2",
+        v_mirror=v_mirror,
     )
     sbend_right = sbend.ref(
-        position=crossing0.ports["o3"], port_id="o2", h_mirror=True, v_mirror=v_mirror
+        position=crossing0.ports["o3"],
+        port_id="o2",
+        h_mirror=True,
+        v_mirror=v_mirror,
     )
 
     c.add(sbend_left)
@@ -486,20 +494,5 @@ def _demo() -> None:
 
 
 if __name__ == "__main__":
-    # c = crossing45()
     c = compensation_path()
-    # c = crossing(
-    #     cross_section=dict(
-    #         cross_section="strip",
-    #         settings=dict(cladding_offsets=[0], cladding_layers=[(3, 0)]),
-    #     )
-    # )
-    # print(c.ports["E1"].y - c.ports['o2'].y)
-    # print(c.get_ports_array())
-    # _demo()
-    # c = crossing_from_taper()
-    # c.pprint()
-    # c = crossing_etched()
-    # c = compensation_path()
-    # c = crossing45(port_spacing=40)
     c.show(show_ports=True)

@@ -16,6 +16,7 @@ def coupler_straight_asymmetric(
     """Coupler with two parallel straights of different widths.
 
     Args:
+    ----
         length: of straight.
         gap: between straights.
         width_top: of top straight.

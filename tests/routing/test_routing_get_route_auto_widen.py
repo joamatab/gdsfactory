@@ -51,13 +51,8 @@ def test_get_route_auto_widen() -> None:
 if __name__ == "__main__":
     c = gf.Component()
     route = gf.routing.get_route_from_waypoints(
-        # [(0, 0), (300, 0), (300, 300), (-600, 300), (-600, -300)],
         [(0, 0), (300, 0), (300, 300), (300, 600), (600, 600)],
         cross_section="strip_auto_widen",
-        # cross_section=xs_pin_m1,
-        # cross_section="strip_auto_widen",
-        # bend=partial(gf.components.bend_euler, cross_section=xs_pin),
-        # taper=taper_pin,
         radius=30,
     )
     c.add(route.references)

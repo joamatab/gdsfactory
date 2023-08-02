@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler_ring import coupler_ring as coupler_ring_function
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -25,6 +29,7 @@ def ring_double(
     connected with two vertical straights (sl: left, sr: right)
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -56,7 +61,9 @@ def ring_double(
         **kwargs,
     )
     straight_component = straight(
-        length=length_y, cross_section=cross_section, **kwargs
+        length=length_y,
+        cross_section=cross_section,
+        **kwargs,
     )
 
     c = Component()

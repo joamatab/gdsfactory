@@ -21,6 +21,7 @@ def get_grating_period_curved(
     matching fluid or glue, then it should be 1.45.
 
     Args:
+    ----
         fiber_angle: in degrees.
         wavelength: um.
         n_slab: slab refractive index.

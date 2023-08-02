@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -7,7 +9,9 @@ from gdsfactory.port import port_array
 from gdsfactory.routing.get_route_sbend import get_route_sbend
 from gdsfactory.routing.sort_ports import sort_ports as sort_ports_function
 from gdsfactory.routing.utils import direction_ports_from_list_ports, flip
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @cell
@@ -23,6 +27,7 @@ def fanout_component(
     """Returns component with Sbend fanout routes.
 
     Args:
+    ----
         component: to fanout ports.
         port_names: list of port names.
         pitch: target port spacing for new component.
@@ -50,7 +55,8 @@ def fanout_component(
 
     for port_name in port_names:
         if port_name not in ref.ports:
-            raise ValueError(f"{port_name} not in {list(ref.ports.keys())}")
+            msg = f"{port_name} not in {list(ref.ports.keys())}"
+            raise ValueError(msg)
 
     ports1 = [p for p in ref.ports.values() if p.name in port_names]
     port = ports1[0]
@@ -89,6 +95,7 @@ def fanout_ports(
     """Returns fanout Sbend routes.
 
     Args:
+    ----
         ports: list of ports.
         pitch: target port spacing for new component.
         dx: how far the fanout.
@@ -123,21 +130,13 @@ def test_fanout_ports() -> None:
 
 
 if __name__ == "__main__":
-    # test_fanout_ports()
-    # c =gf.components.coupler(gap=1.0)
-    # c = gf.components.nxn(west=4)
-    # c = gf.components.nxn(west=4, layer=gf.LAYER.SLAB90)
     c = gf.components.mmi2x2()
 
     cc = fanout_component(
-        component=c, port_names=tuple(c.get_ports_dict(orientation=0).keys())
+        component=c,
+        port_names=tuple(c.get_ports_dict(orientation=0).keys()),
     )
     print(len(cc.ports))
     cc.show(show_ports=True)
 
-    # c = gf.components.nxn(west=4, layer=gf.LAYER.SLAB90)
-    # routes = fanout_ports(ports=c.get_ports_list(orientation=180))
     # for route in routes:
-    #     c.add(route.references)
-    # c.show(show_ports=True)
-    # print(cc.ports.keys())

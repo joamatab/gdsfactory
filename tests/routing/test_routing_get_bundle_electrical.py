@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from functools import partial
-
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.difftest import difftest
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_get_bundle_electrical(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
 
@@ -23,7 +26,6 @@ def test_get_bundle_electrical(
         [c2.ports["e1"]],
         bend=gf.components.wire_corner,
         width=10,
-        # auto_widen=False,
         auto_widen=True,
     )
     for i, route in enumerate(routes):
@@ -46,7 +48,8 @@ def test_get_bundle_electrical(
 
 
 def test_get_bundle_electrical2(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
 
@@ -78,5 +81,4 @@ def test_get_bundle_electrical2(
 
 
 if __name__ == "__main__":
-    # test_get_bundle_electrical(None, check=False)
     test_get_bundle_electrical2(None, check=False)

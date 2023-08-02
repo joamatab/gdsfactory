@@ -4,7 +4,8 @@ import warnings
 try:
     import gplugins
 except ImportError as e:
-    raise ImportError('You need to install gplugins with "pip install gplugins"') from e
+    msg = 'You need to install gplugins with "pip install gplugins"'
+    raise ImportError(msg) from e
 
 
 message = """

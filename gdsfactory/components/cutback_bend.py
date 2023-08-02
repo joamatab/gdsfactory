@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from functools import partial
-
-from numpy import float64
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.components.bend_circular import bend_circular, bend_circular180
 from gdsfactory.components.bend_euler import bend_euler, bend_euler180
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from numpy import float64
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec
 
 
 def _get_bend_size(bend90: Component) -> float64:
@@ -34,6 +37,7 @@ def cutback_bend(
     Use cutback_bend90 instead with smaller footprint.
 
     Args:
+    ----
         bend90: bend spec.
         straight: straight spec.
         straight_length: in um.
@@ -70,7 +74,9 @@ def cutback_bend(
     s = s[:-4]
 
     c = component_sequence(
-        sequence=s, symbol_to_component=symbol_to_component, start_orientation=90
+        sequence=s,
+        symbol_to_component=symbol_to_component,
+        start_orientation=90,
     )
     c.info["n_bends"] = rows * columns * 2 + columns * 2 - 2
     return c
@@ -89,6 +95,7 @@ def cutback_bend90(
     """Returns bend90 cutback.
 
     Args:
+    ----
         bend90: bend spec.
         straight: straight spec.
         straight_length: in um.
@@ -125,7 +132,9 @@ def cutback_bend90(
 
     # Create the component from the sequence
     c = component_sequence(
-        sequence=s, symbol_to_component=symbol_to_component, start_orientation=0
+        sequence=s,
+        symbol_to_component=symbol_to_component,
+        start_orientation=0,
     )
     c.info["n_bends"] = rows * columns * 4
     return c
@@ -143,6 +152,7 @@ def staircase(
     """Returns staircase.
 
     Args:
+    ----
         bend90: bend spec.
         straight: straight spec.
         length_v: vertical length.
@@ -168,7 +178,9 @@ def staircase(
     s = "-A|B" * rows + "-"
 
     c = component_sequence(
-        sequence=s, symbol_to_component=symbol_to_component, start_orientation=0
+        sequence=s,
+        symbol_to_component=symbol_to_component,
+        start_orientation=0,
     )
     c.info["n_bends"] = 2 * rows
     return c
@@ -187,6 +199,7 @@ def cutback_bend180(
     """Returns cutback to measure u bend loss.
 
     Args:
+    ----
         bend180: bend spec.
         straight: straight spec.
         straight_length: in um.
@@ -228,7 +241,9 @@ def cutback_bend180(
     s = s[:-1]
 
     c = component_sequence(
-        sequence=s, symbol_to_component=symbol_to_component, start_orientation=0
+        sequence=s,
+        symbol_to_component=symbol_to_component,
+        start_orientation=0,
     )
     c.info["n_bends"] = rows * columns * 2 + columns * 2 - 2
     return c
@@ -238,14 +253,7 @@ cutback_bend180circular = partial(cutback_bend180, bend180=bend_circular180)
 cutback_bend90circular = partial(cutback_bend90, bend90=bend_circular)
 
 if __name__ == "__main__":
-    # c = cutback_bend()
-    # c = cutback_bend90()
     # c = cutback_bend_circular(rows=7, columns=4, radius=5) #62
     # c = cutback_bend_circular(rows=14, columns=4) #118
-    # c = cutback_bend90()
-    # c = cutback_bend180(rows=3, columns=1)
-    # c = cutback_bend(rows=3, columns=2)
-    # c = cutback_bend90(rows=3, columns=2)
     c = cutback_bend180(rows=2, columns=2)
-    # c = cutback_bend(rows=3, columns=2)
     c.show(show_ports=True)

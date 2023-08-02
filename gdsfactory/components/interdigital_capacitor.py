@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from itertools import chain
 from math import ceil, floor
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -23,9 +26,11 @@ def interdigital_capacitor(
     filters with suppression of harmonic resonance`, doi: 10.1109/22.826833.
 
     Note:
+    ----
         ``finger_length=0`` effectively provides a plate capacitor.
 
     Args:
+    ----
         fingers: total fingers of the capacitor.
         finger_length: length of the probing fingers.
         finger_gap: length of gap between the fingers.

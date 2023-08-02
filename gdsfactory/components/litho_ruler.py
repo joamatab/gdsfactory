@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -20,6 +24,7 @@ def litho_ruler(
     based on phidl.geometry
 
     Args:
+    ----
         height: Height of the ruling marks in um.
         width: Width of the ruling marks in um.
         spacing: Center-to-center spacing of the ruling marks in um.

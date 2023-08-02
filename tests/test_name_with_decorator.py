@@ -28,12 +28,13 @@ def test_name_with_decorator() -> None:
             cell_names.remove(cell_name)
 
         cell_names_duplicated = "\n".join(set(cell_names))
+        msg = f"Duplicated cell names in {c.name!r}:\n{cell_names_duplicated}"
         raise ValueError(
-            f"Duplicated cell names in {c.name!r}:\n{cell_names_duplicated}"
+            msg,
         )
 
     referenced_cells = list(c.get_dependencies(recursive=True))
-    all_cells = [c] + referenced_cells
+    all_cells = [c, *referenced_cells]
 
     no_name_cells = [cell.name for cell in all_cells if cell.name.startswith("Unnamed")]
     assert (
@@ -57,12 +58,13 @@ if __name__ == "__main__":
             cell_names.remove(cell_name)
 
         cell_names_duplicated = "\n".join(set(cell_names))
+        msg = f"Duplicated cell names in {c.name!r}:\n{cell_names_duplicated}"
         raise ValueError(
-            f"Duplicated cell names in {c.name!r}:\n{cell_names_duplicated}"
+            msg,
         )
 
     referenced_cells = list(c.get_dependencies(recursive=True))
-    all_cells = [c] + referenced_cells
+    all_cells = [c, *referenced_cells]
 
     no_name_cells = [cell.name for cell in all_cells if cell.name.startswith("Unnamed")]
     # assert (

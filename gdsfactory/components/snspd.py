@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.optimal_hairpin import optimal_hairpin
-from gdsfactory.typings import Float2, LayerSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Float2, LayerSpec, Optional
 
 
 @cell
@@ -14,7 +18,7 @@ def snspd(
     wire_width: float = 0.2,
     wire_pitch: float = 0.6,
     size: Float2 = (10, 8),
-    num_squares: Optional[int] = None,
+    num_squares: Optional[int] | None = None,
     turn_ratio: float = 4,
     terminals_same_side: bool = False,
     layer: LayerSpec = (1, 0),
@@ -22,6 +26,7 @@ def snspd(
     """Creates an optimally-rounded SNSPD.
 
     Args:
+    ----
         width: Width of the wire.
         pitch: Distance between two adjacent wires. Must be greater than `width`.
         size: None or array-like[2] of int or float
@@ -48,11 +53,9 @@ def snspd(
         size = [xy, xy]
         num_squares = None
     if [size[0], size[1], num_squares].count(None) != 1:
+        msg = "snspd() requires that exactly ONE value of the arguments ``num_squares`` and ``size`` be None to prevent overconstraining, for example:\n>>> snspd(size = (3, None), num_squares = 2000)"
         raise ValueError(
-            "snspd() requires that exactly ONE value of "
-            "the arguments ``num_squares`` and ``size`` be None "
-            "to prevent overconstraining, for example:\n"
-            ">>> snspd(size = (3, None), num_squares = 2000)"
+            msg,
         )
     if size[0] is None:
         ysize = size[1]

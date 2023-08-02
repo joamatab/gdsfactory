@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import datetime
 import pathlib
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import gdstk
 
@@ -12,7 +12,11 @@ from gdsfactory.component import _timestamp2019
 from gdsfactory.config import PATH, logger
 from gdsfactory.name import clean_name
 from gdsfactory.read.import_gds import import_gds
-from gdsfactory.typings import PathType
+
+if TYPE_CHECKING:
+    import datetime
+
+    from gdsfactory.typings import PathType
 
 script_prefix = """
 from pathlib import PosixPath
@@ -34,6 +38,7 @@ def get_script(gdspath: PathType, module: str | None = None) -> str:
     """Returns script for importing a fixed cell.
 
     Args:
+    ----
         gdspath: fixed cell gdspath.
         module: if any includes plot directive.
 
@@ -82,19 +87,21 @@ def get_import_gds_script(dirpath: PathType, module: str | None = None) -> str:
     """
     dirpath = pathlib.Path(dirpath)
     if not dirpath.exists():
-        raise ValueError(f"{str(dirpath.absolute())!r} does not exist.")
+        msg = f"{str(dirpath.absolute())!r} does not exist."
+        raise ValueError(msg)
 
     gdspaths = list(dirpath.glob("*.gds")) + list(dirpath.glob("*.GDS"))
 
     if not gdspaths:
-        raise ValueError(f"No GDS files found at {dirpath.absolute()!r}.")
+        msg = f"No GDS files found at {dirpath.absolute()!r}."
+        raise ValueError(msg)
 
     logger.info(f"Writing {len(gdspaths)} cells from {dirpath.absolute()!r}")
 
     script = [script_prefix]
     script += [f"gdsdir = {str(dirpath.absolute())!r}\n"]
     script += [
-        "import_gds = partial(gf.import_gds, gdsdir=gdsdir, decorator=add_ports)\n"
+        "import_gds = partial(gf.import_gds, gdsdir=gdsdir, decorator=add_ports)\n",
     ]
 
     cells = [get_script(gdspath, module=module) for gdspath in gdspaths]
@@ -106,7 +113,6 @@ def write_cells_recursively(
     cell: gdstk.Cell,
     unit: float = 1e-6,
     precision: float = 1e-9,
-    timestamp: datetime.datetime | None = _timestamp2019,
     dirpath: pathlib.Path | None = None,
 ) -> dict[str, Path]:
     """Write gdstk cells recursively.
@@ -115,10 +121,10 @@ def write_cells_recursively(
         cell: gdstk cell.
         unit: unit size for objects in library. 1um by default.
         precision: for library dimensions (m). 1nm by default.
-        timestamp: Defaults to 2019-10-25. If None uses current time.
         dirpath: directory for the GDS file to write to.
 
     Returns:
+    -------
         gdspaths: dict of cell name to gdspath.
 
     """
@@ -145,12 +151,14 @@ def write_cells(
     unit: float = 1e-6,
     precision: float = 1e-9,
     timestamp: datetime.datetime | None = _timestamp2019,
+    *,
     recursively: bool = False,
     flatten: bool = False,
 ) -> dict[str, Path]:
     """Writes cells into separate GDS files.
 
     Args:
+    ----
         gdspath: GDS file to write cells.
         dirpath: directory path to write GDS files to.
             Defaults to current working directory.
@@ -161,6 +169,7 @@ def write_cells(
         flatten: flatten cell.
 
     Returns:
+    -------
         gdspaths: dict of cell name to gdspath.
 
     """
@@ -226,29 +235,7 @@ def test_write_cells() -> None:
 
 if __name__ == "__main__":
     test_write_cells_recursively()
-    # gdspath = PATH.gdsdir / "alphabet_3top_cells.gds"
-    # gdspaths = write_cells(gdspath=gdspath, dirpath="extra/gds", recursively=False)
-    # assert len(gdspaths) == 3, len(gdspaths)
 
-    # test_write_cells()
-    # import gdsfactory as gf
-
-    # gdspath = PATH.gdsdir / "mzi2x2.gds"
-    # gdspaths = write_cells(gdspath=gdspath, dirpath="extra/gds", recursively=False)
-    # assert len(gdspaths) == 10, len(gdspaths)
-
-    # gdspath = PATH.gdsdir / "mzi2x2.gds"
-    # gf.show(gdspath)
-    # gdspaths = write_cells(gdspath=gdspath, dirpath="extra/gds")
-    # print(len(gdspaths))
-
-    # sample_pdk_cells = gf.grid(
-    #     [
     #         gf.components.straight,
     #         gf.components.bend_euler,
     #         gf.components.grating_coupler_elliptical,
-    #     ]
-    # )
-    # sample_pdk_cells.write_gds("extra/pdk.gds")
-    # gf.write_cells.write_cells(gdspath="extra/pdk.gds", dirpath="extra/gds")
-    # print(gf.write_cells.get_import_gds_script("extra/gds", module="sky130.components"))

@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -15,6 +19,7 @@ def cross(
     """Returns a cross from two rectangles of length and width.
 
     Args:
+    ----
         length: float Length of the cross from one end to the other.
         width: float Width of the arms of the cross.
         layer: layer for geometry.
@@ -68,6 +73,3 @@ def cross(
 if __name__ == "__main__":
     c = cross()
     c.show(show_ports=True)
-    # c.pprint_ports()
-    # cc = gf.routing.add_fiber_array(component=c)
-    # cc.show(show_ports=True)

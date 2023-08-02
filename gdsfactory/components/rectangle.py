@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
-from gdsfactory.typings import Ints, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Ints, LayerSpec
 
 
 @cell
@@ -19,6 +22,7 @@ def rectangle(
     """Returns a rectangle.
 
     Args:
+    ----
         size: (tuple) Width and height of rectangle.
         layer: Specific layer to put polygon geometry on.
         centered: True sets center to (0, 0), False sets south-west to (0, 0).
@@ -27,7 +31,10 @@ def rectangle(
     """
     c = Component()
     ref = c << compass(
-        size=size, layer=layer, port_type=port_type, port_orientations=port_orientations
+        size=size,
+        layer=layer,
+        port_type=port_type,
+        port_orientations=port_orientations,
     )
     if not centered:
         ref.move((size[0] / 2, size[1] / 2))
@@ -43,7 +50,6 @@ marker_tm = partial(rectangle, size=[fiber_size, fiber_size], layer="TM", center
 
 if __name__ == "__main__":
     c = rectangle(size=(3, 2), centered=False, layer=(2, 3))
-    # c = rectangle(size=(3, 2), centered=True, layer=(2, 3))
     print(c.ports)
     print(c.name)
     c.show(show_ports=True)

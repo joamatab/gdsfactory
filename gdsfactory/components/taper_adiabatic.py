@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.path import transition_adiabatic
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import CrossSectionSpec
 
 adiabatic_polyfit_TE1550SOI_220nm = np.array(
     [
@@ -26,7 +30,7 @@ adiabatic_polyfit_TE1550SOI_220nm = np.array(
         -3.74726005e01,
         1.77381560e01,
         -1.12666286e00,
-    ]
+    ],
 )
 
 
@@ -45,6 +49,7 @@ def taper_adiabatic(
     """Returns a straight adiabatic_taper from an effective index callable.
 
     Args:
+    ----
         width1: initial width.
         width2: final width.
         length: 0 uses the optimized length, and otherwise the optimal shape is compressed/stretched to the specified length.
@@ -56,6 +61,7 @@ def taper_adiabatic(
                 - [2] reports good performance up to 1.4 for fundamental TE in SOI (for multiple core thicknesses)
 
     References:
+    ----------
         [1] Burns, W. K., et al. "Optical waveguide parabolic coupling horns." Appl. Phys. Lett., vol. 30, no. 1, 1 Jan. 1977, pp. 28-30, doi:10.1063/1.89199.
         [2] Fu, Yunfei, et al. "Efficient adiabatic silicon-on-insulator waveguide taper." Photonics Res., vol. 2, no. 3, 1 June 2014, pp. A41-A44, doi:10.1364/PRJ.2.000A41.
         npoints: number of points for sampling
@@ -65,7 +71,11 @@ def taper_adiabatic(
 
     # Obtain optimal curve
     x_opt, w_opt = transition_adiabatic(
-        width1, width2, neff_w=neff_w, wavelength=wavelength, alpha=alpha
+        width1,
+        width2,
+        neff_w=neff_w,
+        wavelength=wavelength,
+        alpha=alpha,
     )
 
     # Resample the points
@@ -84,7 +94,8 @@ def taper_adiabatic(
 
     c = gf.Component()
     c.add_polygon(
-        list(zip(x_array, y_array)) + list(zip(x_array, -y_array))[::-1], layer=layer
+        list(zip(x_array, y_array)) + list(zip(x_array, -y_array))[::-1],
+        layer=layer,
     )
 
     # Define ports

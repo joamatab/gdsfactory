@@ -1,13 +1,17 @@
 """Based on phidl.geometry."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.component_layout import Polygon
 from gdsfactory.component_reference import ComponentReference
-from gdsfactory.typings import ComponentOrReference, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrReference, LayerSpec
 
 
 @gf.cell
@@ -27,6 +31,7 @@ def boolean(
     You can also use gdsfactory.drc.boolean_klayout
 
     Args:
+    ----
         A: Component(/Reference) or list of Component(/References).
         B: Component(/Reference) or list of Component(/References).
         operation: {'not', 'and', 'or', 'xor', 'A-B', 'B-A', 'A+B'}.
@@ -36,7 +41,7 @@ def boolean(
     Returns: Component with polygon(s) of the boolean operations between
       the 2 input Components performed.
 
-    Notes
+    Notes:
     -----
     - 'A+B' is equivalent to 'or'.
     - 'A-B' is equivalent to 'not'.
@@ -58,12 +63,12 @@ def boolean(
     D = Component()
     A_polys = []
     B_polys = []
-    A = list(A) if isinstance(A, (list, tuple)) else [A]
-    B = list(B) if isinstance(B, (list, tuple)) else [B]
+    A = list(A) if isinstance(A, list | tuple) else [A]
+    B = list(B) if isinstance(B, list | tuple) else [B]
 
     for X, polys in ((A, A_polys), (B, B_polys)):
         for e in X:
-            if isinstance(e, (Component, ComponentReference)):
+            if isinstance(e, Component | ComponentReference):
                 polys.extend(e.get_polygons())
             elif isinstance(e, Polygon):
                 polys.extend(e.polygons)
@@ -79,11 +84,9 @@ def boolean(
     elif operation == "a+b":
         operation = "or"
     elif operation not in ["not", "and", "or", "xor", "a-b", "b-a", "a+b"]:
+        msg = f"gdsfactory.geometry.boolean() `operation` = {operation} parameter not recognized, must be one of the following:  'not', 'and', 'or', 'xor', 'A-B', 'B-A', 'A+B'"
         raise ValueError(
-            f"gdsfactory.geometry.boolean() `operation` = {operation} "
-            "parameter not recognized, must be one of the "
-            "following:  'not', 'and', 'or', 'xor', 'A-B', "
-            "'B-A', 'A+B'"
+            msg,
         )
 
     # Check for trivial solutions
@@ -134,14 +137,6 @@ def test_boolean() -> None:
 
 
 if __name__ == "__main__":
-    # c = gf.Component()
-    # e1 = c << gf.components.ellipse()
-    # e2 = c << gf.components.ellipse(radii=(10, 6))
-    # e3 = c << gf.components.ellipse(radii=(10, 4))
-    # e3.movex(5)
-    # e2.movex(2)
-    # c = boolean(A=[e1, e3], B=e2, operation="A-B")
-
     import time
 
     n = 50

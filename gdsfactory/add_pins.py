@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional
 
 import gdstk
 import numpy as np
@@ -19,14 +19,16 @@ from numpy import ndarray
 from omegaconf import OmegaConf
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from gdsfactory.component import Component
     from gdsfactory.component_reference import ComponentReference
     from gdsfactory.port import Port
 
-Layer = Tuple[int, int]
-Layers = Tuple[Layer, ...]
-LayerSpec = Optional[Union[Layer, str, int]]
-LayerSpecs = Tuple[LayerSpec, ...]
+Layer = tuple[int, int]
+Layers = tuple[Layer, ...]
+LayerSpec = Optional[Layer | str | int]
+LayerSpecs = tuple[LayerSpec, ...]
 nm = 1e-3
 
 
@@ -41,6 +43,7 @@ def add_bbox(
     """Add bbox on outline.
 
     Args:
+    ----
         component: component to add bbox.
         bbox_layer: bbox layer.
     """
@@ -49,7 +52,11 @@ def add_bbox(
     bbox_layer = get_layer(bbox_layer)
     polygons = component.get_polygons(as_array=False)
     polygons_ = gdstk.boolean(
-        polygons, [], "or", layer=bbox_layer[0], datatype=bbox_layer[1]
+        polygons,
+        [],
+        "or",
+        layer=bbox_layer[0],
+        datatype=bbox_layer[1],
     )
 
     component.add(polygons_)
@@ -65,6 +72,7 @@ def add_bbox_siepic(
     """Add bounding box device recognition layer.
 
     Args:
+    ----
         component: to add bbox.
         bbox_layer: bounding box.
         remove_layers: remove other layers.
@@ -73,7 +81,7 @@ def add_bbox_siepic(
 
     bbox_layer = get_layer(bbox_layer)
     remove_layers = remove_layers or []
-    remove_layers = list(remove_layers) + [bbox_layer]
+    remove_layers = [*list(remove_layers), bbox_layer]
     remove_layers = [get_layer(layer) for layer in remove_layers]
     component = component.remove_layers(layers=remove_layers, recursive=False)
 
@@ -92,7 +100,8 @@ def get_pin_triangle_polygon_tip(
     orientation = p.orientation
 
     if orientation is None:
-        raise ValueError("Port {port.name!r} needs to have an orientation.")
+        msg = "Port {port.name!r} needs to have an orientation."
+        raise ValueError(msg)
 
     ca = np.cos(orientation * np.pi / 180)
     sa = np.sin(orientation * np.pi / 180)
@@ -114,7 +123,7 @@ def get_pin_triangle_polygon_tip(
 
     ptip = p.center + _rotate(dtip, rot_mat)
 
-    polygon = list(port_face) + [ptip]
+    polygon = [*list(port_face), ptip]
     polygon = np.stack(polygon)
     return polygon, ptip
 
@@ -128,6 +137,7 @@ def add_pin_triangle(
     """Add triangle pin with a right angle, pointing out of the port.
 
     Args:
+    ----
         component: to add pin.
         port: Port.
         layer: for the pin marker.
@@ -155,6 +165,7 @@ def add_pin_rectangle_inside(
     """Add square pin towards the inside of the port.
 
     Args:
+    ----
         component: to add pins.
         port: Port.
         pin_length: length of the pin marker for the port.
@@ -210,6 +221,7 @@ def add_pin_rectangle_double(
     """Add two square pins: one inside with label, one outside.
 
     Args:
+    ----
         component: to add pins.
         port: Port.
         pin_length: length of the pin marker for the port.
@@ -282,6 +294,7 @@ def add_pin_rectangle(
     """Add half out pin to a component.
 
     Args:
+    ----
         component: to add pin.
         port: Port.
         pin_length: length of the pin marker for the port.
@@ -342,6 +355,7 @@ def add_pin_path(
     This port type is compatible with SiEPIC pdk.
 
     Args:
+    ----
         component: to add pin.
         port: Port.
         pin_length: length of the pin marker for the port.
@@ -389,7 +403,10 @@ def add_pin_path(
     component.add(path)
 
     component.add_label(
-        text=str(p.name), position=p.center, layer=layer_label, anchor="sw"
+        text=str(p.name),
+        position=p.center,
+        layer=layer_label,
+        anchor="sw",
     )
 
 
@@ -402,11 +419,13 @@ def add_outline(
     """Adds devices outline bounding box in layer.
 
     Args:
+    ----
         component: where to add the markers.
         reference: to read outline from.
         layer: to add padding.
 
     Keyword Args:
+    ------------
         default: default padding.
         top: North padding.
         bottom: padding.
@@ -439,6 +458,7 @@ def add_pins_siepic(
     - netlist extraction
 
     Args:
+    ----
         component: to add pins.
         function: to add pin.
         port_type: optical, electrical, ...
@@ -453,7 +473,9 @@ def add_pins_siepic(
 
 add_pins_siepic_optical = add_pins_siepic
 add_pins_siepic_electrical = partial(
-    add_pins_siepic, port_type="electrical", layer_pin="PORTE"
+    add_pins_siepic,
+    port_type="electrical",
+    layer_pin="PORTE",
 )
 
 
@@ -469,6 +491,7 @@ def add_pins(
     Be careful with this function as it modifies the component.
 
     Args:
+    ----
         component: to add ports to.
         reference: to add pins.
         function: to add each pin.
@@ -489,7 +512,9 @@ def add_pins(
 add_pins_triangle = partial(add_pins, function=add_pin_triangle)
 add_pins_center = partial(add_pins, function=add_pin_rectangle)
 add_pin_inside1nm = partial(
-    add_pin_rectangle_inside, pin_length=1 * nm, layer_label=None
+    add_pin_rectangle_inside,
+    pin_length=1 * nm,
+    layer_label=None,
 )
 add_pins_inside1nm = partial(add_pins, function=add_pin_inside1nm)
 
@@ -502,6 +527,7 @@ def add_settings_label(
     """Add settings in label.
 
     Args:
+    ----
         component: to add pins.
         reference: ComponentReference.
         layer_label: layer spec.
@@ -513,9 +539,12 @@ def add_settings_label(
     settings_dict = OmegaConf.to_container(reference.settings.full)
     settings_string = f"settings={json.dumps(settings_dict)}"
     if len(settings_string) > 1024:
-        raise ValueError(f"label > 1024 characters: {settings_string}")
+        msg = f"label > 1024 characters: {settings_string}"
+        raise ValueError(msg)
     component.add_label(
-        position=reference.center, text=settings_string, layer=layer_label
+        position=reference.center,
+        text=settings_string,
+        layer=layer_label,
     )
 
 
@@ -554,6 +583,7 @@ def add_pins_and_outline(
     - label for the settings
 
     Args:
+    ----
         component: where to add the markers.
         reference: to add pins.
         add_outline_function.
@@ -574,15 +604,6 @@ def add_pins_and_outline(
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # c = test_add_pins()
-    # c.show(show_ports=True)
-    # c = gf.components.straight(length=2)
-    # c.show(show_ports_suborts=True)
-    # p1 = len(c1.get_polygons())
-    # p2 = len(c2.get_polygons())
-    # assert p2 == p1 + 2
-    # c1 = gf.components.straight_heater_metal(length=2)
     c = gf.components.straight(decorator=add_pins)
-    # cc.show(show_ports=False)
     c.show(show_subports=True)
     c.show(show_ports=True)

@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight as straight_function
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def straight_array(
     useful to align the 4 corners of the chip
 
     Args:
+    ----
         n: number of straights.
         spacing: edge to edge straight spacing.
         straight: straight straight Component or library.
@@ -37,5 +42,4 @@ def straight_array(
 
 if __name__ == "__main__":
     c = straight_array()
-    # c.pprint_ports()
     c.show(show_ports=True)

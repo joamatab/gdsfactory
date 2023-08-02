@@ -15,6 +15,7 @@ def layer_priority(
     """Returns new component after removing one layer from another.
 
     Args:
+    ----
         component: spec.
         layer_high_order: layer used to etch.
         layer_low_order: layer etched into.
@@ -37,7 +38,7 @@ def layer_priority(
             gf.get_layer(layer)
             for layer in component.get_layers()
             if gf.get_layer(layer) not in layers_to_remove
-        ]
+        ],
     )
     component_high_order = component.extract([layer_high_order])
     component_low_order = component.extract([layer_low_order])

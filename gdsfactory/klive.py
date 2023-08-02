@@ -21,6 +21,7 @@ def show(
     """Show GDS in klayout.
 
     Args:
+    ----
         gds_filename: to show.
         keep_position: keep position and active layers.
         technology: Name of the KLayout technology to use.
@@ -28,7 +29,8 @@ def show(
         delete: deletes file.
     """
     if not os.path.isfile(gds_filename):
-        raise ValueError(f"{gds_filename} does not exist")
+        msg = f"{gds_filename} does not exist"
+        raise ValueError(msg)
 
     gds_filename = pathlib.Path(gds_filename)
 
@@ -46,7 +48,7 @@ def show(
         conn.settimeout(5)
     except OSError:
         config.logger.warning(
-            "Could not connect to klive server. Is klayout open and klive plugin installed?"
+            "Could not connect to klive server. Is klayout open and klive plugin installed?",
         )
     else:
         msg = ""
@@ -65,8 +67,5 @@ def show(
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # c = gf.components.mzi()
     c = gf.components.straight(length=10)
-    # gdspath = c.write_gds()
-    # show(gdspath)
     c.show()

@@ -26,6 +26,7 @@ def get_polygons_over_under(
     Cleans min width gap and acute angle DRC errors equal to distances.
 
     Args:
+    ----
         component: Component containing polygons to offset.
         layers: list of layers to remove min gap errors.
         distances: Distance to offset polygons.
@@ -39,7 +40,9 @@ def get_polygons_over_under(
           round joints, it indicates the curvature resolution in number of
           points per full circle.
         layer: Specific layer to put polygon geometry on.
+
     Returns:
+    -------
         Component containing a polygon(s) with the specified offset applied.
     """
     polygons = []
@@ -83,6 +86,7 @@ def over_under(
     """Returns cleaned component.
 
     Args:
+    ----
         component:
         layers: list of layers.
         remove_original: remove original layers.
@@ -106,30 +110,15 @@ over_under_remove_original = partial(over_under, remove_original=True)
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # over_under_slab = partial(over_under, layers=((2, 0)), distances=(0.5,))
-    # c = gf.components.coupler_ring(
-    #     cladding_layers=((2, 0)),
-    #     cladding_offsets=(0.2,),
-    #     decorator=over_under_slab,
-    # )
     over_under_slab_remove_original = partial(
-        over_under_remove_original, layers=((2, 0)), distances=(0.5,)
+        over_under_remove_original,
+        layers=((2, 0)),
+        distances=(0.5,),
     )
     c = gf.components.coupler_ring(
         cladding_layers=((2, 0)),
         cladding_offsets=(0.2,),
         decorator=over_under_slab_remove_original,
     )
-    # get_polygons_over_under_slab = partial(
-    #     get_polygons_over_under, layers=((2, 0)), distances=(0.5,)
-    # )
-
-    # c = gf.Component("component_clean")
-    # ref = c << gf.components.coupler_ring(
-    #     cladding_layers=((2, 0)),
-    #     cladding_offsets=(0.2,),  # decorator=over_under_slab_decorator
-    # )
-    # polygons = get_polygons_over_under_slab(ref)
-    # c.add(polygons)
 
     c.show(show_ports=True)

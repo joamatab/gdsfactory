@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
+from typing import TYPE_CHECKING
 
 from numpy import floor
 
@@ -9,7 +10,9 @@ import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.via import viac
-from gdsfactory.typings import ComponentSpec, Float2, Floats, LayerSpecs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Float2, Floats, LayerSpecs
 
 
 @gf.cell
@@ -24,6 +27,7 @@ def via_stack_with_offset(
     """Rectangular layer transition with offset between layers.
 
     Args:
+    ----
         layers: layer specs between vias.
         size: for all vias array.
         sizes: Optional size for each via array. Overrides size.
@@ -58,7 +62,8 @@ def via_stack_with_offset(
     y0 = 0
 
     if sizes and layer_offsets:
-        raise ValueError("You need to set either sizes or layer_offsets")
+        msg = "You need to set either sizes or layer_offsets"
+        raise ValueError(msg)
 
     offsets = offsets or [0] * len(layers)
     layer_offsets = layer_offsets or [0] * len(layers)
@@ -73,19 +78,27 @@ def via_stack_with_offset(
         )
 
     for layer, via, size, size_offset, offset in zip(
-        layers, vias, sizes, layer_offsets, offsets
+        layers,
+        vias,
+        sizes,
+        layer_offsets,
+        offsets,
     ):
         width, height = size
         width += 2 * size_offset
         height += 2 * size_offset
         x0 = -width / 2
         ref_layer = c << compass(
-            size=(width, height), layer=layer, port_type="electrical"
+            size=(width, height),
+            layer=layer,
+            port_type="electrical",
         )
         ref_layer.ymin = y0
 
         ref_layer = c << compass(
-            size=(width, height), layer=previous_layer, port_type="electrical"
+            size=(width, height),
+            layer=previous_layer,
+            port_type="electrical",
         )
         ref_layer.ymin = y0
 
@@ -108,7 +121,10 @@ def via_stack_with_offset(
             y00 = y0 + ch + h / 2 + offset
 
             ref = c.add_array(
-                via, columns=nb_vias_x, rows=nb_vias_y, spacing=(pitch_x, pitch_y)
+                via,
+                columns=nb_vias_x,
+                rows=nb_vias_y,
+                spacing=(pitch_x, pitch_y),
             )
             ref.move((x00, y00))
             y0 += height
@@ -118,9 +134,6 @@ def via_stack_with_offset(
                     f" {enclosure} for via {via.name!r}",
                     stacklevel=3,
                 )
-
-        # print(layer, via.name, ref.xsize, width, w+2*enclosure, ref.ysize, height, h+2*enclosure)
-        # print(ref.xsize, width, ref.ysize, height)
 
         y0 += offset
         previous_layer = layer
@@ -154,6 +167,4 @@ if __name__ == "__main__":
         sizes=((10, 10), (20, 20), (50, 30)),
         vias=(None, "via1", "via2"),
     )
-    # c = via_stack_with_offset_m1_m3(layer_offsets=[0, 5, 10])
-    # c = via_stack_with_offset(vias=(None, None))
     c.show(show_ports=True)

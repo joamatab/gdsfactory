@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -11,7 +12,9 @@ from gdsfactory.components.bend_euler import bend_euler, bend_euler180
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.routing.manhattan import round_corners
 from gdsfactory.snap import snap_to_grid
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 def get_bend_port_distances(bend: Component) -> tuple[float, float]:
@@ -44,6 +47,7 @@ def spiral_inner_io(
     couplers inside.
 
     Args:
+    ----
         N: number of loops.
         x_straight_inner_right: xlength.
         x_straight_inner_left: x length left.
@@ -128,7 +132,11 @@ def spiral_inner_io(
         pts_w += [_pt1, _pt2, _pt3, _pt4, _pt5]
 
     route_west = round_corners(
-        pts_w, bend=_bend90, straight=straight, cross_section=cross_section, **kwargs
+        pts_w,
+        bend=_bend90,
+        straight=straight,
+        cross_section=cross_section,
+        **kwargs,
     )
     component.add(route_west.references)
 
@@ -161,7 +169,11 @@ def spiral_inner_io(
         _bend90 = gf.get_component(bend90, cross_section=cross_section_bend, **kwargs)
 
     route_east = round_corners(
-        pts_e, bend=_bend90, straight=straight, cross_section=cross_section, **kwargs
+        pts_e,
+        bend=_bend90,
+        straight=straight,
+        cross_section=cross_section,
+        **kwargs,
     )
     component.add(route_east.references)
 
@@ -188,6 +200,7 @@ def spiral_inner_io_fiber_single(
     inside the spiral to save space
 
     Args:
+    ----
         cross_section: for the straight sections in the spiral.
         cross_section_bend: for the bends in the spiral.
         cross_section_ports: for input/output ports.
@@ -198,6 +211,7 @@ def spiral_inner_io_fiber_single(
         grating_spacing: in um.
 
     Keyword Args:
+    ------------
         N: number of loops.
         waveguide_spacing: center to center spacing.
         bend90: bend90 spec.
@@ -234,7 +248,9 @@ def spiral_inner_io_fiber_single(
 
 
 def get_straight_length(
-    length: float, spiral_function: ComponentSpec, **kwargs
+    length: float,
+    spiral_function: ComponentSpec,
+    **kwargs,
 ) -> float:
     """Returns y_spiral to achieve a particular spiral length."""
     x0 = 50
@@ -249,7 +265,6 @@ def get_straight_length(
         np.array([spiral0.info["length"], spiral1.info["length"]]),
         deg=1,
     )
-    # print(x_straight_inner_left)
     return (length - p[1]) / p[0]
 
 
@@ -262,7 +277,6 @@ if __name__ == "__main__":
     c = gf.components.spiral_inner_io(
         cross_section=cross_section,
         cross_section_bend=partial(cross_section, mirror=True),
-        # cross_section_bend180=partial(cross_section, mirror=True),
         waveguide_spacing=20,
         radius=30,
         asymmetric_cross_section=True,

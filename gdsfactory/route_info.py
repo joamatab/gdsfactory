@@ -2,12 +2,16 @@ from gdsfactory.typings import CrossSectionSpec
 
 
 def route_info(
-    cs_type: str, length: float, length_eff: float = None, taper: bool = False, **kwargs
+    cs_type: str,
+    length: float,
+    length_eff: float | None = None,
+    taper: bool = False,
+    **kwargs,
 ):
-    """
-    Gets a dictionary of route info, used by pathlength analysis.
+    """Gets a dictionary of route info, used by pathlength analysis.
 
     Args:
+    ----
         cs_type: cross section type
         length: length
         length_eff: effective length (i.e. an equivalent straight length of a bend)
@@ -32,12 +36,15 @@ def route_info(
 
 
 def route_info_from_cs(
-    cs: CrossSectionSpec, length: float, length_eff: float = None, **kwargs
+    cs: CrossSectionSpec,
+    length: float,
+    length_eff: float | None = None,
+    **kwargs,
 ):
-    """
-    Gets a dictionary of route info, used by pathlength analysis.
+    """Gets a dictionary of route info, used by pathlength analysis.
 
     Args:
+    ----
         cs: cross section object or spec
         length: length
         length_eff: effective length (i.e. an equivalent straight length of a bend)

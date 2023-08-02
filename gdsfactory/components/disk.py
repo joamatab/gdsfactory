@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory import Component
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
 
 
 def _compute_parameters(xs_bend, wrap_angle_deg, radius):
     r_bend = xs_bend.radius
     theta = wrap_angle_deg / 2.0
     size_x, dy = r_bend * np.sin(theta * np.pi / 180), r_bend - r_bend * np.cos(
-        theta * np.pi / 180
+        theta * np.pi / 180,
     )
     bus_length = max(4 * size_x, 2 * radius)
 
@@ -42,11 +46,13 @@ def _generate_bends(c, r_bend, wrap_angle_deg, cross_section):
 
 def _generate_straights(c, bus_length, size_x, bend_input, bend_output, cross_section):
     straight_left = c << gf.components.straight(
-        length=(bus_length - 4 * size_x) / 2.0, cross_section=cross_section
+        length=(bus_length - 4 * size_x) / 2.0,
+        cross_section=cross_section,
     )
 
     straight_right = c << gf.components.straight(
-        length=(bus_length - 4 * size_x) / 2.0, cross_section=cross_section
+        length=(bus_length - 4 * size_x) / 2.0,
+        cross_section=cross_section,
     )
 
     if None not in (bend_input, bend_output):
@@ -60,11 +66,18 @@ def _generate_straights(c, bus_length, size_x, bend_input, bend_output, cross_se
 
 
 def _generate_circles(
-    c, radius: float, xs, bend_middle, straight_left, r_bend, dy: float
+    c,
+    radius: float,
+    xs,
+    bend_middle,
+    straight_left,
+    r_bend,
+    dy: float,
 ):
     """Returns Component, circle and circle_cladding.
 
     Args:
+    ----
         c: component.
         radius: in um.
         xs: cross_section:
@@ -80,7 +93,8 @@ def _generate_circles(
 
     if cladding_layer and cladding_offset:
         circle_cladding = c << gf.components.circle(
-            radius=radius + cladding_offset, layer=cladding_layer
+            radius=radius + cladding_offset,
+            layer=cladding_layer,
         )
     else:
         circle_cladding = None
@@ -96,7 +110,7 @@ def _generate_circles(
     else:
         circle.move(
             origin=circle.center,
-            destination=(straight_left.ports["o2"].center + (0, r_bend),),
+            destination=((*straight_left.ports["o2"].center, 0, r_bend),),
         )
 
     if circle_cladding:
@@ -124,6 +138,7 @@ def disk(
     """Disk Resonator.
 
     Args:
+    ----
        radius: disk resonator radius.
        gap: Distance between the bus straight and resonator.
        wrap_angle_deg: Angle in degrees between 0 and 180.
@@ -136,10 +151,12 @@ def disk(
 
     """
     if parity not in (1, -1):
-        raise ValueError("parity must be 1 or -1")
+        msg = "parity must be 1 or -1"
+        raise ValueError(msg)
 
     if wrap_angle_deg < 0.0 or wrap_angle_deg > 180.0:
-        raise ValueError("wrap_angle_deg must be between 0.0 and 180.0")
+        msg = "wrap_angle_deg must be between 0.0 and 180.0"
+        raise ValueError(msg)
 
     c = gf.Component()
 
@@ -148,19 +165,35 @@ def disk(
     xs_bend.radius = radius + xs.width / 2.0 + gap
 
     r_bend, size_x, dy, bus_length = _compute_parameters(
-        xs_bend, wrap_angle_deg, radius
+        xs_bend,
+        wrap_angle_deg,
+        radius,
     )
 
     c, bend_input, bend_middle, bend_output = _generate_bends(
-        c, r_bend, wrap_angle_deg, xs_bend
+        c,
+        r_bend,
+        wrap_angle_deg,
+        xs_bend,
     )
 
     c, straight_left, straight_right = _generate_straights(
-        c, bus_length, size_x, bend_input, bend_output, xs_bend
+        c,
+        bus_length,
+        size_x,
+        bend_input,
+        bend_output,
+        xs_bend,
     )
 
     c, circle, circle_cladding = _generate_circles(
-        c, radius, xs, bend_middle, straight_left, r_bend, dy
+        c,
+        radius,
+        xs,
+        bend_middle,
+        straight_left,
+        r_bend,
+        dy,
     )
 
     c = _absorb(
@@ -205,6 +238,7 @@ def disk_heater(
     """Disk Resonator with top metal heater.
 
     Args:
+    ----
        radius: disk resonator radius.
        gap: Distance between the bus straight and resonator.
        wrap_angle_deg: Angle in degrees between 0 and 180.

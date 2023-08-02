@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Tuple, Union
+from typing import Union
 
 from numpy import array
 
 import gdsfactory as gf
 
-Float2 = Tuple[float, float]
-Coordinate = Union[Tuple[Float2, Float2], array]
+Float2 = tuple[float, float]
+Coordinate = Union[tuple[Float2, Float2], array]
 
 
 def bbox_to_points(
@@ -42,6 +42,7 @@ def bbox(
     """Returns bounding box rectangle from coordinates.
 
     Args:
+    ----
         bbox: Coordinates of the box [(x1, y1), (x2, y2)].
         layer: for bbox.
         top: north offset.

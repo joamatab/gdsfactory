@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.circle import circle
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -16,6 +20,7 @@ def fiber(
     """Returns a fiber.
 
     Args:
+    ----
         core_diameter: in um.
         cladding_diameter: in um.
         layer_core: layer spec for fiber core.
@@ -28,7 +33,11 @@ def fiber(
 
     layer_core = gf.get_layer(layer_core)
     c.add_port(
-        name="F0", width=core_diameter, orientation=0, center=(0, 0), layer=layer_core
+        name="F0",
+        width=core_diameter,
+        orientation=0,
+        center=(0, 0),
+        layer=layer_core,
     )
     return c
 

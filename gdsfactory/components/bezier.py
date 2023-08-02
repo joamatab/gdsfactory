@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import ndarray
 
@@ -7,13 +9,16 @@ import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
 from gdsfactory.component import Component
 from gdsfactory.geometry.functions import angles_deg, curvature, path_length, snap_angle
-from gdsfactory.typings import Coordinate, Coordinates, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Coordinate, Coordinates, CrossSectionSpec
 
 
 def bezier_curve(t: ndarray, control_points: Coordinates) -> ndarray:
     """Returns bezier coordinates.
 
     Args:
+    ----
         t: 1D array of points varying between 0 and 1.
         control_points:
     """
@@ -44,6 +49,7 @@ def bezier(
     """Returns Bezier bend.
 
     Args:
+    ----
         control_points: list of points.
         npoints: number of points varying between 0 and 1.
         with_manhattan_facing_angles: bool.
@@ -115,7 +121,7 @@ def find_min_curv_bezier_control_points(
         - negligible mismatch with start angle and end angle
         """
         ps = array_1d_to_cpts(p)
-        control_points = [start_point] + ps + [end_point]
+        control_points = [start_point, *ps, end_point]
         path_points = bezier_curve(t, control_points)
 
         max_curv = max(np.abs(curvature(path_points, t)))
@@ -135,40 +141,16 @@ def find_min_curv_bezier_control_points(
         y = (i + 1) * (y0 + yn) / nb_pts
         initial_guess += [x, y]
 
-    # initial_guess = [(x0 + xn) / 2, y0, (x0 + xn) / 2, yn]
-
     res = minimize(objective_func, initial_guess, method="Nelder-Mead")
 
     p = res.x
-    return [tuple(start_point)] + array_1d_to_cpts(p) + [tuple(end_point)]
+    return [tuple(start_point), *array_1d_to_cpts(p), tuple(end_point)]
 
 
 if __name__ == "__main__":
-    # control_points = ((0.0, 0.0), (5.0, 0.0), (5.0, 5.0), (10.0, 5.0))
-    # cross_section = gf.get_cross_section(
-    #     "strip", bbox_offsets=[0.5], bbox_layers=[(111, 0)]
-    # )
-    # npoints = 201
-    # with_manhattan_facing_angles = True
-    # xs = gf.get_cross_section(
     #     cross_section,
-    # )
-    # t = np.linspace(0, 1, npoints)
-    # path_points = bezier_curve(t, control_points)
-    # path = gf.Path(path_points)
 
     # if with_manhattan_facing_angles:
-    #     angles = angles_deg(path_points)
-    #     path.start_angle = snap_angle(angles[0])
-    #     path.end_angle = snap_angle(angles[-2])
-    # c = path.extrude(xs)
-
-    # points = ((0.0, 0.0), (5.0, 0.0), (5.0, 5.0), (10.0, 5.0))
-    # c = bezier(control_points=points)
-    # c.pprint()
-    # print(c.ports)
-    # print(c.ports["0"].y - c.ports["1"].y)
-    # c.write_gds()
 
     c = bezier(bbox_offsets=[0.5], bbox_layers=[(111, 0)])
     c.show(show_ports=True)

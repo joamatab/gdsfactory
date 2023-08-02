@@ -10,17 +10,24 @@ happening
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
 def straight_wide(
-    length: float = 5.0, width: float = 1.0, layer: LayerSpec = (2, 0)
+    length: float = 5.0,
+    width: float = 1.0,
+    layer: LayerSpec = (2, 0),
 ) -> gf.Component:
     """Returns straight Component.
 
     Args:
+    ----
         length: of the straight.
         width: in um.
         layer: layer spec
@@ -29,10 +36,18 @@ def straight_wide(
     wg = gf.Component("straight_sample")
     wg.add_polygon([(0, 0), (length, 0), (length, width), (0, width)], layer=layer)
     wg.add_port(
-        name="o1", center=(0, width / 2), width=width, orientation=180, layer=layer
+        name="o1",
+        center=(0, width / 2),
+        width=width,
+        orientation=180,
+        layer=layer,
     )
     wg.add_port(
-        name="o2", center=(length, width / 2), width=width, orientation=0, layer=layer
+        name="o2",
+        center=(length, width / 2),
+        width=width,
+        orientation=0,
+        layer=layer,
     )
     return wg
 

@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
 
 
 @gf.cell
 def mmi1x2(
-    width: Optional[float] = None,
+    width: Optional[float] | None = None,
     width_taper: float = 1.0,
     length_taper: float = 10.0,
     length_mmi: float = 5.5,
@@ -24,6 +28,7 @@ def mmi1x2(
     r"""1x2 MultiMode Interferometer (MMI).
 
     Args:
+    ----
         width: input and output straight width. Defaults to cross_section width.
         width_taper: interface between input straights and mmi region.
         length_taper: into the mmi region.
@@ -144,9 +149,5 @@ if __name__ == "__main__":
     import gdsfactory as gf
 
     c = gf.components.mmi1x2(cross_section="rib_conformal")
-
-    # print(c.xmin)
-    # c.xmin = 0
-    # print(c.xmin)
 
     c.show(show_ports=True)

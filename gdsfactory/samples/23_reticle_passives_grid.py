@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pandas as pd
 
 import gdsfactory as gf
-from gdsfactory.typings import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Component
 
 debug = False
 nlabels = 12
@@ -14,8 +18,7 @@ def mzi_te(**kwargs) -> Component:
     gc = gf.c.grating_coupler_elliptical_tm()
     c = gf.c.mzi_phase_shifter_top_heater_metal(delta_length=40)
     c = gf.routing.add_fiber_array(c, grating_coupler=gc, **kwargs)
-    c = gf.routing.add_electrical_pads_shortest(c)
-    return c
+    return gf.routing.add_electrical_pads_shortest(c)
 
 
 def demo_grid() -> Component:

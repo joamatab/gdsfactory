@@ -11,8 +11,8 @@ from __future__ import annotations
 import hashlib
 import math
 import warnings
-from collections.abc import Iterable
-from typing import Callable
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import mod, pi
@@ -28,13 +28,15 @@ from gdsfactory.component_layout import (
 )
 from gdsfactory.cross_section import CrossSection, Section, Transition
 from gdsfactory.port import Port
-from gdsfactory.typings import (
-    Coordinates,
-    CrossSectionSpec,
-    Float2,
-    LayerSpec,
-    WidthTypes,
-)
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import (
+        Coordinates,
+        CrossSectionSpec,
+        Float2,
+        LayerSpec,
+        WidthTypes,
+    )
 
 
 def _simplify(points, tolerance):
@@ -46,10 +48,10 @@ def _simplify(points, tolerance):
 
 
 class Path(_GeometryHelper):
-    """Path object for smooth Paths. You can extrude a Path with a CrossSection \
-            to create a Component.
+    """Path object for smooth Paths. You can extrude a Path with a CrossSection to create a Component.
 
-    Parameters:
+    Parameters
+    ----------
         path: array-like[N][2], Path, or list of Paths.
             Points or Paths to append() initially.
 
@@ -81,9 +83,9 @@ class Path(_GeometryHelper):
             elif np.asarray(path, dtype=object).size > 1:
                 self.append(path)
             else:
+                msg = "Path() the `path` argument must be either blank, a path Object, an array-like[N][2] list of points, or a list of these"
                 raise ValueError(
-                    "Path() the `path` argument must be either blank, a path Object, "
-                    "an array-like[N][2] list of points, or a list of these"
+                    msg,
                 )
 
     def __repr__(self) -> str:
@@ -123,6 +125,7 @@ class Path(_GeometryHelper):
         smoothly from the previous segment.
 
         Args:
+        ----
             path : Path, array-like[N][2], or list of Paths
                 The input path that will be appended.
         """
@@ -143,14 +146,14 @@ class Path(_GeometryHelper):
             nx2, ny2 = points[-1] - points[-2]
             end_angle = np.arctan2(ny2, nx2) / np.pi * 180
         # If list of Paths or arrays
-        elif isinstance(path, (list, tuple)):
+        elif isinstance(path, list | tuple):
             for p in path:
                 self.append(p)
             return self
         else:
+            msg = "Path.append() the `path` argument must be either a Path object, an array-like[N][2] list of points, or a list of these"
             raise ValueError(
-                "Path.append() the `path` argument must be either "
-                "a Path object, an array-like[N][2] list of points, or a list of these"
+                msg,
             )
 
         # Connect beginning of new points with old points
@@ -172,6 +175,7 @@ class Path(_GeometryHelper):
         of the form my_offset(t) where t goes from 0->1
 
         Args:
+        ----
             offset: int or float, callable. Magnitude of the offset
         """
         if offset == 0:
@@ -221,6 +225,7 @@ class Path(_GeometryHelper):
         Both origin and destination can be 1x2 array-like or a Port.
 
         Args:
+        ----
             origin : array-like[2], Port Origin point of the move.
             destination : array-like[2], Port Destination point of the move.
             axis : {'x', 'y'} Direction of move.
@@ -237,6 +242,7 @@ class Path(_GeometryHelper):
         If no center point specified will rotate around (0,0).
 
         Args:
+        ----
             angle: Angle to rotate the Component in degrees.
             center: array-like[2] or None. component of the Component.
         """
@@ -256,6 +262,7 @@ class Path(_GeometryHelper):
         or array-like[N][2], and will return in kind.
 
         Args:
+        ----
             p1: First point of the line.
             p2: Second point of the line.
         """
@@ -268,10 +275,13 @@ class Path(_GeometryHelper):
         return self
 
     def _centerpoint_offset_curve(
-        self, points, offset_distance, start_angle, end_angle
+        self,
+        points,
+        offset_distance,
+        start_angle,
+        end_angle,
     ):
-        """Creates a offset curve (but does not account for cusps etc)\
-        by computing the centerpoint offset of the supplied x and y points."""
+        """Creates a offset curve (but does not account for cusps etc) by computing the centerpoint offset of the supplied x and y points."""
         new_points = np.array(points, dtype=np.float64)
         dx = np.diff(points[:, 0])
         dy = np.diff(points[:, 1])
@@ -295,8 +305,7 @@ class Path(_GeometryHelper):
         return new_points
 
     def _parametric_offset_curve(self, points, offset_distance, start_angle, end_angle):
-        """Creates a parametric offset (does not account for cusps etc) \
-        by using gradient of the supplied x and y points."""
+        """Creates a parametric offset (does not account for cusps etc) by using gradient of the supplied x and y points."""
         x = points[:, 0]
         y = points[:, 1]
         dxdt = np.gradient(x)
@@ -328,6 +337,7 @@ class Path(_GeometryHelper):
         along the curve can cause discontinuities.
 
         Returns:
+        -------
             s : array-like[N]
                 The arc-length of the Path
             K : array-like[N]
@@ -354,10 +364,12 @@ class Path(_GeometryHelper):
         """Computes an SHA1 hash of the points in the Path and the start_angle and end_angle.
 
         Args:
+        ----
             precision: Rounding precision for the the objects in the Component.  For instance,
                 a precision of 1e-2 will round a point at (0.124, 1.748) to (0.12, 1.75)
 
         Returns:
+        -------
             str Hash result in the form of an SHA1 hex digest string.
 
         .. code::
@@ -381,7 +393,8 @@ class Path(_GeometryHelper):
         final_hash = hashlib.sha1()
         points = (
             np.ascontiguousarray(
-                (self.points / precision) + magic_offset, dtype=np.float64
+                (self.points / precision) + magic_offset,
+                dtype=np.float64,
             )
             .round()
             .astype(np.int64)
@@ -390,7 +403,8 @@ class Path(_GeometryHelper):
         angles = (
             (
                 np.ascontiguousarray(
-                    (self.start_angle, self.end_angle), dtype=np.float64
+                    (self.start_angle, self.end_angle),
+                    dtype=np.float64,
                 )
                 / precision
             )
@@ -445,6 +459,7 @@ class Path(_GeometryHelper):
         The CrossSection defines the layer numbers, widths and offsets.
 
         Args:
+        ----
             p: a path is a list of points (arc, straight, euler).
             cross_section: to extrude.
             layer: optional layer.
@@ -520,6 +535,7 @@ def transition_exponential(y1, y2, exp=0.5):
     """Returns the function for an exponential transition.
 
     Args:
+    ----
         y1: start width in um.
         y2: end width in um.
         exp: exponent.
@@ -546,7 +562,7 @@ adiabatic_polyfit_TE1550SOI_220nm = np.array(
         -3.74726005e01,
         1.77381560e01,
         -1.12666286e00,
-    ]
+    ],
 )
 
 
@@ -562,6 +578,7 @@ def transition_adiabatic(
     """Returns the points for an optimal adiabatic transition for well-guided modes.
 
     Args:
+    ----
         w1: start width in um.
         w2: end width in um.
         neff_w: a callable that returns the effective index as a function of width
@@ -576,6 +593,7 @@ def transition_adiabatic(
         num_points_ODE: number of samplings points for the ODE solve.
 
     References:
+    ----------
         [1] Burns, W. K., et al. "Optical waveguide parabolic coupling horns."
             Appl. Phys. Lett., vol. 30, no. 1, 1 Jan. 1977, pp. 28-30, doi:10.1063/1.89199.
         [2] Fu, Yunfei, et al. "Efficient adiabatic silicon-on-insulator waveguide taper."
@@ -622,6 +640,7 @@ def transition(
     Port names will be cloned from the input CrossSections in reverse.
 
     Args:
+    ----
         cross_section1: First CrossSection.
         cross_section2: Second CrossSection.
         width_type: sine or linear.
@@ -635,9 +654,9 @@ def transition(
     X2 = cross_section2
 
     if not X1.aliases or not X2.aliases:
+        msg = "transition() found no named sections in one or both inputs (cross_section1/cross_section2)."
         raise ValueError(
-            "transition() found no named sections in one "
-            "or both inputs (cross_section1/cross_section2)."
+            msg,
         )
 
     layers1 = {get_layer(section.layer) for section in X1.sections}
@@ -647,25 +666,24 @@ def transition(
 
     has_common_layers = bool(layers1.intersection(layers2))
     if not has_common_layers:
+        msg = f"transition() found no common layers X1 {layers1} and X2 {layers2}"
         raise ValueError(
-            f"transition() found no common layers X1 {layers1} and X2 {layers2}"
+            msg,
         )
 
     sections = []
 
-    sections1 = [
-        X1.aliases[alias] for alias in X1.aliases.keys() if alias in X2.aliases
-    ]
-    sections2 = [
-        X2.aliases[alias] for alias in X2.aliases.keys() if alias in X1.aliases
-    ]
+    sections1 = [X1.aliases[alias] for alias in X1.aliases if alias in X2.aliases]
+    sections2 = [X2.aliases[alias] for alias in X2.aliases if alias in X1.aliases]
 
     if X1.cladding_layers:
         cladding_simplify = X1.cladding_simplify or [None] * len(X1.cladding_layers)
         sections1 += [
             Section(width=X1.width + 2 * offset, layer=layer, simplify=simplify)
             for offset, layer, simplify in zip(
-                X1.cladding_offsets, X1.cladding_layers, cladding_simplify
+                X1.cladding_offsets,
+                X1.cladding_layers,
+                cladding_simplify,
             )
         ]
     if X2.cladding_layers:
@@ -673,7 +691,9 @@ def transition(
         sections2 += [
             Section(width=X2.width + 2 * offset, layer=layer)
             for offset, layer, simplify in zip(
-                X2.cladding_offsets, X2.cladding_layers, cladding_simplify
+                X2.cladding_offsets,
+                X2.cladding_layers,
+                cladding_simplify,
             )
         ]
 
@@ -701,8 +721,9 @@ def transition(
         elif width_type == "parabolic":
             width_fun = _parabolic_transition(width1, width2)
         else:
+            msg = f"width_type={width_type!r} must be {'sine', 'linear', 'parabolic'}"
             raise ValueError(
-                f"width_type={width_type!r} must be {'sine','linear','parabolic'}"
+                msg,
             )
 
         if section1.layer != section2.layer:
@@ -752,6 +773,7 @@ def extrude(
     The CrossSection defines the layer numbers, widths and offsets
 
     Args:
+    ----
         p: a path is a list of points (arc, straight, euler).
         cross_section: to extrude.
         layer: optional layer to extrude.
@@ -771,19 +793,23 @@ def extrude(
     )
 
     if cross_section is None and layer is None:
-        raise ValueError("CrossSection or layer needed")
+        msg = "CrossSection or layer needed"
+        raise ValueError(msg)
 
     if cross_section is not None and layer is not None:
-        raise ValueError("Define only CrossSection or layer")
+        msg = "Define only CrossSection or layer"
+        raise ValueError(msg)
 
     if layer is not None and width is None and widths is None:
-        raise ValueError("Need to define layer width or widths")
+        msg = "Need to define layer width or widths"
+        raise ValueError(msg)
     elif width:
         cross_section = CrossSection(width=width, layer=layer)
 
     elif widths:
         cross_section = CrossSection(
-            width=_linear_transition(widths[0], widths[1]), layer=layer
+            width=_linear_transition(widths[0], widths[1]),
+            layer=layer,
         )
 
     xsection_points = []
@@ -804,13 +830,15 @@ def extrude(
                 port_names=x.port_names,
                 port_types=x.port_types,
                 insets=None,
-            )
+            ),
         ]
 
         if x.cladding_layers and x.cladding_offsets:
             cladding_simplify = x.cladding_simplify or [None] * len(x.cladding_layers)
             for layer, cladding_offset, with_simplify in zip(
-                x.cladding_layers, x.cladding_offsets, cladding_simplify
+                x.cladding_layers,
+                x.cladding_offsets,
+                cladding_simplify,
             ):
                 width = x.width(1) if callable(x.width) else x.width
                 width = max(width) if isinstance(width, Iterable) else width
@@ -820,7 +848,7 @@ def extrude(
                         offset=x.offset,
                         layer=get_layer(layer),
                         simplify=with_simplify,
-                    )
+                    ),
                 ]
 
     for section in sections:
@@ -832,7 +860,7 @@ def extrude(
         port_types = section.port_types
         hidden = section.hidden
 
-        if isinstance(width, (int, float)) and isinstance(offset, (int, float)):
+        if isinstance(width, int | float) and isinstance(offset, int | float):
             xsection_points.append([width, offset])
         if isinstance(layer, int):
             layer = (layer, 0)
@@ -864,7 +892,7 @@ def extrude(
             new_stop_point = [new_x_stop, p_pts[new_stop_idx, 1]]
 
             p_sec = Path(
-                [new_start_point, *p_pts[new_start_idx:new_stop_idx], new_stop_point]
+                [new_start_point, *p_pts[new_start_idx:new_stop_idx], new_stop_point],
             )
 
         if callable(offset):
@@ -881,7 +909,6 @@ def extrude(
             lengths = np.concatenate([[0], lengths])
             width = width(lengths / lengths[-1])
         dy = offset + width / 2
-        # _points = _shear_face(points, dy, shear_angle_start, shear_angle_end)
 
         points1 = p_sec._centerpoint_offset_curve(
             points,
@@ -890,7 +917,6 @@ def extrude(
             end_angle=end_angle,
         )
         dy = offset - width / 2
-        # _points = _shear_face(points, dy, shear_angle_start, shear_angle_end)
 
         points2 = p_sec._centerpoint_offset_curve(
             points,
@@ -920,11 +946,10 @@ def extrude(
                 path=points2,
             )
 
-        # angle = start_angle + shear_angle_start + 90
-        # points2 = _cut_path_with_ray(points[0], angle, points2, start=True)
-        # Simplify lines using the Ramer–Douglas–Peucker algorithm
+        # Simplify lines using the Ramer-Douglas-Peucker algorithm
         if isinstance(simplify, bool):
-            raise ValueError("simplify argument must be a number (e.g. 1e-3) or None")
+            msg = "simplify argument must be a number (e.g. 1e-3) or None"
+            raise ValueError(msg)
 
         with_simplify = section.simplify or simplify
 
@@ -972,7 +997,7 @@ def extrude(
                     if hasattr(x, "cross_section1")
                     else x,
                     shear_angle=shear_angle_start,
-                )
+                ),
             )
             port1.info["face"] = face
         if port_names[1] is not None:
@@ -999,7 +1024,7 @@ def extrude(
                     if hasattr(x, "cross_section2")
                     else x,
                     shear_angle=shear_angle_end,
-                )
+                ),
             )
             port2.info["face"] = face
 
@@ -1016,11 +1041,14 @@ def extrude(
 
 
 def _rotated_delta(
-    point: np.ndarray, center: np.ndarray, orientation: float
+    point: np.ndarray,
+    center: np.ndarray,
+    orientation: float,
 ) -> np.ndarray:
     """Gets the rotated distance of a point from a center.
 
     Args:
+    ----
         point: the initial point.
         center: a center point to use as a reference.
         orientation: the rotation, in degrees.
@@ -1073,8 +1101,9 @@ def _cut_path_with_ray(
 
             if not isinstance(intersection, sg.Point):
                 if not isinstance(intersection, sg.MultiPoint):
+                    msg = f"Expected intersection to be a point, but got {intersection}"
                     raise ValueError(
-                        f"Expected intersection to be a point, but got {intersection}"
+                        msg,
                     )
                 _, nearest = shapely.ops.nearest_points(sg.Point(point), intersection)
                 intersection = nearest
@@ -1102,6 +1131,7 @@ def arc(
     """Returns a radial arc.
 
     Args:
+    ----
         radius: minimum radius of curvature.
         angle: total angle of the curve.
         npoints: Number of points used per 360 degrees. Defaults to pdk.bend_points_distance.
@@ -1124,7 +1154,9 @@ def arc(
     npoints = max(npoints, int(360 / angle) + 1)
 
     t = np.linspace(
-        start_angle * np.pi / 180, (angle + start_angle) * np.pi / 180, npoints
+        start_angle * np.pi / 180,
+        (angle + start_angle) * np.pi / 180,
+        npoints,
     )
     x = radius * np.cos(t)
     y = radius * (np.sin(t) + 1)
@@ -1140,7 +1172,8 @@ def arc(
 
 def _cumtrapz(x):
     """Numpy-based implementation of the cumulative trapezoidal integration \
-    function usually found in scipy (scipy.integrate.cumtrapz)."""
+    function usually found in scipy (scipy.integrate.cumtrapz).
+    """
     return np.cumsum((x[1:] + x[:-1]) / 2)
 
 
@@ -1173,6 +1206,7 @@ def euler(
     https://dx.doi.org/10.1364/oe.27.031394
 
     Args:
+    ----
         radius: minimum radius of curvature.
         angle: total angle of the curve.
         p: Proportion of the curve that is an Euler curve.
@@ -1193,7 +1227,8 @@ def euler(
     from gdsfactory.pdk import get_active_pdk
 
     if (p < 0) or (p > 1):
-        raise ValueError("euler requires argument `p` be between 0 and 1")
+        msg = "euler requires argument `p` be between 0 and 1"
+        raise ValueError(msg)
     if p == 0:
         P = arc(radius=radius, angle=angle, npoints=npoints)
         P.info["Reff"] = radius
@@ -1282,12 +1317,14 @@ def straight(length: float = 10.0, npoints: int = 2) -> Path:
     For transitions you should increase have at least 100 points
 
     Args:
+    ----
         length: of straight.
         npoints: number of points.
 
     """
     if length < 0:
-        raise ValueError(f"length = {length} needs to be > 0")
+        msg = f"length = {length} needs to be > 0"
+        raise ValueError(msg)
     x = np.linspace(0, length, npoints)
     y = x * 0
     points = np.array((x, y)).T
@@ -1298,11 +1335,15 @@ def straight(length: float = 10.0, npoints: int = 2) -> Path:
 
 
 def spiral_archimedean(
-    min_bend_radius: float, separation: float, number_of_loops: float, npoints: int
+    min_bend_radius: float,
+    separation: float,
+    number_of_loops: float,
+    npoints: int,
 ) -> Path:
     """Returns an Archimedean spiral.
 
     Args:
+    ----
         radius: Inner radius of the spiral.
         separation: Separation between the loops in um.
         number_of_loops: number of loops.
@@ -1322,7 +1363,7 @@ def spiral_archimedean(
             (separation / np.pi * theta + min_bend_radius)
             * np.array((np.sin(theta), np.cos(theta)))
             for theta in np.linspace(0, number_of_loops * 2 * np.pi, npoints)
-        ]
+        ],
     )
 
 
@@ -1348,6 +1389,7 @@ def smooth(
     """Returns a smooth Path from a series of waypoints.
 
     Args:
+    ----
         points: array-like[N][2] List of waypoints for the path to follow.
         radius: radius of curvature, passed to `bend`.
         bend: bend function that returns a path that round corners.
@@ -1373,9 +1415,9 @@ def smooth(
         points, normals, ds, theta, dtheta = _compute_segments(new_points)
 
     if np.any(np.abs(np.abs(dtheta) - 180) < 1e-6):
+        msg = "smooth() received points which double-back on themselves--turns cannot be computed when going forwards then exactly backwards."
         raise ValueError(
-            "smooth() received points which double-back on themselves"
-            "--turns cannot be computed when going forwards then exactly backwards."
+            msg,
         )
 
     # FIXME add caching
@@ -1393,9 +1435,9 @@ def smooth(
     d = np.abs(np.array(radii) / np.tan(np.radians(180 - dtheta) / 2))
     encroachment = np.concatenate([[0], d]) + np.concatenate([d, [0]])
     if np.any(encroachment > ds):
+        msg = "smooth(): Not enough distance between points to to fit curves.Try reducing the radius or spacing the points out farther"
         raise ValueError(
-            "smooth(): Not enough distance between points to to fit curves."
-            "Try reducing the radius or spacing the points out farther"
+            msg,
         )
     p1 = points[1:-1, :] - normals[:-1, :] * d[:, np.newaxis]
 
@@ -1511,15 +1553,8 @@ if __name__ == "__main__":
 
     import gdsfactory as gf
 
-    # nm = 1e-3
-    # points = np.array([(20, 10), (40, 10), (20, 40), (50, 40), (50, 20), (70, 20)])
-    # p = smooth(points=points)
-    # p = arc(start_angle=0)
-    # c = p.extrude(layer=(1, 0), width=0.1, simplify=50 * nm)
     p = straight()
-    # p.plot()
 
-    # c = p.extrude(layer=(1, 0), width=0.1)
     s1 = gf.Section(width=2.2, offset=0, layer=(3, 0), name="etch")
     s2 = gf.Section(width=1.1, offset=3, layer=(1, 0), name="wg2")
     X1 = gf.CrossSection(
@@ -1545,11 +1580,4 @@ if __name__ == "__main__":
 
     Xtrans = gf.path.transition(cross_section1=X1, cross_section2=X2, width_type="sine")
     c = p.extrude(cross_section=Xtrans)
-    # c = gf.components.splitter_tree(
-    #     noutputs=2**2,
-    #     spacing=(120.0, 50.0),
-    #     # bend_length=30,
-    #     # bend_s=None,
-    #     cross_section="rib_conformal2",
-    # )
     c.show()

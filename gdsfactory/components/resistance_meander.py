@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.geometry.offset import offset
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -23,6 +27,7 @@ def resistance_meander(
     based on phidl.geometry
 
     Args:
+    ----
         pad_size: Size of the two matched impedance pads (microns).
         num_squares: Number of squares comprising the resonator wire.
         width: The width of the squares (microns).
@@ -35,13 +40,17 @@ def resistance_meander(
 
     # Checking validity of input
     if x <= 0 or z <= 0:
-        raise ValueError("Pad must have positive, real dimensions")
+        msg = "Pad must have positive, real dimensions"
+        raise ValueError(msg)
     elif width > z:
-        raise ValueError("Width of cell cannot be greater than height of pad")
+        msg = "Width of cell cannot be greater than height of pad"
+        raise ValueError(msg)
     elif num_squares <= 0:
-        raise ValueError("Number of squares must be a positive real number")
+        msg = "Number of squares must be a positive real number"
+        raise ValueError(msg)
     elif width <= 0:
-        raise ValueError("Width of cell must be a positive real number")
+        msg = "Width of cell must be a positive real number"
+        raise ValueError(msg)
 
     # Performing preliminary calculations
     num_rows = int(np.floor(z / (2 * width)))

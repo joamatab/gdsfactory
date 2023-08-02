@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -9,7 +10,9 @@ import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.via import via1, via2, viac
-from gdsfactory.typings import ComponentSpec, Float2, Floats, LayerSpec, LayerSpecs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Float2, Floats, LayerSpec, LayerSpecs
 
 
 @gf.cell
@@ -34,6 +37,7 @@ def via_stack(
     enclosure = via.info['enclosure']
 
     Args:
+    ----
         size: of the layers.
         layers: layers on which to draw rectangles.
         layer_offsets: Optional offsets for each layer with respect to size.
@@ -101,7 +105,8 @@ def via_stack(
                 width = max(min_width, width)
                 height = max(min_height, height)
             elif min_width > width or min_height > height:
-                raise ValueError(f"size {size} is too small to fit a {(w, h)} um via")
+                msg = f"size {size} is too small to fit a {w, h} um via"
+                raise ValueError(msg)
 
             nb_vias_x = abs(width - w - 2 * enclosure) / pitch_x + 1
             nb_vias_y = abs(height - h - 2 * enclosure) / pitch_y + 1
@@ -109,7 +114,10 @@ def via_stack(
             nb_vias_x = int(np.floor(nb_vias_x)) or 1
             nb_vias_y = int(np.floor(nb_vias_y)) or 1
             ref = c.add_array(
-                via, columns=nb_vias_x, rows=nb_vias_y, spacing=(pitch_x, pitch_y)
+                via,
+                columns=nb_vias_x,
+                rows=nb_vias_y,
+                spacing=(pitch_x, pitch_y),
             )
             if ref.xsize + enclosure > width or ref.ysize + enclosure > height:
                 warnings.warn(
@@ -148,6 +156,7 @@ def via_stack_circular(
     along the specified circumference.
 
     Args:
+    ----
         radius: of the via stack (center).
         angular_extent: of the via stack.
         center_angle: of the via stack.
@@ -156,7 +165,6 @@ def via_stack_circular(
         vias: vias to use to fill the rectangles.
         layer_port: if None assumes port is on the last layer.
     """
-
     # We basically just want to place rectangular via stacks
     # stacked with a little bit of an offset
     c = gf.Component()
@@ -207,7 +215,10 @@ def via_stack_circular(
             pos = radius * np.array((np.cos(ang), np.sin(ang)))
 
             ref = c.add_array(
-                via, columns=nb_vias_x, rows=1, spacing=(pitch_x, pitch_y)
+                via,
+                columns=nb_vias_x,
+                rows=1,
+                spacing=(pitch_x, pitch_y),
             )
             ref.center = pos
 
@@ -256,7 +267,6 @@ def _smaller_angle(angle, angle1, angle2):
     But it does so assuming that angle1 and angle2 are between [-pi, pi]
     and that we are trying to fill an arc
     """
-
     if angle2 >= 0 and angle1 >= 0:
         if angle2 > angle1:
             return angle < angle2
@@ -290,6 +300,7 @@ def via_stack_from_rules(
     each with maximum via area.
 
     Args:
+    ----
         size: of the layers, len(size).
         layers: layers on which to draw rectangles.
         layer_offsets: Optional offsets for each layer with respect to size.
@@ -327,12 +338,15 @@ def via_stack_from_rules(
     vias = vias or []
     c.info["vias"] = []
     for current_via, min_size, min_gap, min_enclosure in zip(
-        vias, via_min_size, via_min_gap, via_min_enclosure
+        vias,
+        via_min_size,
+        via_min_gap,
+        via_min_enclosure,
     ):
         if current_via is not None:
             # Optimize via
             via = gf.get_component(
-                optimized_via(current_via, size, min_size, min_gap, min_enclosure)
+                optimized_via(current_via, size, min_size, min_gap, min_enclosure),
             )
             c.info["vias"].append(via.info)
 
@@ -346,7 +360,10 @@ def via_stack_from_rules(
             nb_vias_x = int(np.floor(nb_vias_x)) or 1
             nb_vias_y = int(np.floor(nb_vias_y)) or 1
             ref = c.add_array(
-                via, columns=nb_vias_x, rows=nb_vias_y, spacing=(pitch_x, pitch_y)
+                via,
+                columns=nb_vias_x,
+                rows=nb_vias_y,
+                spacing=(pitch_x, pitch_y),
             )
 
             cw = (width - (nb_vias_x - 1) * pitch_x - w) / 2
@@ -370,6 +387,7 @@ def optimized_via(
     Uses inclusion, minimum width, and minimum spacing rules to place the maximum number of individual vias, with maximum via area.
 
     Arguments:
+    ---------
         base_via: to modify.
         size: of the target enclosing medium.
         min_via_size: minimum size the vias can take.
@@ -383,8 +401,9 @@ def optimized_via(
         try:
             via_size[dim] = float(via_area / num_vias) - min_via_gap[dim]
         except ZeroDivisionError as e:
+            msg = "Cannot fit vias with specified minimum dimensions in provided space."
             raise RuntimeError(
-                "Cannot fit vias with specified minimum dimensions in provided space."
+                msg,
             ) from e
 
     return partial(
@@ -413,7 +432,7 @@ def test_via_stack_from_rules() -> None:
             via_min_size=via_min_size,
             via_min_gap=via_min_gap,
             via_min_enclosure=via_min_enclosure,
-        )
+        ),
     )
 
     assert c.info["vias"][0]["size"][0] > via_min_size[0][0]
@@ -451,43 +470,12 @@ via_stack_slab_npp_m3 = partial(
     vias=(None, None, viac),
 )
 via_stack_heater_mtop = via_stack_heater_m3 = partial(
-    via_stack, layers=("HEATER", "M2", "M3"), vias=(None, via1, via2)
+    via_stack,
+    layers=("HEATER", "M2", "M3"),
+    vias=(None, via1, via2),
 )
 
 
 if __name__ == "__main__":
     c = via_stack()
     c.show()
-    # c = gf.pack([via_stack_slab_m3, via_stack_heater_mtop])[0]
-
-    # c = gf.Component("offgrid_demo")
-    # v1 = c << via_stack_slab_m3()
-    # v2 = c << via_stack_slab_m3()
-    # v2.x = 20.0005
-    # c.show()
-
-    # c2 = gf.Component()
-    # c21 = c2 << c
-    # c22 = c2 << c
-    # c22.x = 20.0005 + 30
-    # c2.show()
-
-    # c = via_stack_heater_mtop(layer_offsets=(0, 1, 2))
-    # c = via_stack_circular()
-    # c = via_stack_m1_m3(size=(4.5, 4.5))
-    # print(c.to_dict())
-    # c.show(show_ports=True)
-
-    # c = via_stack_from_rules()
-    # c.show(show_ports=True)
-
-    # c = via_stack_circular(
-    #     radius=20.0,
-    #     angular_extent=300,
-    #     center_angle=0,
-    #     width=5.0,
-    #     layers=("M1", "M2", "M3"),
-    #     vias=(via1, via2),
-    #     layer_port=None,
-    # )
-    # c.show(show_ports=True)

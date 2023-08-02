@@ -110,7 +110,9 @@ def copy(src: pathlib.Path, dest: pathlib.Path) -> None:
 
 
 def _install_to_klayout(
-    src: pathlib.Path, klayout_subdir_name: str, package_name: str
+    src: pathlib.Path,
+    klayout_subdir_name: str,
+    package_name: str,
 ) -> None:
     """Install into KLayout technology.
 
@@ -138,7 +140,8 @@ def install_klayout_package() -> None:
 
 
 def install_klayout_technology(
-    tech_dir: pathlib.Path, tech_name: str | None = None
+    tech_dir: pathlib.Path,
+    tech_name: str | None = None,
 ) -> None:
     """Install technology to KLayout."""
     _install_to_klayout(
@@ -164,11 +167,4 @@ def convert_py_to_ipynb(files=py_files, output_folder=PATH.cwd / "notebooks") ->
 
 
 if __name__ == "__main__":
-    # cwd = pathlib.Path(__file__).resolve().parent
-    # home = pathlib.Path.home()
-    # src = cwd / "generic_tech" / "klayout" / "tech"
-
-    # write_git_attributes()
-    # install_gdsdiff()
-    # install_klayout_package()
     convert_py_to_ipynb()

@@ -3,24 +3,30 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 wire_straight = partial(straight, cross_section="metal_routing")
 
 
 @gf.cell
 def wire_corner(
-    cross_section: CrossSectionSpec = "metal_routing", with_bbox: bool = False, **kwargs
+    cross_section: CrossSectionSpec = "metal_routing",
+    with_bbox: bool = False,
+    **kwargs,
 ) -> Component:
     """Returns 45 degrees electrical corner wire.
 
     Args:
+    ----
         cross_section: spec.
         with_bbox: if True, includes the bbox layer and bbox offsets of the cross_section
         kwargs: cross_section settings.
@@ -81,6 +87,7 @@ def wire_corner45(
     """Returns 90 degrees electrical corner wire.
 
     Args:
+    ----
         cross_section: spec.
         with_bbox: if True, includes the bbox layer and bbox offsets of the cross_section
         kwargs: cross_section settings.
@@ -90,8 +97,9 @@ def wire_corner45(
     width = x.width
     radius = x.radius if radius is None else radius
     if radius is None:
+        msg = "Radius needs to be specified in wire_corner45 or in the cross_section."
         raise ValueError(
-            "Radius needs to be specified in wire_corner45 or in the cross_section."
+            msg,
         )
 
     c = Component()
@@ -148,6 +156,7 @@ def wire_corner_sections(
     Works well with symmetric cross_sections, not quite ready for asymmetric.
 
     Args:
+    ----
         cross_section: spec.
         with_bbox: if True, includes the bbox layer and bbox offsets of the cross_section
         kwargs: cross_section settings.
@@ -219,29 +228,7 @@ def wire_corner_sections(
 
 
 if __name__ == "__main__":
-    # c = wire_straight()
-
-    # xsection = gf.cross_section.cross_section(
-    #     width=1,
-    #     offset=0,
-    #     layer="M3",
-    #     bbox_layers = ("M1", "M2"),
-    #     bbox_offsets = (1, 2),
-    # )
-
-    # c = wire_corner(cross_section=xsection, with_bbox=True)
-    # c.show(show_ports=True)
-    # section1 = gf.cross_section.Section(width=0.4, layer="M1", offset=0.5)
-    # section2 = gf.cross_section.Section(width=0.4, layer="M1", offset=-0.5)
-    # xsection = gf.cross_section.cross_section(
-    #     width=0.4, offset=0, layer="M1", sections=[section1, section2]
-    # )
     from gdsfactory.cross_section import metal_slotted
-
-    # # c = wire_corner_sections(cross_section=metal_slotted)
-    # # c.show(show_ports=True)
-    # # c.pprint_ports()
-    # # c.pprint()
 
     metal_slotted_bbox = metal_slotted(
         bbox_layers=("M1", "M2"),
@@ -270,5 +257,3 @@ if __name__ == "__main__":
     )
     c.add(route.references)
     c.show()
-
-    # print(yaml.dump(c.to_dict()))

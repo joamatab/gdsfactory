@@ -35,13 +35,3 @@ def test_point_is_on_2nm_grid() -> None:
 
 if __name__ == "__main__":
     test_is_on_2nm_grid()
-    # print(snap_to_grid(1.1e-3))
-    # print(snap_to_2nm_grid(1.1e-3))
-    # print(snap_to_2nm_grid(3.1e-3))
-
-    # print(on_1nm_grid(1.1e-3))
-    # print(on_1nm_grid(1e-3))
-
-    # print(on_2nm_grid(1.1e-3))
-    # print(on_2nm_grid(1e-3))
-    # print(on_2nm_grid(2e-3))

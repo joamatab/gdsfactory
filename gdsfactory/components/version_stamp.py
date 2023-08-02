@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import datetime
 import platform
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.text import text
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -48,6 +51,7 @@ def version_stamp(
     """Component with module version and date.
 
     Args:
+    ----
         labels: Iterable of labels
     """
     now = datetime.datetime.now()
@@ -68,7 +72,9 @@ def version_stamp(
 
     txt_params = {"layer": layer, "justify": "left", "size": text_size}
     date = text(
-        position=(x, text_size + 2 * pixel_size), text=short_stamp, **txt_params
+        position=(x, text_size + 2 * pixel_size),
+        text=short_stamp,
+        **txt_params,
     ).ref()
     c.add(date)
     c.absorb(date)
@@ -94,7 +100,6 @@ if __name__ == "__main__":
         pixel_size=4,
         layer="M1",
         with_qr_code=True,
-        # text=["b1", "demo"],
         text_size=20,
     )
     c.show(show_ports=True)

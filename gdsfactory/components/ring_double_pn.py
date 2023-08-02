@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -8,7 +9,9 @@ import gdsfactory as gf
 from gdsfactory.components.via import via
 from gdsfactory.components.via_stack import via_stack
 from gdsfactory.cross_section import Section
-from gdsfactory.typings import ComponentSpec, CrossSection, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSection, LayerSpec
 
 
 @gf.cell
@@ -61,6 +64,7 @@ def ring_double_pn(
     """Returns add-drop pn ring with optional doped heater.
 
     Args:
+    ----
         add_gap: gap to add waveguide.
         drop_gap: gap to drop waveguide.
         radius: for the bend and coupler.
@@ -77,7 +81,6 @@ def ring_double_pn(
         heater_vias: components specifications for heater vias
         kwargs: cross_section settings.
     """
-
     add_gap = gf.snap.snap_to_grid(add_gap, nm=2)
     drop_gap = gf.snap.snap_to_grid(drop_gap, nm=2)
     c = gf.Component()
@@ -86,7 +89,7 @@ def ring_double_pn(
 
     add_waveguide_path = gf.Path()
     add_waveguide_path.append(
-        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle))
+        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle)),
     )
     add_waveguide = c << add_waveguide_path.extrude(cross_section=cross_section)
     add_waveguide.x = 0
@@ -94,7 +97,7 @@ def ring_double_pn(
 
     drop_waveguide_path = gf.Path()
     drop_waveguide_path.append(
-        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle))
+        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle)),
     )
     drop_waveguide = c << drop_waveguide_path.extrude(cross_section=cross_section)
     drop_waveguide.x = 0
@@ -132,8 +135,9 @@ def ring_double_pn(
         heater_path = gf.Path()
         heater_path.append(
             gf.path.arc(
-                radius=heater_radius, angle=undoping_angle - doped_heater_angle_buffer
-            )
+                radius=heater_radius,
+                angle=undoping_angle - doped_heater_angle_buffer,
+            ),
         )
 
         top_heater_ref = c << heater_path.extrude(width=0.5, layer=doped_heater_layer)
@@ -158,7 +162,8 @@ def ring_double_pn(
         top_right_heater_via.move((deltax, deltay))
 
         bottom_heater_ref = c << heater_path.extrude(
-            width=0.5, layer=doped_heater_layer
+            width=0.5,
+            layer=doped_heater_layer,
         )
         bottom_heater_ref.rotate(-(undoping_angle - doped_heater_angle_buffer) / 2)
         bottom_heater_ref.x = add_waveguide.x
@@ -170,10 +175,10 @@ def ring_double_pn(
         bottom_left_heater_via.rotate(bottom_heater_ref.ports["o1"].orientation)
 
         deltax = -abs(
-            bottom_heater_ref.ports["o1"].x - bottom_left_heater_via.ports["e3"].x
+            bottom_heater_ref.ports["o1"].x - bottom_left_heater_via.ports["e3"].x,
         )
         deltay = abs(
-            bottom_heater_ref.ports["o1"].y - bottom_left_heater_via.ports["e3"].y
+            bottom_heater_ref.ports["o1"].y - bottom_left_heater_via.ports["e3"].y,
         )
         bottom_left_heater_via.move((deltax, deltay))
 
@@ -181,10 +186,10 @@ def ring_double_pn(
         bottom_right_heater_via.rotate(bottom_heater_ref.ports["o2"].orientation)
 
         deltax = abs(
-            bottom_heater_ref.ports["o2"].x - bottom_right_heater_via.ports["e3"].x
+            bottom_heater_ref.ports["o2"].x - bottom_right_heater_via.ports["e3"].x,
         )
         deltay = abs(
-            bottom_heater_ref.ports["o2"].y - bottom_right_heater_via.ports["e3"].y
+            bottom_heater_ref.ports["o2"].y - bottom_right_heater_via.ports["e3"].y,
         )
         bottom_right_heater_via.move((deltax, deltay))
 
@@ -197,15 +202,5 @@ def ring_double_pn(
 
 
 if __name__ == "__main__":
-    # c = ring_single(layer=(2, 0), cross_section_factory=gf.cross_section.pin, width=1)
-    # c = ring_single(width=2, gap=1, layer=(2, 0), radius=7, length_y=1)
-    # print(c.ports)
-
-    # c = gf.routing.add_fiber_array(ring_single)
     c = ring_double_pn(width=0.5)
     c.show(show_ports=True)
-
-    # cc = gf.add_pins(c)
-    # print(c.settings)
-    # print(c.settings)
-    # cc.show(show_ports=True)

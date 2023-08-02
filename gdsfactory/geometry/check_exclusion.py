@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from gdsfactory.typings import ComponentOrPath
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrPath
 
 
 def check_exclusion(
@@ -19,6 +22,7 @@ def check_exclusion(
     exclusion if 0 no area violates exclusion.
 
     Args:
+    ----
         gdspath: path to GDS.
         layer1: tuple.
         layer2: tuple.
@@ -46,7 +50,8 @@ def check_exclusion(
 
     valid_metrics = ["Square", "Euclidean"]
     if metrics not in valid_metrics:
-        raise ValueError("metrics = {metrics} not in {valid_metrics}")
+        msg = "metrics = {metrics} not in {valid_metrics}"
+        raise ValueError(msg)
     metrics = getattr(pya.Region, metrics)
 
     d = a.separation_check(
@@ -58,7 +63,6 @@ def check_exclusion(
         min_projection,
         max_projection,
     )
-    # print(d.polygons().area())
     return d.polygons().area()
 
 
@@ -80,12 +84,4 @@ if __name__ == "__main__":
     print(check_exclusion(c))
 
     # if isinstance(gdspath, gf.Component):
-    #     gdspath.flatten()
-    #     gdspath = gdspath.write_gds()
-    # layout = pya.Layout()
-    # layout.read(str(gdspath))
-    # cell = layout.top_cell()
     # region = pya.Region(cell.begin_shapes_rec(layout.layer(layer[0], layer[1])))
-
-    # d = region.space_check(min_space * dbu)
-    # print(d.polygons().area())

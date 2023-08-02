@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
-from gdsfactory.typings import Ints, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Ints, LayerSpec
 
 
 @cell
@@ -17,6 +21,7 @@ def compass(
     """Rectangle with ports on each edge (north, south, east, and west).
 
     Args:
+    ----
         size: rectangle size.
         layer: tuple (int, int).
         port_type: optical, electrical.

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
 from gdsfactory.port import select_ports_electrical
 from gdsfactory.routing.route_quad import route_quad
-from gdsfactory.typings import Callable, ComponentSpec, Optional, Strs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Callable, ComponentSpec, Optional, Strs
 
 
 @gf.cell
@@ -14,13 +18,14 @@ def add_electrical_pads_shortest(
     pad: ComponentSpec = "pad",
     pad_port_spacing: float = 50.0,
     select_ports: Callable = select_ports_electrical,
-    port_names: Optional[Strs] = None,
+    port_names: Optional[Strs] | None = None,
     port_orientation: float = 90,
     layer: gf.typings.LayerSpec = "M3",
 ) -> Component:
     """Returns new Component with a pad by each electrical port.
 
     Args:
+    ----
         component: to route.
         pad: pad element or function.
         pad_port_spacing: spacing between pad and port.
@@ -84,8 +89,6 @@ def add_electrical_pads_shortest(
 
 
 if __name__ == "__main__":
-    # c = gf.components.cross(length=100, layer=gf.LAYER.M3)
-    # c = gf.components.mzi_phase_shifter()
     c = gf.components.straight_heater_metal(length=100)
     c = add_electrical_pads_shortest(component=c, port_orientation=270)
     c.show(show_ports=True)

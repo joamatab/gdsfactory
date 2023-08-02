@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.typings import Component, ComponentSpec, Optional, Tuple
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Component, ComponentSpec, Optional, Tuple
 
 _cols_200mm_wafer = (2, 6, 6, 8, 8, 6, 6, 2)
 
@@ -10,12 +14,13 @@ _cols_200mm_wafer = (2, 6, 6, 8, 8, 6, 6, 2)
 def wafer(
     reticle: ComponentSpec = "die",
     cols: Tuple[int, ...] = _cols_200mm_wafer,
-    xspacing: Optional[float] = None,
-    yspacing: Optional[float] = None,
+    xspacing: Optional[float] | None = None,
+    yspacing: Optional[float] | None = None,
 ) -> Component:
     """Returns complete wafer. Useful for mask aligner steps.
 
     Args:
+    ----
         reticle: spec for each wafer reticle.
         cols: how many columns per row.
         xspacing: optional spacing, defaults to reticle.xsize.
@@ -28,7 +33,10 @@ def wafer(
 
     for i, columns in enumerate(cols):
         ref = c.add_array(
-            reticle, rows=1, columns=columns, spacing=(xspacing, yspacing)
+            reticle,
+            rows=1,
+            columns=columns,
+            spacing=(xspacing, yspacing),
         )
         ref.x = 0
         ref.movey(i * yspacing)

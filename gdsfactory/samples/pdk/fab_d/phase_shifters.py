@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import pydantic
 
 import gdsfactory as gf
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Layer
 
 
 @pydantic.dataclasses.dataclass
@@ -24,10 +27,15 @@ xs_strip = partial(gf.cross_section.strip, layer=LAYER.WG, width=1)
 
 
 xs_strip_heater_metal = partial(
-    gf.cross_section.strip_heater_metal, layer=LAYER.WG, width=1
+    gf.cross_section.strip_heater_metal,
+    layer=LAYER.WG,
+    width=1,
 )
 xs_rib_heater_doped = partial(
-    gf.cross_section.rib_heater_doped, layer=LAYER.WG, width=1, layer_slab=LAYER.SLAB
+    gf.cross_section.rib_heater_doped,
+    layer=LAYER.WG,
+    width=1,
+    layer_slab=LAYER.SLAB,
 )
 xs_strip_heater_doped = partial(
     gf.cross_section.strip_heater_doped,
@@ -37,7 +45,10 @@ xs_strip_heater_doped = partial(
     bbox_offsets_heater=(0, 0.1),
 )
 xs_rib_pin = partial(
-    gf.cross_section.pin, layer=LAYER.WG, width=1, layer_slab=LAYER.SLAB
+    gf.cross_section.pin,
+    layer=LAYER.WG,
+    width=1,
+    layer_slab=LAYER.SLAB,
 )
 
 
@@ -70,10 +81,5 @@ def write_library(component_factory, dirpath) -> None:
 
 
 if __name__ == "__main__":
-    # import pathlib
-    # write_library(component_factory=component_factory, dirpath=pathlib.Path.cwd())
-
     c = ps_heater_doped()
-    # c = ps_heater_metal()
-    # c = ps_pin()
     c.show(show_ports=True)

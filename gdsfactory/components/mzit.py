@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler import coupler as coupler_function
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec
 
 
 @gf.cell
@@ -35,6 +39,7 @@ def mzit(
     http://photonics.intec.ugent.be/publications/PhD.asp?ID=250
 
     Args:
+    ----
         w1: narrow waveguide width (um).
         w2: wide waveguide width (um).
         dy: port to port vertical spacing.
@@ -125,7 +130,6 @@ def mzit(
     )
     t20i.connect("o1", wgs2.ports["o2"])
 
-    # outer_arm (w2)
     t2 = c << gf.get_component(
         taper,
         width1=w0,
@@ -205,10 +209,5 @@ def mzit(
 
 
 if __name__ == "__main__":
-    # c = mzit(coupler1=None)
-    # c = mzit(delta_length=20, layer=(2, 0))
     c = mzit(delta_length=20)
-    # c = mzit(delta_length=20, coupler_gap1=0.1, coupler_gap2=0.5)
-    # c = mzit(delta_length=20, coupler_gap1=0.5, coupler_gap2=0.1)
-    # c = mzit(coupler_length1=200)
     c.show(show_ports=True)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdstk
 import numpy as np
@@ -12,7 +12,11 @@ from gdsfactory.components.grating_coupler_elliptical_trenches import grating_co
 from gdsfactory.cross_section import strip
 from gdsfactory.port import select_ports_optical
 from gdsfactory.routing.route_fiber_array import route_fiber_array
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Label
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Label
 
 
 def route_fiber_single(
@@ -31,6 +35,7 @@ def route_fiber_single(
     """Returns route Tuple(references, grating couplers) for single fiber input/output.
 
     Args:
+    ----
         component: to add grating couplers.
         fiber_spacing: between grating couplers.
         grating_coupler: grating coupler Spec
@@ -44,6 +49,7 @@ def route_fiber_single(
         kwargs: cross_section settings
 
     Returns:
+    -------
         elements: list of ComponentReferences for routes and labels
         grating_couplers: list of grating_couplers references
 
@@ -80,7 +86,8 @@ def route_fiber_single(
 
     """
     if not select_ports(component.ports):
-        raise ValueError(f"No ports for {component.name}")
+        msg = f"No ports for {component.name}"
+        raise ValueError(msg)
 
     component = component.copy()
     component_copy = component.copy()
@@ -107,7 +114,8 @@ def route_fiber_single(
     if component.xsize + 2 * gc_port2center < min_input_to_output_spacing:
         fanout_length = (
             gf.snap.snap_to_grid(
-                min_input_to_output_spacing - component.xsize - 2 * gc_port2center, 10
+                min_input_to_output_spacing - component.xsize - 2 * gc_port2center,
+                10,
             )
             / 2
         )
@@ -219,16 +227,11 @@ if __name__ == "__main__":
     c = gf.components.crossing()
     c = gf.components.rectangle()
 
-    # elements, gc = route_fiber_single(
-    #     c, grating_coupler=[gcte, gctm, gcte, gctm],
-    # )
-
     layer = (2, 0)
     c = gf.components.straight(width=2, length=500)
     c = gf.components.mmi1x2(length_mmi=167)
     c = gf.components.ring_single(length_x=167)
     c = gf.components.mmi2x2()
-    # c = gf.components.spiral_inner_io_fiber_single()
 
     gc = gf.components.grating_coupler_elliptical_te(layer=layer)
     (
@@ -238,7 +241,6 @@ if __name__ == "__main__":
         ports_component,
     ) = route_fiber_single(
         c,
-        # grating_coupler=[gc, gc, gc, gc],
         radius=10,
         layer=layer,
     )
@@ -255,20 +257,6 @@ if __name__ == "__main__":
     cc.add_ports(ports_grating_input_waveguide)
     cc.show(show_ports=True)
 
-    # layer = (31, 0)
-    # c = gf.components.mmi2x2()
-    # c = gf.components.straight(width=2, length=500)
-    # gc = gf.components.grating_coupler_elliptical_te(layer=layer)
-    # elements, gc = route_fiber_single(
     #     c,
-    #     grating_coupler=[gc, gc, gc, gc],
-    #     radius=10,
-    #     layer=layer,
-    # )
-    # cc = gf.Component("sample_route_fiber_single")
-    # cr = cc << c.rotate(90)
     # for e in elements:
-    #     cc.add(e)
     # for e in gc:
-    #     cc.add(e)
-    # cc.show(show_ports=True)

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from gdsfactory.component import Component
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from gdsfactory.component import Component
 
 
 def check_width(
@@ -14,6 +17,7 @@ def check_width(
     """Reads layer from top cell and returns a number of edges violating min width.
 
     Args:
+    ----
         gdspath: path to GDS or Component.
         layer: tuple (int, int).
         min_width: in um.
@@ -31,8 +35,6 @@ def check_width(
     layout.read(str(gdspath))
     cell = layout.top_cell()
     region = pya.Region(cell.begin_shapes_rec(layout.layer(layer[0], layer[1])))
-    # print(region)
-    # print(min_width*1e3)
     return len(region.width_check(min_width * dbu))
 
 

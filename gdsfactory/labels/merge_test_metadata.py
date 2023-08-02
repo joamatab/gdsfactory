@@ -2,16 +2,21 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from omegaconf import DictConfig, OmegaConf
 
 from gdsfactory.config import logger
-from gdsfactory.typings import PathType
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import PathType
 
 
 def parse_csv_data(
-    csv_labels_path: Path, ignore_prefix: str = "METR_"
+    csv_labels_path: Path,
+    ignore_prefix: str = "METR_",
 ) -> list[list[str]]:
     """Returns CSV labels as a list of strings."""
     with open(csv_labels_path) as f:
@@ -27,8 +32,7 @@ def parse_csv_data(
         lines = [[s.strip() for s in split if s.strip()] for split in lines]
 
         # Remove empty lines
-        lines = [line for line in lines if line]
-    return lines
+        return [line for line in lines if line]
 
 
 def get_cell_from_label_brackets(label: str) -> str:
@@ -36,7 +40,8 @@ def get_cell_from_label_brackets(label: str) -> str:
     try:
         cell_name = label.split("(")[1].split(")")[0]
     except IndexError as error:
-        raise ValueError(f"{label!r} needs (cell name) between parenthesis") from error
+        msg = f"{label!r} needs (cell name) between parenthesis"
+        raise ValueError(msg) from error
 
     if cell_name.startswith("loopback"):
         cell_name = "_".join(cell_name.split("_")[1:])
@@ -44,18 +49,19 @@ def get_cell_from_label_brackets(label: str) -> str:
 
 
 def component_name_from_string_with_dashes(label: str) -> str:
-    """Returns cell_name assuming opt-GratingName-ComponentName-PortName"""
-
+    """Returns cell_name assuming opt-GratingName-ComponentName-PortName."""
     if label.startswith("elec"):
         if not label.split("-"):
+            msg = f"{label!r} needs to follow GratingName-ComponentName-PortName"
             raise ValueError(
-                f"{label!r} needs to follow GratingName-ComponentName-PortName"
+                msg,
             )
         return label.split("-")[1]
 
     if len(label.split("-")) < 2:
+        msg = f"{label!r} needs to follow GratingName-ComponentName-PortName"
         raise ValueError(
-            f"{label!r} needs to follow GratingName-ComponentName-PortName"
+            msg,
         )
     return label.split("-")[1]
 
@@ -70,6 +76,7 @@ def merge_test_metadata(
     labels in CSV and YAML mask metadata.
 
     Args:
+    ----
         labels_path: for test labels in CSV.
         mask_metadata: dict with test metadata.
         component_name_from_string: returns label string.
@@ -86,7 +93,8 @@ def merge_test_metadata(
     labels_path = Path(labels_path)
 
     if not labels_path.exists():
-        raise FileNotFoundError(f"missing CSV labels {labels_path!r}")
+        msg = f"missing CSV labels {labels_path!r}"
+        raise FileNotFoundError(msg)
 
     labels_list = parse_csv_data(labels_path)
     metadata = mask_metadata.get("cells", {})
@@ -99,7 +107,10 @@ def merge_test_metadata(
         if name in metadata:
             test_metadata[name] = metadata[name]
             test_metadata[name].label = dict(
-                x=float(x), y=float(y), text=label, angle=angle
+                x=float(x),
+                y=float(y),
+                text=label,
+                angle=angle,
             )
         else:
             logger.warning(f"missing component metadata for {name!r}")

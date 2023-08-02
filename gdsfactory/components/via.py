@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -22,6 +25,7 @@ def via(
     Defaults to a square via.
 
     Args:
+    ----
         size: in x, y direction.
         spacing: pitch_x, pitch_y.
         gap: edge to edge via gap in x, y.
@@ -46,9 +50,11 @@ def via(
         |_______________________________________|
     """
     if spacing is None and gap is None:
-        raise ValueError("either spacing or gap should be defined")
+        msg = "either spacing or gap should be defined"
+        raise ValueError(msg)
     elif spacing is not None and gap is not None:
-        raise ValueError("You can't define spacing and gap at the same time")
+        msg = "You can't define spacing and gap at the same time"
+        raise ValueError(msg)
     if spacing is None:
         spacing = (size[0] + gap[0], size[1] + gap[1])
 
@@ -78,6 +84,5 @@ via2 = partial(via, layer="VIA2")
 
 if __name__ == "__main__":
     c = via()
-    # c.pprint()
     print(c)
     c.show(show_ports=True)

@@ -15,4 +15,3 @@ def test_partial_cross_section() -> None:
 
 if __name__ == "__main__":
     test_partial_cross_section()
-    # f = partial(gf.cross_section.strip, width=0.2)

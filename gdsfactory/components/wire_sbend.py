@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.wire import wire_corner, wire_straight
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -10,6 +14,7 @@ def wire_sbend(dx: float = 20.0, dy: float = 10.0, **kwargs) -> Component:
     """Sbend corner with manhattan wires.
 
     Args:
+    ----
         dx: xsize.
         dy: ysize.
         kwargs: cross_section settings.

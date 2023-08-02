@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler_ring import coupler_ring as _coupler_ring
 from gdsfactory.components.straight import straight
 from gdsfactory.components.via_stack import via_stack_heater_mtop
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
 
 via_stack_heater_mtop_mini = partial(via_stack_heater_mtop, size=(4, 4))
 
@@ -33,6 +36,7 @@ def ring_single_heater(
     two bends (bl, br) and horizontal straight (wg: top)
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -81,7 +85,10 @@ def ring_single_heater(
     )
 
     bend = gf.get_component(
-        bend, radius=radius, cross_section=cross_section_waveguide_heater, **kwargs
+        bend,
+        radius=radius,
+        cross_section=cross_section_waveguide_heater,
+        **kwargs,
     )
 
     c = gf.Component()
@@ -91,7 +98,6 @@ def ring_single_heater(
     bl = c << bend
     br = c << bend
     st = c << straight_top
-    # st.mirror(p1=(0, 0), p2=(1, 0))
 
     sl.connect(port="o1", destination=cb.ports["o2"])
     bl.connect(port="o2", destination=sl.ports["o2"])
@@ -117,8 +123,9 @@ def ring_single_heater(
     valid_orientations = {p.orientation for p in via.ports.values()}
 
     if not p1:
+        msg = f"No ports found for port_orientation {port_orientation} in {valid_orientations}"
         raise ValueError(
-            f"No ports found for port_orientation {port_orientation} in {valid_orientations}"
+            msg,
         )
 
     c.add_ports(p1, prefix="l_")
@@ -129,11 +136,4 @@ def ring_single_heater(
 if __name__ == "__main__":
     c = ring_single_heater(width=0.5, gap=1, layer=(2, 0), radius=10, length_y=1)
     print(c.to_yaml())
-    # print(c.to_dict())
     c.show(show_subports=False)
-    # c.pprint_ports()
-
-    # cc = gf.add_pins(c)
-    # print(c.settings)
-    # print(c.settings)
-    # cc.show(show_ports=True)

@@ -37,9 +37,6 @@ def test_add_ports_from_pins_siepic(data_regression) -> None:
 
 
 if __name__ == "__main__":
-    # test_add_ports_list()
-    # test_add_ports_dict()
-
     c = gf.components.straight(decorator=add_pins)
     gdspath = c.write_gds()
     c2 = gf.import_gds(gdspath, decorator=add_ports_from_markers_inside)

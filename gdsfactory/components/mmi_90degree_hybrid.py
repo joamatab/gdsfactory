@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
-from gdsfactory.component import Component
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -32,6 +36,7 @@ def mmi_90degree_hybrid(
     platform", Optics Express 25(23), 2017
 
     Args:
+    ----
         width: input and output straight width.
         width_taper: interface between input straights and mmi region.
         length_taper: into the mmi region.
@@ -89,7 +94,10 @@ def mmi_90degree_hybrid(
     x = gf.get_cross_section(cross_section)
 
     mmi = c << gf.get_component(
-        straight, length=length_mmi, width=w_mmi, cross_section=cross_section
+        straight,
+        length=length_mmi,
+        width=w_mmi,
+        cross_section=cross_section,
     )
 
     y_signal_in = gap_mmi * 3 / 2 + width_taper * 3 / 2

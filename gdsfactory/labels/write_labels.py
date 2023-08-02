@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import pathlib
 from pathlib import Path
-from typing import Iterator
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -13,22 +13,30 @@ import gdsfactory as gf
 from gdsfactory.config import logger
 from gdsfactory.pdk import get_layer
 from gdsfactory.routing.add_fiber_single import add_fiber_single
-from gdsfactory.typings import LayerSpec, Optional, PathType
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from gdsfactory.typings import LayerSpec, Optional, PathType
 
 
 def find_labels(
-    gdspath: PathType, layer_label: LayerSpec = "LABEL", prefix: str = "opt_"
+    gdspath: PathType,
+    layer_label: LayerSpec = "LABEL",
+    prefix: str = "opt_",
 ) -> Iterator[tuple[str, float, float]]:
     """Return text label and locations iterator from a GDS file.
 
     Klayout does not support label rotations.
 
     Args:
+    ----
         gdspath: for the gds.
         layer_label: for the labels.
         prefix: for the labels to select.
 
-    Returns
+    Returns:
+    -------
         string: for the label.
         x: x position (um).
         y: y position (um).
@@ -66,7 +74,7 @@ def find_labels(
 def write_labels_klayout(
     gdspath: PathType,
     layer_label: LayerSpec = "LABEL",
-    filepath: Optional[PathType] = None,
+    filepath: Optional[PathType] | None = None,
     prefix: str = "opt_",
 ) -> Path:
     """Load GDS and extracts labels in KLayout text and coordinates.
@@ -78,6 +86,7 @@ def write_labels_klayout(
     - rotation (degrees)
 
     Args:
+    ----
         gdspath: for the mask.
         layer_label: for labels to write.
         filepath: for CSV file. Defaults to gdspath with CSV suffix.
@@ -100,7 +109,7 @@ def write_labels_gdstk(
     gdspath: Path,
     prefixes: list[str] = ("opt", "elec"),
     layer_label: LayerSpec = "LABEL",
-    filepath: Optional[PathType] = None,
+    filepath: Optional[PathType] | None = None,
     debug: bool = False,
 ) -> Path:
     """Load GDS and extracts label text and coordinates.
@@ -112,6 +121,7 @@ def write_labels_gdstk(
     - rotation (degrees)
 
     Args:
+    ----
         gdspath: for the mask.
         prefix: for the labels to write.
         layer_label: for labels to write.
@@ -158,12 +168,3 @@ def test_find_labels() -> None:
 
 if __name__ == "__main__":
     test_find_labels()
-
-    # import gdsfactory as gf
-    # c = gf.components.straight()
-    # cc = add_fiber_single(component=c)
-    # gdspath = cc.write_gds()
-    # print(len(list(find_labels(gdspath))))
-    # cc.show(show_ports=True)
-    # gdspath = CONFIG["samples_path"] / "mask" / "build" / "mask" / "sample.gds"
-    # write_labels(gdspath)

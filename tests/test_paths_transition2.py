@@ -16,8 +16,6 @@ def test_transition_ports() -> None:
 
 
 if __name__ == "__main__":
-    # test_transition_ports()
-
     width1 = 0.5
     width2 = 1.0
     x1 = gf.cross_section.strip(width=0.5)

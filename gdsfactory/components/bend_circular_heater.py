@@ -1,19 +1,23 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
-from gdsfactory.component import Component
 from gdsfactory.path import arc
-from gdsfactory.typings import CrossSectionSpec, LayerSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec, LayerSpec, Optional
 
 
 @gf.cell
 def bend_circular_heater(
     radius: float = 10,
     angle: float = 90,
-    npoints: Optional[int] = None,
+    npoints: Optional[int] | None = None,
     heater_to_wg_distance: float = 1.2,
     heater_width: float = 0.5,
     layer_heater: LayerSpec = "HEATER",
@@ -24,6 +28,7 @@ def bend_circular_heater(
     """Creates an arc of arclength `theta` starting at angle `start_angle`.
 
     Args:
+    ----
         radius: in um.
         angle: angle of arc (degrees).
         npoints: Number of points used per 360 degrees.
@@ -50,7 +55,11 @@ def bend_circular_heater(
         layer=layer_heater,
     )
     x = gf.CrossSection(
-        width=width, offset=0, layer=layer, port_names=["in", "out"], sections=[s1, s2]
+        width=width,
+        offset=0,
+        layer=layer,
+        port_names=["in", "out"],
+        sections=[s1, s2],
     )
 
     p = arc(radius=radius, angle=angle, npoints=npoints)

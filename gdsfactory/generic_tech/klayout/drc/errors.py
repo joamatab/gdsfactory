@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import Float2, Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Float2, Layer
 
 layer = gf.LAYER.WG
 nm = 1e-3
@@ -31,7 +35,9 @@ def gap_min(gap: float = 0.1) -> Component:
 
 @gf.cell
 def separation(
-    gap: float = 0.1, layer1: Layer = gf.LAYER.HEATER, layer2: Layer = gf.LAYER.M1
+    gap: float = 0.1,
+    layer1: Layer = gf.LAYER.HEATER,
+    layer2: Layer = gf.LAYER.M1,
 ) -> Component:
     c = gf.Component()
     r1 = c << gf.components.rectangle(size=(1, 1), layer=layer1)
@@ -43,7 +49,9 @@ def separation(
 
 @gf.cell
 def enclosing(
-    enclosing: float = 0.1, layer1: Layer = gf.LAYER.VIAC, layer2: Layer = gf.LAYER.M1
+    enclosing: float = 0.1,
+    layer1: Layer = gf.LAYER.VIAC,
+    layer2: Layer = gf.LAYER.M1,
 ) -> Component:
     """Layer1 must be enclosed by layer2 by value.
 
@@ -70,7 +78,8 @@ def snapping_error(gap: float = 1e-3) -> Component:
 
 @gf.cell
 def not_inside(
-    layer: Layer = gf.LAYER.VIAC, not_inside: Layer = gf.LAYER.NPP
+    layer: Layer = gf.LAYER.VIAC,
+    not_inside: Layer = gf.LAYER.NPP,
 ) -> Component:
     """Layer must be inside by layer."""
     enclosing = 0.1
@@ -85,23 +94,12 @@ def not_inside(
 
 @gf.cell
 def errors() -> Component:
-    components = (
-        [width_min(), gap_min(), separation(), enclosing(), not_inside()]
-        # + [width_min(size=(i * nm, i * nm)) for i in range(1, 199)]
-        # + [gap_min(i * nm) for i in range(199)]
-    )
+    components = [width_min(), gap_min(), separation(), enclosing(), not_inside()]
     c = gf.pack(components, spacing=1.5)
     return c[0]
 
 
 if __name__ == "__main__":
-    # c = width_min()
-    # c.write_gds("wmin.gds")
-    # c = gap_min()
-    # c.write_gds("gmin.gds")
-    # c = snapping_error()
-    # c.write_gds("snap.gds")
-
     c = errors()
     c = gf.add_padding_container(c, layers=(gf.LAYER.FLOORPLAN,), default=5)
     c.write_gds("errors.gds")

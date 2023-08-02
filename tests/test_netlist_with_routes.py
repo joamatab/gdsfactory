@@ -17,11 +17,6 @@ def test_netlist_with_routes() -> None:
     n = c.get_netlist()
     connections = n["connections"]
 
-    # print(routes[0].settings)
-    # print(c.get_netlist().connections)
-    # print(c.get_netlist().instances)
-    # print(len(c.get_netlist().connections))
-
     assert len(c.get_dependencies()) == 3
     assert len(connections) == 2  # 2 components + 1 flat netlist
 

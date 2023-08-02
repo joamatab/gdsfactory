@@ -31,6 +31,7 @@ def from_np(
     Extracts contours skimage.measure.find_contours using `threshold`.
 
     Args:
+    ----
         ndarray: 2D ndarray representing the device layout.
         nm_per_pixel: scale_factor.
         layer: layer tuple to output gds.
@@ -56,8 +57,7 @@ def from_np(
         else:
             d.add_polygon(points, layer=layer)
 
-    c = boolean(c, d, operation="not", layer=layer)
-    return c
+    return boolean(c, d, operation="not", layer=layer)
 
 
 if __name__ == "__main__":

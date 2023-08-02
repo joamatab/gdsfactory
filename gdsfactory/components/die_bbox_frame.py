@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import Tuple, Union
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.components.text import text
-from gdsfactory.typings import Anchor, LayerSpec
 
-Coordinate = Union[Tuple[float, float], Tuple[int, int]]
+if TYPE_CHECKING:
+    from gdsfactory.typings import Anchor, LayerSpec
+
+Coordinate = Union[tuple[float, float], tuple[int, int]]
 
 
 @gf.cell_without_validator
@@ -27,6 +29,7 @@ def die_bbox_frame(
     The chip/die boundary can include a label with the name of the die.
 
     Args:
+    ----
         bbox: bounding box to frame.
         street_width: Width of the boundary box.
         street_length: length of the boundary box.
@@ -60,7 +63,7 @@ def die_bbox_frame(
             sx - street_width,
             sx - street_length,
             sx - street_length,
-        ]
+        ],
     )
     ypts = np.array(
         [
@@ -70,7 +73,7 @@ def die_bbox_frame(
             sy - street_width,
             sy - street_width,
             sy,
-        ]
+        ],
     )
     D.add_polygon([x + xpts, y + ypts], layer=layer)
     D.add_polygon([x - xpts, y + ypts], layer=layer)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -9,7 +10,9 @@ from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.bezier import bezier
 from gdsfactory.config import logger
-from gdsfactory.typings import CrossSectionSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec, Float2
 
 
 @cell
@@ -26,6 +29,7 @@ def bend_s(
     min_bend_radius depends on height and length
 
     Args:
+    ----
         size: in x and y direction.
         npoints: number of points.
         cross_section: spec.
@@ -51,13 +55,13 @@ def bend_s(
         and c.info["min_bend_radius"] < cross_section.radius
     ):
         if check_min_radius:
+            msg = f"The min bend radius of the generated s bend {c.info['min_bend_radius']} is below the bend radius of the waveguide {cross_section.radius}"
             raise ValueError(
-                f"The min bend radius of the generated s bend {c.info['min_bend_radius']} "
-                f"is below the bend radius of the waveguide {cross_section.radius}"
+                msg,
             )
         else:
             logger.warning(
-                f"The min bend radius of the generated s bend {c.info['min_bend_radius']} is below the bend radius of the waveguide {cross_section.radius}"
+                f"The min bend radius of the generated s bend {c.info['min_bend_radius']} is below the bend radius of the waveguide {cross_section.radius}",
             )
 
     return c
@@ -69,17 +73,16 @@ def get_min_sbend_size(
     num_points: int = 100,
     **kwargs,
 ):
-    """
-    Returns the minimum sbend size to comply with bend radius requirements.
+    """Returns the minimum sbend size to comply with bend radius requirements.
 
-     Args:
+    Args:
+    ----
         size: in x and y direction. One of them is None, which is the size we need to figure out.
         cross_section: spec.
         num_points: number of points to iterate over between max_size and 0.1 * max_size
         kwargs: cross_section settings.
 
     """
-
     cross_section_f = gf.get_cross_section(cross_section, **kwargs)
 
     if size[0] is None:
@@ -89,12 +92,14 @@ def get_min_sbend_size(
         ind = 1
         known_s = size[0]
     else:
-        raise ValueError("One of the two elements in size has to be None")
+        msg = "One of the two elements in size has to be None"
+        raise ValueError(msg)
 
     min_radius = cross_section_f.radius
 
     if min_radius is None:
-        raise ValueError("The min radius for the specified layer is not known!")
+        msg = "The min radius for the specified layer is not known!"
+        raise ValueError(msg)
 
     min_size = np.inf
 
@@ -107,12 +112,13 @@ def get_min_sbend_size(
     for i, s in enumerate(sizes):
         sz = copy.deepcopy(size)
         sz[ind] = s
-        # print(sz)
         try:
             bend_s(
-                size=sz, cross_section=cross_section, check_min_radius=True, **kwargs
+                size=sz,
+                cross_section=cross_section,
+                check_min_radius=True,
+                **kwargs,
             )
-            # print(c.info['min_bend_radius'])
             min_size = sizes[i]
         except ValueError:
             break
@@ -122,10 +128,4 @@ def get_min_sbend_size(
 
 if __name__ == "__main__":
     c = bend_s()
-    # c = bend_s(bbox_offsets=[0.5], bbox_layers=[(111, 0)], width=2)
-    # c = bend_s(size=[10, 2.5])  # 10um bend radius
-    # c = bend_s(size=[20, 3], cross_section="rib")  # 10um bend radius
-    # c.pprint()
-    # c = bend_s_biased()
-    # print(c.info["min_bend_radius"])
     c.show(show_ports=False)

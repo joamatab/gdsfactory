@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_s import bend_s
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -19,6 +23,7 @@ def coupler_asymmetric(
     """Bend coupled to straight waveguide.
 
     Args:
+    ----
         bend: spec.
         gap: um.
         dy: port to port vertical spacing.
@@ -59,7 +64,11 @@ def coupler_asymmetric(
 
     port_width = 2 * w + gap
     c.add_port(
-        name="o1", center=(0, 0), width=port_width, orientation=180, cross_section=x
+        name="o1",
+        center=(0, 0),
+        width=port_width,
+        orientation=180,
+        cross_section=x,
     )
     c.add_port(name="o3", port=bottom_bend.ports["o2"])
     c.add_port(name="o2", port=wg.ports["o2"])

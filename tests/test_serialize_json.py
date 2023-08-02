@@ -54,11 +54,4 @@ def test_clean_value_json_gdstk_polygon() -> None:
 
 if __name__ == "__main__":
     test_clean_value_json_callable()
-    # test_clean_value_json_gdstk_polygon()
-    # test_clean_value_json_numpy_array()
     # def func(a: int, b: int) -> int:
-    #     return a + b
-
-    # partial_func = functools.partial(func, b=2)
-    # expected = {"function": "func", "settings": {"b": 2}}
-    # assert clean_value_json(partial_func) == expected

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_circular import bend_circular180
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.mmi2x2 import mmi2x2
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Optional
 
 
 @gf.cell
@@ -20,7 +24,7 @@ def bendu_double(
     port4: str = "o4",
     **kwargs,
 ) -> ComponentSpec:
-    """Returns double bend"""
+    """Returns double bend."""
     xs = gf.get_cross_section(cross_section, **kwargs)
     bendu = gf.Component()
     bend_r = bendu << bend180(cross_section=xs)
@@ -45,18 +49,20 @@ def straight_double(
     cross_section: CrossSectionSpec = "strip",
     port1: str = "o1",
     port2: str = "o2",
-    straight_length: Optional[float] = None,
+    straight_length: Optional[float] | None = None,
     **kwargs,
 ) -> ComponentSpec:
-    """Returns double straight"""
+    """Returns double straight."""
     xs = gf.get_cross_section(cross_section, **kwargs)
 
     straight_double = gf.Component("straight_double")
     straight_component = straight(
-        length=straight_length or xs.radius * 2, cross_section=xs
+        length=straight_length or xs.radius * 2,
+        cross_section=xs,
     )
     straight_component2 = straight(
-        length=straight_length or xs.radius * 2, cross_section=xs
+        length=straight_length or xs.radius * 2,
+        cross_section=xs,
     )
     straight_r = straight_double << straight_component
     straight_r2 = straight_double << straight_component2.mirror((1, 0))
@@ -82,13 +88,14 @@ def cutback_2x2(
     port4: str = "o4",
     bend180: ComponentSpec = bend_circular180,
     mirror: bool = False,
-    straight_length: Optional[float] = None,
+    straight_length: Optional[float] | None = None,
     cross_section: CrossSectionSpec = "strip",
     **kwargs,
 ) -> Component:
     """Returns a daisy chain of splitters for measuring their loss.
 
     Args:
+    ----
         component: for cutback.
         cols: number of columns.
         rows: number of rows.

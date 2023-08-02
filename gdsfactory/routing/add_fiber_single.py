@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.add_labels import (
@@ -18,7 +18,11 @@ from gdsfactory.port import select_ports_optical
 from gdsfactory.routing.get_input_labels import get_input_labels
 from gdsfactory.routing.get_route import get_route_from_waypoints
 from gdsfactory.routing.route_fiber_single import route_fiber_single
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
 
 
 @cell
@@ -51,6 +55,7 @@ def add_fiber_single(
     You can always rotate it for East-West orientation.
 
     Args:
+    ----
         component: component or component function to connect to grating couplers.
         grating_coupler: grating coupler instance, function or list of functions.
         layer_label: for test and measurement label.
@@ -72,6 +77,7 @@ def add_fiber_single(
         cross_section: cross_section spec.
 
     Keyword Args:
+    ------------
         max_y0_optical: in um.
         straight_separation: spacing between waveguides.
         list_port_labels: None, add labels to port indices in this list.
@@ -121,10 +127,12 @@ def add_fiber_single(
     zero_port = zero_port or optical_port_names[0]
 
     if not optical_ports:
-        raise ValueError(f"No optical ports found in {component.name!r}")
+        msg = f"No optical ports found in {component.name!r}"
+        raise ValueError(msg)
 
     if zero_port not in optical_port_names:
-        raise ValueError(f"zero_port = {zero_port!r} not in {optical_port_names}")
+        msg = f"zero_port = {zero_port!r} not in {optical_port_names}"
+        raise ValueError(msg)
 
     component = move_port_to_zero(component, zero_port) if zero_port else component
 
@@ -133,27 +141,31 @@ def add_fiber_single(
     optical_port_names = [p.name for p in optical_ports]
 
     if not optical_ports:
-        raise ValueError(f"No ports for {component.name}")
+        msg = f"No ports for {component.name}"
+        raise ValueError(msg)
 
     component_name = component_name or component.metadata_child.get(
-        "name", component.name
+        "name",
+        component.name,
     )
 
     gc = (
         grating_coupler[0]
-        if isinstance(grating_coupler, (list, tuple))
+        if isinstance(grating_coupler, list | tuple)
         else grating_coupler
     )
     gc = gf.get_component(gc)
 
     if gc_port_name not in gc.ports:
-        raise ValueError(f"{gc_port_name!r} not in {list(gc.ports.keys())}")
+        msg = f"{gc_port_name!r} not in {list(gc.ports.keys())}"
+        raise ValueError(msg)
 
     gc_port_orientation = int(gc.ports[gc_port_name].orientation)
 
     if gc_port_orientation != 180:
+        msg = f"{gc_port_name!r} orientation {gc_port_orientation} needs to be 180 deg."
         raise ValueError(
-            f"{gc_port_name!r} orientation {gc_port_orientation} needs to be 180 deg."
+            msg,
         )
 
     gc_port_to_edge = abs(gc.xmax - gc.ports[gc_port_name].center[0])
@@ -233,7 +245,10 @@ def add_fiber_single(
     if with_loopback:
         length = c.ysize - 2 * gc_port_to_edge
         wg = c << gf.get_component(
-            straight, length=length, cross_section=cross_section, **kwargs
+            straight,
+            length=length,
+            cross_section=cross_section,
+            **kwargs,
         )
         wg.rotate(90)
         wg.xmax = c.xmin - loopback_xspacing
@@ -256,7 +271,10 @@ def add_fiber_single(
             and get_input_label_text_loopback_function
         ):
             text = get_input_label_text_loopback_function(
-                port=port, gc=gc, gc_index=0, component_name=component_name
+                port=port,
+                gc=gc,
+                gc_index=0,
+                component_name=component_name,
             )
 
             c.add_label(
@@ -268,7 +286,10 @@ def add_fiber_single(
 
             port = wg.ports["o1"]
             text = get_input_label_text_loopback_function(
-                port=port, gc=gc, gc_index=1, component_name=component_name
+                port=port,
+                gc=gc,
+                gc_index=1,
+                component_name=component_name,
             )
             c.add_label(
                 text=text,
@@ -283,17 +304,10 @@ def add_fiber_single(
 
 
 if __name__ == "__main__":
-    # from gdsfactory.samples.big_device import big_device
-    # w = h = 18 * 50
-    # c = big_device(spacing=50.0, size=(w, h))
-    # gc = gf.functions.rotate90(gf.components.grating_coupler_elliptical_arbitrary)
-
     gc = gf.components.grating_coupler_elliptical_arbitrary
     c = gf.c.mmi2x2()
     cc = gf.routing.add_fiber_single(
         component=c,
         grating_coupler=gc,
-        # layer_label="TEXT"
-        # layer_label=None,
     )
     cc.show(show_ports=False)

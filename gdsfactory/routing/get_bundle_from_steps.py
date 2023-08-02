@@ -47,6 +47,7 @@ def get_bundle_from_steps(
     and a more convenient version of `get_bundle_from_waypoints`.
 
     Args:
+    ----
         port1: start ports (list or dict).
         port2: end ports (list or dict).
         steps: that define the route (x, y, dx, dy) [{'dx': 5}, {'dy': 10}].
@@ -113,9 +114,9 @@ def get_bundle_from_steps(
     for d in steps:
         if not STEP_DIRECTIVES.issuperset(d):
             invalid_step_directives = list(set(d.keys()) - STEP_DIRECTIVES)
+            msg = f"Invalid step directives: {invalid_step_directives}.Valid directives are {list(STEP_DIRECTIVES)}"
             raise ValueError(
-                f"Invalid step directives: {invalid_step_directives}."
-                f"Valid directives are {list(STEP_DIRECTIVES)}"
+                msg,
             )
         x = d["x"] if "x" in d else x
         x += d.get("dx", 0)
@@ -174,7 +175,9 @@ def get_bundle_from_steps(
 
 
 get_bundle_from_steps_electrical = partial(
-    get_bundle_from_steps, bend=wire_corner, cross_section="metal_routing"
+    get_bundle_from_steps,
+    bend=wire_corner,
+    cross_section="metal_routing",
 )
 
 get_bundle_from_steps_electrical_multilayer = partial(
@@ -229,7 +232,11 @@ if __name__ == "__main__":
     pt.move((300, 500))
 
     routes = get_bundle_from_steps_electrical(
-        pb.ports, pt.ports, end_straight_length=60, separation=30, steps=[{"dy": 100}]
+        pb.ports,
+        pt.ports,
+        end_straight_length=60,
+        separation=30,
+        steps=[{"dy": 100}],
     )
 
     for route in routes:

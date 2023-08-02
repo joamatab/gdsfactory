@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 
 @pytest.mark.parametrize("port_type", ["electrical", "optical", "placement"])
@@ -14,5 +18,4 @@ def test_rename_ports(port_type, data_regression: DataRegressionFixture):
 
 if __name__ == "__main__":
     c = gf.c.nxn(port_type="placement")
-    # c = gf.c.nxn(port_type="optical")
     c.show(show_ports=True)

@@ -11,14 +11,16 @@ import gdsfactory as gf
 
 class CrossSection(BaseModel):
     __root__: str = Field(
-        ..., description="A cross section to use for waveguides or traces."
+        ...,
+        description="A cross section to use for waveguides or traces.",
     )
 
 
 class RouteSettings(BaseModel):
     cross_section: CrossSection | None = None
     separation: float | None = Field(
-        5.0, description="The minimum separation between routes in the bundle [um]."
+        5.0,
+        description="The minimum separation between routes in the bundle [um].",
     )
 
     class Config:
@@ -97,7 +99,8 @@ class Instance(BaseModel):
 
     component: str
     settings: dict[str, Any] | None = Field(
-        None, description="Settings for the component"
+        None,
+        description="Settings for the component",
     )
 
 
@@ -120,12 +123,16 @@ class PicYamlConfiguration(BaseModel):
     ports: dict[str, str] | None = None
 
     def add_instance(
-        self, name: str, component: gf.Component, placement: Placement | None = None
+        self,
+        name: str,
+        component: gf.Component,
+        placement: Placement | None = None,
     ) -> None:
         component_name = component.settings.function_name
         component_settings = component.settings.changed
         self.instances[name] = Instance(
-            component=component_name, settings=component_settings
+            component=component_name,
+            settings=component_settings,
         )
         if not placement:
             placement = Placement()
@@ -173,7 +180,8 @@ class SchematicConfiguration(BaseModel):
             if settings:
                 component_settings = component_settings | settings
             self.instances[name] = Instance(
-                component=component_name, settings=component_settings
+                component=component_name,
+                settings=component_settings,
             )
         else:
             if not settings:

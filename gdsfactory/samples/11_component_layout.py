@@ -12,9 +12,13 @@ Lets build straight crossing out of a vertical and horizontal arm
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory import LAYER
-from gdsfactory.component import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -28,6 +32,7 @@ def crossing_arm(
     """Returns a crossing arm.
 
     Args:
+    ----
         wg_width:
         r1:
         r2:
@@ -54,11 +59,19 @@ def crossing_arm(
     c.add_polygon(taper_points, layer=LAYER.WG)
 
     c.add_port(
-        name="o1", center=(-xmax, 0), orientation=180, width=wg_width, layer=LAYER.WG
+        name="o1",
+        center=(-xmax, 0),
+        orientation=180,
+        width=wg_width,
+        layer=LAYER.WG,
     )
 
     c.add_port(
-        name="o2", center=(xmax, 0), orientation=0, width=wg_width, layer=LAYER.WG
+        name="o2",
+        center=(xmax, 0),
+        orientation=0,
+        width=wg_width,
+        layer=LAYER.WG,
     )
     return c
 

@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.components.taper_cross_section import taper_cross_section
 from gdsfactory.cross_section import strip
 from gdsfactory.port import select_ports_optical
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -24,6 +28,7 @@ def add_tapers(
     """Returns new component with taper in all optical ports.
 
     Args:
+    ----
         component: to add tapers.
         taper: taper spec.
         select_ports: function to select ports.
@@ -32,6 +37,7 @@ def add_tapers(
         cross_section2: end cross_section factory (cross_section).
 
     Keyword Args:
+    ------------
         cross_section1: start cross_section factory.
         length: transition length.
         npoints: number of points.

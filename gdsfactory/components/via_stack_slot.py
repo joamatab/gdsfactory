@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
+from typing import TYPE_CHECKING
 
 from numpy import floor
 
@@ -9,7 +10,9 @@ import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.via import via1, viac
-from gdsfactory.typings import ComponentSpec, Floats, LayerSpec, LayerSpecs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Floats, LayerSpec, LayerSpecs
 
 
 @gf.cell
@@ -28,6 +31,7 @@ def via_stack_slot(
     """Rectangular via_stack with slotted via in X direction.
 
     Args:
+    ----
         size: of the layers.
         layers: layers on which to draw rectangles.
         layer_offsets: cladding_offset for each layer.
@@ -67,12 +71,16 @@ def via_stack_slot(
 
     """
     if size[0] - 2 * enclosure < 0:
+        msg = (
+            f"via_stack length (size[0] = {size[0]}) < 2*enclosure ({2 * enclosure}). "
+        )
         raise ValueError(
-            f"via_stack length (size[0] = {size[0]}) < 2*enclosure ({2*enclosure}). "
+            msg,
         )
     if size[1] - 2 * enclosure < 0:
+        msg = f"via_stack width (size[1] = {size[1]}) < 2*enclosure ({2 * enclosure}). "
         raise ValueError(
-            f"via_stack width (size[1] = {size[1]}) < 2*enclosure ({2*enclosure}). "
+            msg,
         )
 
     layer_port = layer_port or layers[-1]
@@ -91,7 +99,7 @@ def via_stack_slot(
     }
     if len(elements) > 1:
         warnings.warn(
-            f"Got {len(layers)} layers, {len(layer_offsetsx)} layer_offsetsx, {len(layer_offsetsy)} layer_offsetsy."
+            f"Got {len(layers)} layers, {len(layer_offsetsx)} layer_offsetsx, {len(layer_offsetsy)} layer_offsetsy.",
         )
 
     for layer, offsetx, offsety in zip(layers, layer_offsetsx, layer_offsetsy):
@@ -117,13 +125,13 @@ def via_stack_slot(
 via_stack_slot_m1_m2 = partial(via_stack_slot, layers=("M1", "M2"), via=via1)
 
 via_stack_slot_slab_m1 = partial(
-    via_stack_slot, layers=("M1",), via=viac, layer_offsets=(0,)
+    via_stack_slot,
+    layers=("M1",),
+    via=viac,
+    layer_offsets=(0,),
 )
 
 
 if __name__ == "__main__":
     c = via_stack_slot()
-    # c = via_stack_slot_m1_m2(layer_offsets=(0.5, 1), enclosure=1, size=(3, 3))
-    # c = via_stack_slot_m1_m2()
-    # c = via_stack_slot_slab_m1()
     c.show(show_ports=True)

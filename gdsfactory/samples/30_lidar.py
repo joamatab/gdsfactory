@@ -18,7 +18,8 @@ if __name__ == "__main__":
 
     # power Splitter
     splitter_tree = c << gf.components.splitter_tree(
-        noutputs=noutputs, spacing=splitter_tree_spacing
+        noutputs=noutputs,
+        spacing=splitter_tree_spacing,
     )
 
     # phase Shifters
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     phase_shifter_optical_ports = []
 
     for i, port in enumerate(
-        splitter_tree.get_ports_list(orientation=0, port_type="optical")
+        splitter_tree.get_ports_list(orientation=0, port_type="optical"),
     ):
         ref = c.add_ref(phase_shifter, alias=f"ps{i}")
         ref.connect("o1", port)
@@ -35,7 +36,10 @@ if __name__ == "__main__":
 
     # antennas
     antennas = c << gf.components.array(
-        gf.components.dbr(n=200), rows=noutputs, columns=1, spacing=(0, antenna_pitch)
+        gf.components.dbr(n=200),
+        rows=noutputs,
+        columns=1,
+        spacing=(0, antenna_pitch),
     )
     antennas.xmin = ref.xmax + 50
     antennas.y = 0

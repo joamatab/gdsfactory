@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.text_rectangular import text_rectangular
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 LINE_LENGTH = 420.0
 
@@ -27,6 +30,7 @@ def cdsem_bend180(
     """Returns CDSEM structures.
 
     Args:
+    ----
         width: of the line.
         radius: um.
         wg_length: in um.
@@ -42,10 +46,16 @@ def cdsem_bend180(
         wg_length = 2 * r
 
     bend90 = gf.get_component(
-        bend90, cross_section=cross_section, radius=r, width=width
+        bend90,
+        cross_section=cross_section,
+        radius=r,
+        width=width,
     )
     wg = gf.get_component(
-        straight, cross_section=cross_section, length=wg_length, width=width
+        straight,
+        cross_section=cross_section,
+        length=wg_length,
+        width=width,
     )
 
     # Add the U-turn on straight layer

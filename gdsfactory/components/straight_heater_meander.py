@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, Floats, LayerSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, Floats, LayerSpec, Optional
 
 
 @gf.cell
@@ -17,8 +20,8 @@ def straight_heater_meander(
     layer_heater: LayerSpec = "HEATER",
     radius: float = 5.0,
     via_stack: Optional[ComponentSpec] = "via_stack_heater_mtop",
-    port_orientation1: Optional[int] = None,
-    port_orientation2: Optional[int] = None,
+    port_orientation1: Optional[int] | None = None,
+    port_orientation2: Optional[int] | None = None,
     heater_taper_length: Optional[float] = 10.0,
     straight_widths: Floats = (0.8, 0.9, 0.8),
     taper_length: float = 10,
@@ -31,6 +34,7 @@ def straight_heater_meander(
     https://www.osapublishing.org/oe/abstract.cfm?URI=oe-27-9-13430
 
     Args:
+    ----
         length: total length of the optical path.
         spacing: waveguide spacing (center to center).
         cross_section: for waveguide.
@@ -69,7 +73,8 @@ def straight_heater_meander(
     cross_section2 = cross_section
 
     straight_length = gf.snap.snap_to_grid(
-        (length - (rows - 1) * route.length) / rows, nm=2
+        (length - (rows - 1) * route.length) / rows,
+        nm=2,
     )
     ports = {}
 
@@ -79,7 +84,8 @@ def straight_heater_meander(
     for row, straight_width in enumerate(straight_widths):
         cross_section1 = gf.get_cross_section(cross_section, width=straight_width)
         straight = gf.c.straight(
-            length=straight_length - 2 * taper_length, cross_section=cross_section1
+            length=straight_length - 2 * taper_length,
+            cross_section=cross_section1,
         )
 
         taper = partial(
@@ -102,11 +108,13 @@ def straight_heater_meander(
     for row in range(1, rows, 2):
         extra_length = 3 * (rows - row - 1) / 2 * radius
         extra_straight1 = c << gf.c.straight(
-            length=extra_length, cross_section=cross_section
+            length=extra_length,
+            cross_section=cross_section,
         )
         extra_straight1.connect("o1", ports[f"o1_{row+1}"])
         extra_straight2 = c << gf.c.straight(
-            length=extra_length, cross_section=cross_section
+            length=extra_length,
+            cross_section=cross_section,
         )
         extra_straight2.connect("o1", ports[f"o1_{row+2}"])
 
@@ -120,11 +128,13 @@ def straight_heater_meander(
 
         extra_length = 3 * (row - 1) / 2 * radius
         extra_straight1 = c << gf.c.straight(
-            length=extra_length, cross_section=cross_section
+            length=extra_length,
+            cross_section=cross_section,
         )
         extra_straight1.connect("o1", ports[f"o2_{row+1}"])
         extra_straight2 = c << gf.c.straight(
-            length=extra_length, cross_section=cross_section
+            length=extra_length,
+            cross_section=cross_section,
         )
         extra_straight2.connect("o1", ports[f"o2_{row}"])
 
@@ -146,7 +156,9 @@ def straight_heater_meander(
 
     if layer_heater:
         heater_cross_section = partial(
-            gf.cross_section.cross_section, width=heater_width, layer=layer_heater
+            gf.cross_section.cross_section,
+            width=heater_width,
+            layer=layer_heater,
         )
 
         heater = c << gf.c.straight(
@@ -159,7 +171,7 @@ def straight_heater_meander(
         via = via_stacke = via_stackw = gf.get_component(via_stack)
         dx = via_stackw.get_ports_xsize() / 2 + heater_taper_length or 0
         via_stack_west_center = heater.size_info.cw - (dx, 0)
-        via_stack_east_center = heater.size_info.ce + (dx, 0)
+        via_stack_east_center = (*heater.size_info.ce, dx, 0)
 
         via_stack_west = c << via_stackw
         via_stack_east = c << via_stacke
@@ -171,12 +183,14 @@ def straight_heater_meander(
         p2 = via_stack_east.get_ports_list(orientation=port_orientation2)
 
         if not p1:
+            msg = f"No ports for port_orientation1 {port_orientation1} in {valid_orientations}"
             raise ValueError(
-                f"No ports for port_orientation1 {port_orientation1} in {valid_orientations}"
+                msg,
             )
         if not p2:
+            msg = f"No ports for port_orientation2 {port_orientation2} in {valid_orientations}"
             raise ValueError(
-                f"No ports for port_orientation2 {port_orientation2} in {valid_orientations}"
+                msg,
             )
 
         c.add_ports(p1, prefix="l_")
@@ -201,39 +215,11 @@ def straight_heater_meander(
 
 
 if __name__ == "__main__":
-    # rows = 3
-    # length = 300.0
-    # spacing = 3
-
-    # c = gf.Component()
-    # p1 = gf.Port(center=(0, 0), orientation=0)
-    # p2 = gf.Port(center=(0, spacing), orientation=0)
-    # route = gf.routing.get_route(p1, p2)
-    # straight_length = gf.snap.snap_to_grid((length - (rows - 1) * route.length) / rows)
-    # straight_array = c << gf.components.array(spacing=(0, spacing), columns=1, rows=rows)
-
     # for row in range(1, rows, 2):
-    #     route = gf.routing.get_route(
-    #         straight_array.ports[f"o2_{row+1}_1"], straight_array.ports[f"o2_{row}_1"]
-    #     )
-    #     c.add(route.references)
-
-    #     route = gf.routing.get_route(
-    #         straight_array.ports[f"o1_{row+1}_1"], straight_array.ports[f"o1_{row+2}_1"]
-    #     )
-    #     c.add(route.references)
-
-    # c.add_port("o1", port=straight_array.ports["o1_1_1"])
-    # c.add_port("o2", port=straight_array.ports[f"o2_{rows}_1"])
 
     c = straight_heater_meander(
         straight_widths=(0.5,) * 7,
         taper_length=10,
-        # taper_length=10,
         length=1000,
-        # port_orientation1=0
-        # cross_section=partial(gf.cross_section.strip, width=0.8),
     )
     c.show(show_ports=True)
-    # scene = c.to_3d()
-    # scene.show()

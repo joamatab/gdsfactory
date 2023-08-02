@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory import LAYER, Port
-from gdsfactory.component import Component
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec
 
 
 @gf.cell
@@ -20,6 +24,7 @@ def big_device(
     """Big component with N ports on each side.
 
     Args:
+    ----
         size: x, y.
         nports: number of ports.
         spacing: in um.
@@ -42,7 +47,7 @@ def big_device(
     for i in range(N):
         port = Port(
             name=f"W{i}",
-            center=p0 + (-dx, (i - N / 2) * spacing),
+            center=(*p0, -dx, (i - N / 2) * spacing),
             orientation=180,
             layer=layer,
             width=wg_width,
@@ -52,7 +57,7 @@ def big_device(
     for i in range(N):
         port = Port(
             name=f"E{i}",
-            center=p0 + (dx, (i - N / 2) * spacing),
+            center=(*p0, dx, (i - N / 2) * spacing),
             orientation=0,
             layer=layer,
             width=wg_width,
@@ -62,7 +67,7 @@ def big_device(
     for i in range(N):
         port = Port(
             name=f"N{i}",
-            center=p0 + ((i - N / 2) * spacing, dy),
+            center=(*p0, (i - N / 2) * spacing, dy),
             orientation=90,
             layer=layer,
             width=wg_width,
@@ -72,7 +77,7 @@ def big_device(
     for i in range(N):
         port = Port(
             name=f"S{i}",
-            center=p0 + ((i - N / 2) * spacing, -dy),
+            center=(*p0, (i - N / 2) * spacing, -dy),
             orientation=-90,
             layer=layer,
             width=wg_width,
@@ -94,5 +99,4 @@ if __name__ == "__main__":
     pdk.gds_write_settings.flatten_invalid_refs = False
     c = big_device()
     c = gf.routing.add_fiber_array(c)
-    # c.write_gds("./test.gds")
     c.show(show_ports=False)

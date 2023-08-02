@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -23,6 +27,7 @@ def nxn(
     """Returns a nxn component with nxn ports (west, east, north, south).
 
     Args:
+    ----
         west: number of west ports.
         east: number of east ports.
         north: number of north ports.
@@ -52,7 +57,9 @@ def nxn(
             [ysize / 2]
             if west == 1
             else np.linspace(
-                wg_margin + wg_width / 2, ysize - wg_margin - wg_width / 2, west
+                wg_margin + wg_width / 2,
+                ysize - wg_margin - wg_width / 2,
+                west,
             )
         )
         orientation = 180
@@ -74,7 +81,9 @@ def nxn(
             [ysize / 2]
             if east == 1
             else np.linspace(
-                wg_margin + wg_width / 2, ysize - wg_margin - wg_width / 2, east
+                wg_margin + wg_width / 2,
+                ysize - wg_margin - wg_width / 2,
+                east,
             )
         )
         orientation = 0
@@ -96,7 +105,9 @@ def nxn(
             [xsize / 2]
             if north == 1
             else np.linspace(
-                wg_margin + wg_width / 2, xsize - wg_margin - wg_width / 2, north
+                wg_margin + wg_width / 2,
+                xsize - wg_margin - wg_width / 2,
+                north,
             )
         )
         orientation = 90
@@ -117,7 +128,9 @@ def nxn(
             [xsize / 2]
             if south == 1
             else np.linspace(
-                wg_margin + wg_width / 2, xsize - wg_margin - wg_width / 2, south
+                wg_margin + wg_width / 2,
+                xsize - wg_margin - wg_width / 2,
+                south,
             )
         )
         orientation = 270
@@ -138,7 +151,5 @@ def nxn(
 
 
 if __name__ == "__main__":
-    # c = nxn(north=1.3, south=3)
     c = nxn()
-    # c = gf.components.extension.extend_ports(component=c)
     c.show(show_ports=True)

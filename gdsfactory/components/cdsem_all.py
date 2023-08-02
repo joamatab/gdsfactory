@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -9,7 +10,9 @@ from gdsfactory.components.cdsem_bend180 import cdsem_bend180
 from gdsfactory.components.cdsem_straight import cdsem_straight
 from gdsfactory.components.cdsem_straight_density import cdsem_straight_density
 from gdsfactory.components.text_rectangular import text_rectangular
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 text_rectangular_mini = partial(text_rectangular, size=1)
 
@@ -29,6 +32,7 @@ def cdsem_all(
     """Column with all optical PCMs.
 
     Args:
+    ----
         widths: for straight lines.
         dense_lines_width: in um.
         dense_lines_width_difference: in um.

@@ -24,6 +24,7 @@ def outline(
     argument. `elements` may be a Component, Polygon, or list of Components.
 
     Args:
+    ----
         elements: Component(/Reference), list of Component(/Reference), or Polygon
             Polygons to outline or Component containing polygons to outline.
         distance: int or float
@@ -105,9 +106,5 @@ def test_outline_ports() -> None:
 
 
 if __name__ == "__main__":
-    # e1 = gf.components.ellipse(radii=(6, 6))
-    # e2 = gf.components.ellipse(radii=(10, 4))
-    # c = outline([e1, e2], distance=1)
-    # c.show(show_ports=True)
     test_outline()
     test_outline_ports()

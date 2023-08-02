@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -24,6 +28,7 @@ def litho_calipers(
     based on phidl
 
     Args:
+    ----
         notch_size: [xwidth, yheight].
         notch_spacing: in um.
         num_notches: number of notches.
@@ -41,15 +46,15 @@ def litho_calipers(
     for i in range(num_notches_total):
         if i == centre_notch:
             D.add_ref(R1).movex(i * (notch_size[0] + notch_spacing)).movey(
-                notch_size[1]
+                notch_size[1],
             )
             D.add_ref(R2).movex(
                 i * (notch_size[0] + notch_spacing)
-                + offset_per_notch * (centre_notch - i)
+                + offset_per_notch * (centre_notch - i),
             ).movey(-2 * notch_size[1] - row_spacing)
         D.add_ref(R1).movex(i * (notch_size[0] + notch_spacing))
         D.add_ref(R2).movex(
-            i * (notch_size[0] + notch_spacing) + offset_per_notch * (centre_notch - i)
+            i * (notch_size[0] + notch_spacing) + offset_per_notch * (centre_notch - i),
         ).movey(-notch_size[1] - row_spacing)
 
     return D

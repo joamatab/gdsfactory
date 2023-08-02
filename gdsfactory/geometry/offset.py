@@ -22,6 +22,7 @@ def offset(
     """Returns new Component with polygons eroded or dilated by an offset.
 
     Args:
+    ----
         elements: Component(/Reference), list of Component(/Reference), or Polygon
           Polygons to offset or Component containing polygons to offset.
         distance: Distance to offset polygons. Positive values expand, negative shrink.
@@ -35,6 +36,7 @@ def offset(
         layer: Specific layer to put polygon geometry on.
 
     Returns:
+    -------
         Component containing a polygon(s) with the specified offset applied.
 
     .. plot::
@@ -59,9 +61,9 @@ def offset(
         elements = [elements]
     polygons_to_offset = []
     for e in elements:
-        if isinstance(e, (Component, ComponentReference)):
+        if isinstance(e, Component | ComponentReference):
             polygons_to_offset += e.get_polygons(by_spec=False)
-        elif isinstance(e, (Polygon, gdstk.Polygon)):
+        elif isinstance(e, Polygon | gdstk.Polygon):
             polygons_to_offset.append(e)
     if len(polygons_to_offset) == 0:
         return gf.Component("offset")
@@ -95,10 +97,10 @@ if __name__ == "__main__":
     c = gf.Component()
     layer_slab = (2, 0)
     c1 = gf.components.coupler_ring(
-        cladding_layers=[layer_slab], cladding_offsets=[0.5]
+        cladding_layers=[layer_slab],
+        cladding_offsets=[0.5],
     )
     d = 0.8
-    # d = 1
     c2 = gf.geometry.offset(c1, distance=+d, layer=layer_slab)
     c3 = gf.geometry.offset(c2, distance=-d, layer=layer_slab)
 

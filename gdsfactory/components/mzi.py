@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
@@ -11,7 +12,9 @@ from gdsfactory.components.mmi1x2 import mmi1x2
 from gdsfactory.components.mmi2x2 import mmi2x2
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -41,6 +44,7 @@ def mzi(
     """Mzi.
 
     Args:
+    ----
         delta_length: bottom arm vertical extra length.
         length_y: vertical length for both and top arms.
         length_x: horizontal length. None uses to the straight_x_bot/top defaults.
@@ -106,7 +110,9 @@ def mzi(
     b5.connect("o1", cp1.ports[port_e0_splitter])
 
     syl = c << gf.get_component(
-        straight_y, length=delta_length / 2 + length_y, cross_section=cross_section
+        straight_y,
+        length=delta_length / 2 + length_y,
+        cross_section=cross_section,
     )
     syl.connect("o1", b5.ports["o2"])
     b6 = c << bend
@@ -114,7 +120,9 @@ def mzi(
 
     straight_x_bot = (
         gf.get_component(
-            straight_x_bot, length=length_x, cross_section=cross_section_x_bot
+            straight_x_bot,
+            length=length_x,
+            cross_section=cross_section_x_bot,
         )
         if length_x
         else gf.get_component(straight_x_bot)
@@ -128,7 +136,9 @@ def mzi(
     b1.connect("o1", cp1.ports[port_e1_splitter])
 
     sytl = c << gf.get_component(
-        straight_y, length=length_y, cross_section=cross_section
+        straight_y,
+        length=length_y,
+        cross_section=cross_section,
     )
     sytl.connect("o1", b1.ports["o2"])
 
@@ -136,7 +146,9 @@ def mzi(
     b2.connect("o2", sytl.ports["o2"])
     straight_x_top = (
         gf.get_component(
-            straight_x_top, length=length_x, cross_section=cross_section_x_top
+            straight_x_top,
+            length=length_x,
+            cross_section=cross_section_x_top,
         )
         if length_x
         else gf.get_component(straight_x_top)
@@ -223,25 +235,6 @@ mzi_coupler = partial(
 if __name__ == "__main__":
     c = mzi()
     print(sorted([i.name for i in c.get_dependencies()]))
-    # from gdsfactory import get_generic_pdk
 
-    # pdk = get_generic_pdk()
-    # pdk.activate()
-
-    # c = mzi(cross_section="strip")
-    # c = gf.components.mzi2x2_2x2(straight_x_top="straight_heater_metal")
-    # c.show(show_ports=True)
-
-    # c = gf.components.mzi2x2_2x2(straight_x_top="straight_heater_metal")
     c = gf.routing.add_fiber_array(c)
-    # gdspath = c.write_gds(flatten_invalid_refs=True)
-    # gf.show(gdspath)
     c.show()
-
-    # c1.write_gds("a.gds")
-
-    # c2 = gf.read.import_gds("a.gds")
-    # c2 = c2.flatten()
-
-    # c3 = gf.grid([c2, c1])
-    # c3.show(show_ports=False)

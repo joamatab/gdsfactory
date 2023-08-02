@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.components.bend_circular import bend_circular
 from gdsfactory.components.straight_heater_metal import straight_heater_metal
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -22,6 +26,7 @@ def bend_port(
     """Returns a component with a bend and a straight extension.
 
     Args:
+    ----
         component: to bend.
         port_name: of the component port origin.
         port_name2: of the component port destination.
@@ -38,12 +43,13 @@ def bend_port(
     c.component = component
 
     if port_name not in component.ports:
+        msg = f"port_name {port_name!r} not in {list(component.ports.keys())}"
         raise ValueError(
-            f"port_name {port_name!r} not in {list(component.ports.keys())}"
+            msg,
         )
 
     extension_length = extension_length or abs(
-        component.ports[port_name2].center[0] - component.ports[port_name].center[0]
+        component.ports[port_name2].center[0] - component.ports[port_name].center[0],
     )
 
     ref = c << component
@@ -56,7 +62,9 @@ def bend_port(
     b.connect(port_name1_bend, ref.ports[port_name])
 
     s = c << gf.components.straight(
-        length=extension_length, cross_section=cross_section, **kwargs
+        length=extension_length,
+        cross_section=cross_section,
+        **kwargs,
     )
     straight_ports = s.get_ports_list()
     o2 = straight_ports[1].name
@@ -71,10 +79,5 @@ def bend_port(
 
 
 if __name__ == "__main__":
-    # c = gf.components.straight_pin()
-    # c = gf.components.straight_heater_metal()
-    # c = bend_port(component=c, port_name="e1")
-    # c = bend_port(component=gf.components.mzi_phase_shifter)
-    # c = gf.components.mzi2x2_2x2(straight_x_top="straight_heater_metal")
     c = bend_port()
     c.show(show_ports=True)

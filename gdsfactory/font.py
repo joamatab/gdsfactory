@@ -24,7 +24,7 @@ except ImportError:
         "\n\n (Note: Windows users may have to find and replace the 'libfreetype.dll' "
         "file in their Python package directory /freetype/ with the correct one"
         "from here: https://github.com/ubawurinna/freetype-windows-binaries"
-        " -- be sure to rename 'freetype.dll' to 'libfreetype.dll') "
+        " -- be sure to rename 'freetype.dll' to 'libfreetype.dll') ",
     )
 
 
@@ -32,6 +32,7 @@ def _get_font_by_file(file):
     """Load font file.
 
     Args:
+    ----
         file [str, BinaryIO]: Load a font face from a given file
     """
     # Cache opened fonts
@@ -48,28 +49,29 @@ def _get_font_by_name(name):
     """Try to load a system font by name.
 
     Args:
+    ----
         name [str]: Load a system font
     """
     try:
         font_file = font_manager.findfont(name, fallback_to_default=False)
     except Exception as e:
+        msg = f"Failed to find font: {name!r}Try specifying the exact (full) path to the .ttf or .otf file. Otherwise, it might be resolved by rebuilding the matplotlib font cache"
         raise ValueError(
-            f"Failed to find font: {name!r}"
-            "Try specifying the exact (full) path to the .ttf or .otf file. "
-            "Otherwise, it might be resolved by rebuilding the matplotlib font cache"
+            msg,
         ) from e
     return _get_font_by_file(font_file)
 
 
-def _get_glyph(font, letter):  # noqa: C901
+def _get_glyph(font, letter):
     """Get a block reference to the given letter."""
     if not isinstance(letter, str) and len(letter) == 1:
-        raise TypeError(f"Letter must be a string of length 1. Got: {letter!r}")
+        msg = f"Letter must be a string of length 1. Got: {letter!r}"
+        raise TypeError(msg)
 
     if not isinstance(font, freetype.Face):
+        msg = "font {font!r} must be a freetype font face. Load a font using _get_font_by_name first."
         raise TypeError(
-            "font {font!r} must be a freetype font face. "
-            "Load a font using _get_font_by_name first."
+            msg,
         )
 
     if getattr(font, "gds_glyphs", None) is None:
@@ -126,9 +128,9 @@ def _get_glyph(font, letter):  # noqa: C901
                         plist.extend(points[start])
                         curve.commands("C", *plist)
                     else:
+                        msg = "Missing bezier control points. We require at least two control points to get a cubic curve."
                         raise ValueError(
-                            "Missing bezier control points. We require at least"
-                            " two control points to get a cubic curve."
+                            msg,
                         )
                     cpoint += 3
                 else:
@@ -152,8 +154,9 @@ def _get_glyph(font, letter):  # noqa: C901
                     cpoint += 2
             else:
                 if tags[cpoint] & 2:
+                    msg = "Sequential control points not valid for cubic splines."
                     raise ValueError(
-                        "Sequential control points not valid for cubic splines."
+                        msg,
                     )
                 # We are at a quadratic sequential control point.
                 # Check if we're at the end of the segment

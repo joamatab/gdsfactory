@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
@@ -9,7 +11,9 @@ from gdsfactory.components.ge_detector_straight_si_contacts import (
     ge_detector_straight_si_contacts,
 )
 from gdsfactory.components.mmi_90degree_hybrid import mmi_90degree_hybrid
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -28,6 +32,7 @@ def coh_rx_single_pol(
     r"""Single polarization coherent receiver.
 
     Args:
+    ----
         bend: 90 degrees bend library.
         cross_section: for routing.
         hybrid_90deg: generates the 90 degree hybrid.
@@ -61,7 +66,8 @@ def coh_rx_single_pol(
 
     if in_wg_length > 0.0:
         straight = gf.components.straight(
-            length=in_wg_length, cross_section=cross_section
+            length=in_wg_length,
+            cross_section=cross_section,
         )
         signal_in = c << straight
         lo_in = c << straight
@@ -140,7 +146,8 @@ def coh_rx_single_pol(
     # --- Draw metal connections ----
 
     route = gf.routing.get_route_electrical(
-        pd_i1.ports["bot_e3"], pd_i2.ports["top_e3"]
+        pd_i1.ports["bot_e3"],
+        pd_i2.ports["top_e3"],
     )
     c.add(route.references)
 
@@ -159,7 +166,8 @@ def coh_rx_single_pol(
     )
 
     route = gf.routing.get_route_electrical_m2(
-        pd_q1.ports["bot_e3"], pd_q2.ports["top_e3"]
+        pd_q1.ports["bot_e3"],
+        pd_q2.ports["top_e3"],
     )
     c.add(route.references)
 
@@ -205,7 +213,7 @@ def coh_rx_single_pol(
         p0x, p0y = pd_i1.ports["top_e2"].center
         p1x, p1y = pad_array.ports["e41"].center
         route = gf.routing.get_route_from_waypoints_electrical(
-            [(p0x, p0y), (p0x, p1y), (p1x, p1y)]
+            [(p0x, p0y), (p0x, p1y), (p1x, p1y)],
         )
 
         c.add(route.references)
@@ -217,7 +225,7 @@ def coh_rx_single_pol(
                 (p0x, p0y),
                 (p0x + 0.5 * (p1x - p0x), p0y),
                 (p0x + 0.5 * (p1x - p0x), p1y),
-            ]
+            ],
         )
 
         c.add(route.references)
@@ -226,7 +234,7 @@ def coh_rx_single_pol(
         p0x, p0y = pd_i2.ports["bot_e2"].center
         p1x, p1y = pad_array.ports["e11"].center
         route = gf.routing.get_route_from_waypoints_electrical(
-            [(p0x, p0y), (p0x, p1y), (p1x, p1y)]
+            [(p0x, p0y), (p0x, p1y), (p1x, p1y)],
         )
         c.add(route.references)
 
@@ -237,20 +245,22 @@ def coh_rx_single_pol(
                 (p0x, p0y),
                 (p0x + 0.5 * (p1x - p0x), p0y),
                 (p0x + 0.5 * (p1x - p0x), p1y),
-            ]
+            ],
         )
 
         c.add(route.references)
 
         # I out pad
         route = gf.routing.get_route_electrical(
-            pad_array.ports["e31"], c.ports["i_out"]
+            pad_array.ports["e31"],
+            c.ports["i_out"],
         )
         c.add(route.references)
 
         # Q out pad
         route = gf.routing.get_route_electrical_multilayer(
-            pad_array.ports["e21"], c.ports["q_out"]
+            pad_array.ports["e21"],
+            c.ports["q_out"],
         )
         c.add(route.references)
 
@@ -265,10 +275,12 @@ def coh_rx_single_pol(
             prefix="q1vminus",
         )
         c.add_ports(
-            pd_q2.get_ports_list(port_type="electrical", prefix="bot"), prefix="q2vplus"
+            pd_q2.get_ports_list(port_type="electrical", prefix="bot"),
+            prefix="q2vplus",
         )
         c.add_ports(
-            pd_i2.get_ports_list(port_type="electrical", prefix="bot"), prefix="i2vplus"
+            pd_i2.get_ports_list(port_type="electrical", prefix="bot"),
+            prefix="i2vplus",
         )
 
     return c

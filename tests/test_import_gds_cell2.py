@@ -25,7 +25,6 @@ def rectangles1():
 
 def test_import_gds_cell_with_name_conflicts() -> None:
     """Imports specific cell."""
-    pass
 
 
 if __name__ == "__main__":

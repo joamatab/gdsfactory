@@ -8,27 +8,26 @@ import functools
 import hashlib
 import inspect
 import sys
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from functools import partial
 from inspect import getmembers
-from typing import Any, Callable, Dict, List, Tuple, TypeVar, Union
+from typing import Any, Literal, TypeVar, Union
 
 from pydantic import BaseModel, Field, validate_arguments
-from typing_extensions import Literal
 
 from gdsfactory.add_pins import add_pins_inside1nm, add_pins_siepic_optical
 from gdsfactory.serialization import clean_dict
 
 nm = 1e-3
 
-Layer = Tuple[int, int]
-Layers = Tuple[Layer, ...]
+Layer = tuple[int, int]
+Layers = tuple[Layer, ...]
 WidthTypes = Literal["sine", "linear", "parabolic"]
 
 LayerSpec = Union[Layer, int, str]
-LayerSpecs = Union[List[LayerSpec], Tuple[LayerSpec, ...]]
+LayerSpecs = Union[list[LayerSpec], tuple[LayerSpec, ...]]
 
-Floats = Tuple[float, ...]
+Floats = tuple[float, ...]
 port_names_electrical = ("e1", "e2")
 port_types_electrical = ("electrical", "electrical")
 
@@ -40,7 +39,8 @@ cladding_simplify_optical = None
 class Section(BaseModel):
     """CrossSection to extrude a path with a waveguide.
 
-    Parameters:
+    Parameters
+    ----------
         width: of the section (um) or parameterized function from 0 to 1.
              the width at t==0 is the width at the beginning of the Path.
              the width at t==1 is the width at the end.
@@ -92,7 +92,8 @@ class CrossSection(BaseModel):
 
     cladding_layers follow path shape, while bbox_layers are rectangular.
 
-    Parameters:
+    Parameters
+    ----------
         layer: main Section layer. Main section name = '_default'.
             If None does not draw the main section.
         width: main Section width (um) or function parameterized from 0 to 1.
@@ -208,7 +209,7 @@ class CrossSection(BaseModel):
                 port_names=self.port_names,
                 port_types=self.port_types,
                 name="_default",
-            )
+            ),
         }
         sections = self.sections or []
         for section in sections:
@@ -227,6 +228,7 @@ class CrossSection(BaseModel):
         """Add bounding box layers to a component.
 
         Args:
+        ----
             component: to add layers.
             top: top padding.
             bottom: bottom padding.
@@ -269,7 +271,7 @@ class CrossSection(BaseModel):
         return xmin, xmax
 
 
-CrossSectionSpec = Union[CrossSection, Callable, Dict[str, Any]]
+CrossSectionSpec = Union[CrossSection, Callable, dict[str, Any]]
 
 
 class Transition(CrossSection):
@@ -277,7 +279,8 @@ class Transition(CrossSection):
 
     cladding_layers follow path shape, while bbox_layers are rectangular.
 
-    Parameters:
+    Parameters
+    ----------
         cross_section1: input cross_section.
         cross_section2: output cross_section.
         width_type: sine or linear.
@@ -329,7 +332,7 @@ class Transition(CrossSection):
 
 
 def _xsection_without_validator(func):
-    """Decorator for cross_section functions
+    """Decorator for cross_section functions.
 
     use xsection instead so it will validate arguments with types.
     """
@@ -356,8 +359,9 @@ def _xsection_without_validator(func):
         settings = clean_dict(settings)
 
         if not isinstance(xs, CrossSection):
+            msg = f"function {func.__name__!r} return type = {type(xs)}"
             raise ValueError(
-                f"function {func.__name__!r} return type = {type(xs)}",
+                msg,
                 "make sure that functions with @xsection decorator return a CrossSection",
             )
 
@@ -372,7 +376,7 @@ _F = TypeVar("_F", bound=Callable)
 
 
 def xsection(func: _F) -> _F:
-    """Decorator for CrossSection functions
+    """Decorator for CrossSection functions.
 
     Validates type annotations with pydantic.
 
@@ -426,6 +430,7 @@ def cross_section(
     """Return CrossSection.
 
     Args:
+    ----
         width: main Section width (um) or function parameterized from 0 to 1.
             the width at t==0 is the width at the beginning of the Path.
             the width at t==1 is the width at the end.
@@ -506,7 +511,6 @@ radius_nitride = 20
 radius_rib = 20
 
 
-# strip = cross_section
 strip_pins = partial(
     cross_section,
     add_pins=add_pins_inside1nm,
@@ -517,7 +521,11 @@ strip_pins = partial(
 strip = strip_pins
 strip_auto_widen = partial(strip, width_wide=0.9, auto_widen=True)
 strip_no_pins = partial(
-    strip, add_pins=None, add_bbox=None, cladding_layers=None, cladding_offsets=None
+    strip,
+    add_pins=None,
+    add_bbox=None,
+    cladding_layers=None,
+    cladding_offsets=None,
 )
 strip_siepic = partial(cross_section, add_pins=add_pins_siepic_optical)
 
@@ -569,6 +577,7 @@ def slot(
     """Return CrossSection Slot (with an etched region in the center).
 
     Args:
+    ----
         width: main Section width (um) or function parameterized from 0 to 1.
             the width at t==0 is the width at the beginning of the Path.
             the width at t==1 is the width at the end.
@@ -576,6 +585,7 @@ def slot(
         slot_width: in um.
 
     Keyword Args:
+    ------------
         offset: main Section center offset (um) or function from 0 to 1.
              the offset at t==0 is the offset at the beginning of the Path.
              the offset at t==1 is the offset at the end.
@@ -644,6 +654,7 @@ def rib_with_trenches(
     """Return CrossSection of rib waveguide defined by trenches.
 
     Args:
+    ----
         width: main Section width (um) or function parameterized from 0 to 1.
             the width at t==0 is the width at the beginning of the Path.
             the width at t==1 is the width at the end.
@@ -686,11 +697,14 @@ def rib_with_trenches(
 
     sections = kwargs.pop("sections", [])
     sections += [
-        Section(width=width_slab, layer=layer, name="slab", simplify=simplify_slab)
+        Section(width=width_slab, layer=layer, name="slab", simplify=simplify_slab),
     ]
     sections += [
         Section(
-            width=width_trench, offset=offset, layer=layer_trench, name=f"trench_{i}"
+            width=width_trench,
+            offset=offset,
+            layer=layer_trench,
+            name=f"trench_{i}",
         )
         for i, offset in enumerate([+trench_offset, -trench_offset])
     ]
@@ -717,6 +731,7 @@ def l_with_trenches(
     """Return CrossSection of l waveguide defined by trenches.
 
     Args:
+    ----
         width: main Section width (um) or function parameterized from 0 to 1.
             the width at t==0 is the width at the beginning of the Path.
             the width at t==1 is the width at the end.
@@ -757,15 +772,15 @@ def l_with_trenches(
         c = p.extrude(xs)
         c.plot()
     """
-    # width_slab = max(width_slab, width + width_trench)
-
     mult = 1 if mirror else -1
     trench_offset = mult * (width / 2 + width_trench / 2)
     sections = kwargs.pop("sections", [])
     sections += [
         Section(
-            width=width_slab, layer=layer, offset=mult * (width_slab / 2 - width / 2)
-        )
+            width=width_slab,
+            layer=layer,
+            offset=mult * (width_slab / 2 - width / 2),
+        ),
     ]
     sections += [Section(width=width_trench, offset=trench_offset, layer=layer_trench)]
 
@@ -837,6 +852,7 @@ def pin(
     """Rib PIN doped cross_section.
 
     Args:
+    ----
         width: ridge width.
         layer: ridge layer.
         layer_slab: slab layer.
@@ -952,6 +968,7 @@ def pn(
     """Rib PN doped cross_section.
 
     Args:
+    ----
         width: width of the ridge in um.
         layer: ridge layer.
         layer_slab: slab layer.
@@ -1060,12 +1077,16 @@ def pn(
         offset_high_doping = width_high_doping / 2 + gap_high_doping
         if layer_npp is not None:
             npp = Section(
-                width=width_high_doping, offset=+offset_high_doping, layer=layer_npp
+                width=width_high_doping,
+                offset=+offset_high_doping,
+                layer=layer_npp,
             )
             sections.append(npp)
         if layer_ppp is not None:
             ppp = Section(
-                width=width_high_doping, offset=-offset_high_doping, layer=layer_ppp
+                width=width_high_doping,
+                offset=-offset_high_doping,
+                layer=layer_ppp,
             )
             sections.append(ppp)
 
@@ -1100,7 +1121,9 @@ def pn(
     bbox_offsets = bbox_offsets or []
     for layer_cladding, cladding_offset in zip(bbox_layers, bbox_offsets):
         s = Section(
-            width=width_slab + 2 * cladding_offset, offset=0, layer=layer_cladding
+            width=width_slab + 2 * cladding_offset,
+            offset=0,
+            layer=layer_cladding,
         )
         sections.append(s)
 
@@ -1153,6 +1176,7 @@ def pn_with_trenches(
     """Rib PN doped cross_section.
 
     Args:
+    ----
         width: width of the ridge in um.
         layer: ridge layer. None adds only ridge.
         layer_trench: layer to etch trenches.
@@ -1272,12 +1296,16 @@ def pn_with_trenches(
         offset_high_doping = width_high_doping / 2 + gap_high_doping
         if layer_npp:
             npp = Section(
-                width=width_high_doping, offset=+offset_high_doping, layer=layer_npp
+                width=width_high_doping,
+                offset=+offset_high_doping,
+                layer=layer_npp,
             )
             sections.append(npp)
         if layer_ppp:
             ppp = Section(
-                width=width_high_doping, offset=-offset_high_doping, layer=layer_ppp
+                width=width_high_doping,
+                offset=-offset_high_doping,
+                layer=layer_ppp,
             )
             sections.append(ppp)
 
@@ -1312,7 +1340,9 @@ def pn_with_trenches(
     bbox_offsets = bbox_offsets or []
     for layer_cladding, cladding_offset in zip(bbox_layers, bbox_offsets):
         s = Section(
-            width=width_slab + 2 * cladding_offset, offset=0, layer=layer_cladding
+            width=width_slab + 2 * cladding_offset,
+            offset=0,
+            layer=layer_cladding,
         )
         sections.append(s)
 
@@ -1363,6 +1393,7 @@ def pn_with_trenches_asymmetric(
     """Rib PN doped cross_section with asymmetric dimensions left and right.
 
     Args:
+    ----
         width: width of the ridge in um.
         layer: ridge layer. None adds only ridge.
         layer_trench: layer to etch trenches.
@@ -1431,7 +1462,6 @@ def pn_with_trenches_asymmetric(
         c = p.extrude(xs)
         c.plot()
     """
-
     # Trenches
     trench_offset = width / 2 + width_trench / 2
     sections = kwargs.pop("sections", [])
@@ -1445,7 +1475,7 @@ def pn_with_trenches_asymmetric(
         sections += [Section(width=width, offset=0, layer=wg_marking_layer)]
 
     # Low doping
-    if not isinstance(gap_low_doping, (list, Tuple)):
+    if not isinstance(gap_low_doping, list | tuple):
         gap_low_doping = [gap_low_doping] * 2
 
     if layer_n:
@@ -1466,7 +1496,7 @@ def pn_with_trenches_asymmetric(
         sections.append(p)
 
     if gap_medium_doping is not None:
-        if not isinstance(gap_medium_doping, (list, Tuple)):
+        if not isinstance(gap_medium_doping, list | tuple):
             gap_medium_doping = [gap_medium_doping] * 2
 
         if layer_np:
@@ -1487,7 +1517,7 @@ def pn_with_trenches_asymmetric(
             sections.append(pp)
 
     if gap_high_doping is not None:
-        if not isinstance(gap_high_doping, (list, Tuple)):
+        if not isinstance(gap_high_doping, list | tuple):
             gap_high_doping = [gap_high_doping] * 2
 
         if layer_npp:
@@ -1540,7 +1570,9 @@ def pn_with_trenches_asymmetric(
     bbox_offsets = bbox_offsets or []
     for layer_cladding, cladding_offset in zip(bbox_layers, bbox_offsets):
         s = Section(
-            width=width_slab + 2 * cladding_offset, offset=0, layer=layer_cladding
+            width=width_slab + 2 * cladding_offset,
+            offset=0,
+            layer=layer_cladding,
         )
         sections.append(s)
 
@@ -1587,6 +1619,7 @@ def l_wg_doped_with_trenches(
     """L waveguide PN doped cross_section.
 
     Args:
+    ----
         width: width of the ridge in um.
         layer: ridge layer. None adds only ridge.
         layer_trench: layer to etch trenches.
@@ -1650,11 +1683,14 @@ def l_wg_doped_with_trenches(
         c = p.extrude(xs)
         c.plot()
     """
-
     trench_offset = -1 * (width / 2 + width_trench / 2)
     sections = kwargs.pop("sections", [])
     sections += [
-        Section(width=width_slab, layer=layer, offset=-1 * (width_slab / 2 - width / 2))
+        Section(
+            width=width_slab,
+            layer=layer,
+            offset=-1 * (width_slab / 2 - width / 2),
+        ),
     ]
     sections += [Section(width=width_trench, offset=trench_offset, layer=layer_trench)]
 
@@ -1687,7 +1723,9 @@ def l_wg_doped_with_trenches(
         offset_high_doping = width / 2 - gap_high_doping - width_high_doping / 2
 
         high_doping = Section(
-            width=width_high_doping, offset=+offset_high_doping, layer=layer_high
+            width=width_high_doping,
+            offset=+offset_high_doping,
+            layer=layer_high,
         )
 
         sections.append(high_doping)
@@ -1750,6 +1788,7 @@ def strip_heater_metal_undercut(
     dimensions from https://doi.org/10.1364/OE.18.020298
 
     Args:
+    ----
         width: waveguide width.
         layer: waveguide layer.
         heater_width: of metal heater.
@@ -1821,6 +1860,7 @@ def strip_heater_metal(
     dimensions from https://doi.org/10.1364/OE.18.020298
 
     Args:
+    ----
         width: waveguide width (um).
         layer: waveguide layer.
         heater_width: of metal heater.
@@ -1836,7 +1876,6 @@ def strip_heater_metal(
         c = p.extrude(xs)
         c.plot()
     """
-
     sections = kwargs.pop("sections", [])
     sections += [
         Section(
@@ -1844,7 +1883,7 @@ def strip_heater_metal(
             width=heater_width,
             port_names=port_names_electrical,
             port_types=port_types_electrical,
-        )
+        ),
     ]
 
     return strip(
@@ -1868,6 +1907,7 @@ def strip_heater_doped(
     """Returns strip cross_section with N++ doped heaters on both sides.
 
     Args:
+    ----
         width: in um.
         layer: waveguide spec.
         heater_width: in um.
@@ -1989,14 +2029,14 @@ def rib_heater_doped(
 
     if with_bot_heater:
         sections += [
-            Section(layer=layer_heater, width=heater_width, offset=+heater_offset)
+            Section(layer=layer_heater, width=heater_width, offset=+heater_offset),
         ]
     if with_top_heater:
         sections += [
-            Section(layer=layer_heater, width=heater_width, offset=-heater_offset)
+            Section(layer=layer_heater, width=heater_width, offset=-heater_offset),
         ]
     sections += [
-        Section(width=slab_width, layer=layer_slab, offset=slab_offset, name="slab")
+        Section(width=slab_width, layer=layer_slab, offset=slab_offset, name="slab"),
     ]
     return strip(
         width=width,
@@ -2029,6 +2069,7 @@ def rib_heater_doped_via_stack(
     dimensions from https://doi.org/10.1364/OE.27.010456
 
     Args:
+    ----
         width: in um.
         layer: for main waveguide section.
         heater_width: in um.
@@ -2091,7 +2132,7 @@ def rib_heater_doped_via_stack(
                 layer=layer_heater,
                 width=heater_width,
                 offset=+heater_offset,
-            )
+            ),
         ]
 
     if with_top_heater:
@@ -2100,7 +2141,7 @@ def rib_heater_doped_via_stack(
                 layer=layer_heater,
                 width=heater_width,
                 offset=-heater_offset,
-            )
+            ),
         ]
 
     if with_bot_heater:
@@ -2169,6 +2210,7 @@ def pn_ge_detector_si_contacts(
     presence of the contacts. Such contacts can be subwavelength or not.
 
     Args:
+    ----
         width_si: width of the full etch si in um.
         layer_si: si ridge layer.
         width_ge: width of the ge in um.
@@ -2255,10 +2297,14 @@ def pn_ge_detector_si_contacts(
         width_high_doping = width_doping - gap_high_doping
         offset_high_doping = width_high_doping / 2 + gap_high_doping
         npp = Section(
-            width=width_high_doping, offset=+offset_high_doping, layer=layer_npp
+            width=width_high_doping,
+            offset=+offset_high_doping,
+            layer=layer_npp,
         )
         ppp = Section(
-            width=width_high_doping, offset=-offset_high_doping, layer=layer_ppp
+            width=width_high_doping,
+            offset=-offset_high_doping,
+            layer=layer_ppp,
         )
         sections.extend((npp, ppp))
     if layer_via is not None:
@@ -2288,7 +2334,9 @@ def pn_ge_detector_si_contacts(
     bbox_offsets = bbox_offsets or []
     for layer_cladding, cladding_offset in zip(bbox_layers, bbox_offsets):
         s = Section(
-            width=width_si + 2 * cladding_offset, offset=0, layer=layer_cladding
+            width=width_si + 2 * cladding_offset,
+            offset=0,
+            layer=layer_cladding,
         )
         sections.append(s)
 
@@ -2311,11 +2359,13 @@ CrossSectionFactory = Callable[..., CrossSection]
 
 
 def get_cross_section_factories(
-    modules, verbose: bool = False
+    modules,
+    verbose: bool = False,
 ) -> dict[str, CrossSectionFactory]:
     """Returns cross_section factories from a module or list of modules.
 
     Args:
+    ----
         modules: module or iterable of modules.
         verbose: prints in case any errors occur.
     """
@@ -2351,35 +2401,6 @@ def test_copy() -> None:
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # xs = gf.cross_section.pin(
-    #     width=0.5,
-    #     # gap_low_doping=0.05,
-    #     # width_doping=2.0,
-    #     # offset_low_doping=0,
-    #     mirror=False,
-    # )
-    # xs = pn_with_trenches(width=0.3)
-    # xs = slot(width=0.3)
-    # xs = rib_with_trenches()
-    # p = gf.path.straight()
-    # c = p.extrude(xs)
-    # xs = l_with_trenches(
-    #     width=0.5,
-    #     width_trench=2.0,
-    #     width_slab=7.0,
-    # )
-    # p = gf.path.straight()
-    # c = p.extrude(xs)
-    # xs = l_wg_doped_with_trenches(
-    #     layer="WG", width=0.5, width_trench=2.0, width_slab=7.0, gap_low_doping=0.1
-    # )
-    # p = gf.path.straight()
-    # c = p.extrude(cross_section=xs)
-    # xs = rib_with_trenches() # FIXME
-    # c = gf.components.straight(cross_section=xs)
     c = gf.components.straight(cross_section="strip")
 
-    # xs = l_wg()
-    # p = gf.path.straight()
-    # c = p.extrude(xs)
     c.show(show_ports=True)

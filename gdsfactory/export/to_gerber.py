@@ -1,28 +1,28 @@
-"""
-Based on Gerber file spec:
-https://www.ucamco.com/files/downloads/file_en/456/gerber-layer-format-specification-revision-2022-02_en.pdf
+"""Based on Gerber file spec:
+https://www.ucamco.com/files/downloads/file_en/456/gerber-layer-format-specification-revision-2022-02_en.pdf.
 
 See Also:
+--------
 - https://github.com/opiopan/pcb-tools-extension
 - https://github.com/jamesbowman/cuflow/blob/master/gerber.py
+
 """
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Literal
 
 from pydantic import BaseModel, Field
-from typing_extensions import Literal
 
 from gdsfactory import Component
 
 
 class GerberLayer(BaseModel):
     name: str
-    function: List[str]
+    function: list[str]
     polarity: Literal["Positive", "Negative"]
 
 
 class GerberOptions(BaseModel):
-    header: Optional[List[str]] = None
+    header: list[str] | None = None
     mode: Literal["mm", "in"] = "mm"
     resolution: float = 1e-6
     int_size: int = 4
@@ -30,7 +30,7 @@ class GerberOptions(BaseModel):
 
 # For generating a gerber job json file
 class BoardOptions(BaseModel):
-    size: Optional[tuple] = (None,)
+    size: tuple | None = (None,)
     n_layers: int = (2,)
 
 
@@ -66,12 +66,13 @@ def polygon(pp):
 def to_gerber(
     component: Component,
     dirpath: Path,
-    layermap_to_gerber_layer: Dict[Tuple[int, int], GerberLayer],
+    layermap_to_gerber_layer: dict[tuple[int, int], GerberLayer],
     options: GerberOptions = Field(default_factory=dict),
 ) -> None:
     """Writes each layer to a different Gerber file.
 
     Args:
+    ----
         component: to export.
         dirpath: directory path.
         layermap_to_gerber_layer: map of GDS layer to GerberLayer.
@@ -211,40 +212,45 @@ if __name__ == "__main__":
                     zmin=0.0,
                     material="cu",
                 ),
-            )
+            ),
         )
 
     LAYER_STACK = get_pcb_layer_stack()
 
     layermap_to_gerber = {
         LAYER.F_Cu: GerberLayer(
-            name="F_Cu", function=["Copper", "L1", "Top"], polarity="Positive"
+            name="F_Cu",
+            function=["Copper", "L1", "Top"],
+            polarity="Positive",
         ),
         LAYER.B_Cu: GerberLayer(
-            name="B_Cu", function=["Copper", "L2", "Bot"], polarity="Positive"
+            name="B_Cu",
+            function=["Copper", "L2", "Bot"],
+            polarity="Positive",
         ),
         LAYER.F_Silkscreen: GerberLayer(
-            name="F_Silkscreen", function=["Legend", "Top"], polarity="Positive"
+            name="F_Silkscreen",
+            function=["Legend", "Top"],
+            polarity="Positive",
         ),
         LAYER.F_Mask: GerberLayer(
-            name="F_Mask", function=["SolderMask", "Top"], polarity="Negative"
+            name="F_Mask",
+            function=["SolderMask", "Top"],
+            polarity="Negative",
         ),
         LAYER.B_Mask: GerberLayer(
-            name="B_Mask", function=["SolderMask", "Bot"], polarity="Negative"
+            name="B_Mask",
+            function=["SolderMask", "Bot"],
+            polarity="Negative",
         ),
         LAYER.Edge_Cuts: GerberLayer(
-            name="Edge_Cuts", function=["Profile"], polarity="Positive"
+            name="Edge_Cuts",
+            function=["Profile"],
+            polarity="Positive",
         ),
     }
 
-    # from gdsfactory.install import install_klayout_technology
-    # from gdsfactory.technology.klayout_tech import KLayoutTechnology
-    # tech_dir = (pathlib.Path(__file__) / "..").resolve() / "klayout"
-    # pcb_tech = KLayoutTechnology(name='PCB', layer_views=PCBViews())
-    # pcb_tech.technology.dbu = 1e-3
-    # pcb_tech.export_technology_files(tech_dir=str(tech_dir))
     #
-    # install_klayout_technology(tech_dir=tech_dir, tech_name="PCB")
 
     c = gf.components.text(layer=LAYER.F_Cu)
     c = LAYER_VIEWS.preview_layerset()

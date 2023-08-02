@@ -88,5 +88,3 @@ def test_get_bundle_path_length_matching_nb_loops() -> None:
 
 if __name__ == "__main__":
     test_get_bundle_path_length_matching()
-    # test_get_bundle_path_length_matching_extra_length()
-    # test_get_bundle_path_length_matching_nb_loops()

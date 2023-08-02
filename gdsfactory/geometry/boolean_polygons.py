@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 
 import gdsfactory as gf
-from gdsfactory.typings import Component, ComponentReference, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Component, ComponentReference, LayerSpec
 
 
 def boolean_polygons(
@@ -17,6 +21,7 @@ def boolean_polygons(
     See [gdstk docs](https://heitzmann.github.io/gdstk/geometry/gdstk.boolean.html#gdstk.boolean) for details.
 
     Args:
+    ----
         operand1: polygon set A.
         operand2: polygon set B.
         operation: the name of the operation to perform, i.e. "or", "and", "not", or "xor".

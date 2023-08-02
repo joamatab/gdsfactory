@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.geometry import check_exclusion
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -24,7 +28,8 @@ def exclusion(
 
 
 @pytest.mark.parametrize(
-    "space,min_space,area_expected", [(0.16, 0.1, 0), (0.1, 0.11, 50000)]
+    ("space", "min_space", "area_expected"),
+    [(0.16, 0.1, 0), (0.1, 0.11, 50000)],
 )
 def test_exclusion(space: float, min_space: float, area_expected: int) -> None:
     c = exclusion(space=space)

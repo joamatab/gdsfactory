@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -8,7 +8,11 @@ import gdsfactory as gf
 from gdsfactory.component import Component, ComponentReference
 from gdsfactory.port import Port, flipped
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import Route, RouteFactory
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import Route, RouteFactory
 
 
 def sort_key_west_to_east(port: Port) -> float:
@@ -38,6 +42,7 @@ def route_ports_to_side(
     """Routes ports to a given side.
 
     Args:
+    ----
         ports: list/dict/Component/ComponentReference to route to a side.
         side: 'north', 'south', 'east' or 'west'.
         x: position to route ports for east/west. None, uses most east/west value.
@@ -45,12 +50,14 @@ def route_ports_to_side(
         routing_func: the routing function. By default uses `get_route`.
 
     Keyword Args:
+    ------------
       radius: in um.
       separation: in um.
       extend_bottom/extend_top for east/west routing.
       extend_left, extend_right for south/north routing.
 
     Returns:
+    -------
         List of routes: with routing elements.
         List of ports: of the new ports.
 
@@ -84,7 +91,7 @@ def route_ports_to_side(
     if isinstance(ports, dict):
         ports = list(ports.values())
 
-    elif isinstance(ports, (Component, ComponentReference)):
+    elif isinstance(ports, Component | ComponentReference):
         ports = list(ports.ports.values())
 
     # Choose which
@@ -95,7 +102,8 @@ def route_ports_to_side(
         xy = x if x is not None else side
         func_route = route_ports_to_x
     else:
-        raise ValueError(f"side = {side} not valid (north, south, west, east)")
+        msg = f"side = {side} not valid (north, south, west, east)"
+        raise ValueError(msg)
 
     return func_route(ports, xy, routing_func=routing_func, **kwargs)
 
@@ -136,6 +144,7 @@ def route_ports_to_x(
     """Returns route to x.
 
     Args:
+    ----
         list_ports: reasonably well behaved list of ports.
            ports facing north ports are norther than any other ports
            ports facing south ports are souther ...
@@ -160,6 +169,7 @@ def route_ports_to_x(
         dy_start: override minimum starting y distance.
 
     Returns:
+    -------
         routes: list of routes
         ports: list of the new optical ports
 
@@ -198,10 +208,11 @@ def route_ports_to_x(
         x = max(p.x for p in list_ports) + bx
     elif x == "west":
         x = min(p.x for p in list_ports) - bx
-    elif isinstance(x, (float, int)):
+    elif isinstance(x, float | int):
         pass
     else:
-        raise ValueError(f"x={x!r} should be a float or east or west")
+        msg = f"x={x!r} should be a float or east or west"
+        raise ValueError(msg)
 
     if x < min(xs):
         sort_key_north = sort_key_west_to_east
@@ -217,9 +228,9 @@ def route_ports_to_x(
         backward_ports = west_ports
         angle = 180
     else:
-        raise ValueError("x should be either to the east or to the west of all ports")
+        msg = "x should be either to the east or to the west of all ports"
+        raise ValueError(msg)
 
-    # forward_ports.sort()
     north_ports.sort(key=sort_key_north)
     south_ports.sort(key=sort_key_south)
     forward_ports.sort(key=sort_key_south_to_north)
@@ -234,7 +245,11 @@ def route_ports_to_x(
     ports = []
 
     def add_port(
-        p, y, l_elements, l_ports, start_straight_length=start_straight_length
+        p,
+        y,
+        l_elements,
+        l_ports,
+        start_straight_length=start_straight_length,
     ) -> None:
         new_port = p.copy(name=f"{p.name}_new")
         new_port.orientation = angle
@@ -246,7 +261,7 @@ def route_ports_to_x(
                 start_straight_length=start_straight_length,
                 radius=radius,
                 **routing_func_args,
-            )
+            ),
         ]
         l_ports += [new_port.flip()]
 
@@ -348,6 +363,7 @@ def route_ports_to_y(
         radius: in um.
 
     Returns:
+    -------
         - a list of Routes
         - a list of the new optical ports
 
@@ -406,7 +422,7 @@ def route_ports_to_y(
             )
             - by
         )
-    elif isinstance(y, (float, int)):
+    elif isinstance(y, float | int):
         pass
     if y <= min(ys):
         sort_key_east = sort_key_south_to_north
@@ -422,7 +438,8 @@ def route_ports_to_y(
         backward_ports = south_ports
         angle = -90.0
     else:
-        raise ValueError("y should be either to the north or to the south of all ports")
+        msg = "y should be either to the north or to the south of all ports"
+        raise ValueError(msg)
 
     west_ports.sort(key=sort_key_west)
     east_ports.sort(key=sort_key_east)
@@ -440,7 +457,11 @@ def route_ports_to_y(
     ports = []
 
     def add_port(
-        p, x, l_elements, l_ports, start_straight_length=start_straight_length
+        p,
+        x,
+        l_elements,
+        l_ports,
+        start_straight_length=start_straight_length,
     ):
         new_port = p.copy()
         new_port.orientation = angle
@@ -458,13 +479,14 @@ def route_ports_to_y(
                     start_straight_length=start_straight_length,
                     radius=radius,
                     **routing_func_args,
-                )
+                ),
             ]
             l_ports += [flipped(new_port)]
 
         except Exception as error:
+            msg = f"Could not connect {p.name!r} to {new_port.name!r}"
             raise ValueError(
-                f"Could not connect {p.name!r} to {new_port.name!r}"
+                msg,
             ) from error
 
     x_optical_left = x0_left
@@ -570,5 +592,4 @@ if __name__ == "__main__":
         for i, p in enumerate(ports):
             c.add_port(name=f"{side[0]}{i}", port=p)
 
-    # c.plot()
     c.show(show_ports=True)

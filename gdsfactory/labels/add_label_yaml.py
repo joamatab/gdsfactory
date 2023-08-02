@@ -1,12 +1,16 @@
 """Add label YAML."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import flatdict
 import pydantic
 
 import gdsfactory as gf
 from gdsfactory.name import clean_name
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 ignore = [
     "cross_section",
@@ -34,6 +38,7 @@ def add_label_yaml(
     """Returns Component with measurement label.
 
     Args:
+    ----
         component: to add labels to.
         port_types: list of port types to label.
         layer: text label layer.
@@ -58,13 +63,12 @@ settings:
     info = []
     layer = get_layer(layer)
 
-    # metadata = component.metadata_child.changed
     metadata = component.metadata_child.get("changed")
     if metadata:
         info += [
             f"  {k}: {v}"
             for k, v in metadata.items()
-            if k not in metadata_ignore and isinstance(v, (int, float, str))
+            if k not in metadata_ignore and isinstance(v, int | float | str)
         ]
 
     metadata = (

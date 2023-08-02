@@ -35,7 +35,7 @@ To generate a straight route:
 from __future__ import annotations
 
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pydantic import validate_arguments
@@ -48,15 +48,19 @@ from gdsfactory.components.taper import taper as taper_function
 from gdsfactory.components.via_corner import via_corner
 from gdsfactory.components.wire import wire_corner
 from gdsfactory.cross_section import metal2, metal3
-from gdsfactory.port import Port
 from gdsfactory.routing.manhattan import round_corners, route_manhattan
-from gdsfactory.typings import (
-    ComponentSpec,
-    Coordinates,
-    CrossSectionSpec,
-    MultiCrossSectionAngleSpec,
-    Route,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.port import Port
+    from gdsfactory.typings import (
+        ComponentSpec,
+        Coordinates,
+        CrossSectionSpec,
+        MultiCrossSectionAngleSpec,
+        Route,
+    )
 
 
 @validate_arguments
@@ -79,6 +83,7 @@ def get_route(
     `get_route` is an automatic version of `get_route_from_steps`.
 
     Args:
+    ----
         input_port: start port.
         output_port: end port.
         bend: bend spec.
@@ -112,9 +117,10 @@ def get_route(
         else gf.get_component(bend, cross_section=cross_section, **kwargs)
     )
     if taper:
-        if isinstance(cross_section, (tuple, list)):
+        if isinstance(cross_section, tuple | list):
+            msg = "Tapers not implemented for routes made from multiple cross_sections."
             raise ValueError(
-                "Tapers not implemented for routes made from multiple cross_sections."
+                msg,
             )
         x = gf.get_cross_section(cross_section, **kwargs)
         taper_length = x.taper_length
@@ -183,6 +189,7 @@ def get_route_from_waypoints(
     gf.routing.
 
     Args:
+    ----
         waypoints: Coordinates that define the route.
         bend: function that returns bends.
         straight: function that returns straight waveguides.
@@ -265,11 +272,15 @@ def get_route_from_waypoints(
 
 
 get_route_from_waypoints_electrical = partial(
-    get_route_from_waypoints, bend=wire_corner, cross_section="metal_routing"
+    get_route_from_waypoints,
+    bend=wire_corner,
+    cross_section="metal_routing",
 )
 
 get_route_from_waypoints_electrical_m2 = partial(
-    get_route_from_waypoints, bend=wire_corner, cross_section=metal2
+    get_route_from_waypoints,
+    bend=wire_corner,
+    cross_section=metal2,
 )
 
 get_route_from_waypoints_electrical_multilayer = partial(
@@ -280,26 +291,7 @@ get_route_from_waypoints_electrical_multilayer = partial(
 
 
 if __name__ == "__main__":
-    # w = gf.components.mmi1x2()
-    # c = gf.Component()
     # c << w
-    # route = get_route(w.ports["o2"], w.ports["o1"], layer=(2, 0), width=2)
-    # cc = c.add(route.references)
-    # cc.show(show_ports=True)
-
-    # c = gf.Component("multi-layer")
-    # ptop = c << gf.components.pad_array()
-    # pbot = c << gf.components.pad_array(orientation=90)
-
-    # ptop.movex(300)
-    # ptop.movey(300)
-    # route = get_route_electrical_multilayer(
-    #     ptop.ports["e11"],
-    #     pbot.ports["e11"],
-    #     end_straight_length=100,
-    # )
-    # c.add(route.references)
-    # c.show()
 
     c = gf.Component("sample_connect")
     mmi1 = c << gf.components.mmi1x2()

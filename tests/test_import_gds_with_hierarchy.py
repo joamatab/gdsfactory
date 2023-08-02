@@ -1,12 +1,14 @@
-# from pprint import pprint
-
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import jsondiff
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.cross_section import cross_section
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 gdspath = gf.PATH.gdsdir / "mzi2x2.gds"
 
@@ -25,7 +27,8 @@ def test_read_gds_with_settings2(data_regression: DataRegressionFixture) -> None
 
 def test_read_gds_equivalent2() -> None:
     """Ensures we can load it from GDS + YAML and get the same component
-    settings."""
+    settings.
+    """
     splitter = gf.components.mmi1x2(cross_section=cross_section)
     c1 = gf.components.mzi(splitter=splitter, cross_section=cross_section)
     c2 = gf.import_gds(gdspath, read_metadata=True)
@@ -34,19 +37,9 @@ def test_read_gds_equivalent2() -> None:
     d2 = c2.to_dict()
 
     # we change the name, so there is no cache conflicts
-    # d1.pop("name")
-    # d2.pop("name")
-    # d1.pop("ports")
-    # d2.pop("ports")
-    # c1.pprint()
-    # c2.pprint()
 
     d = jsondiff.diff(d1, d2)
 
-    # from pprint import pprint
-    # pprint(d1)
-    # pprint(d2)
-    # pprint(d)
     assert len(d) == 0, d
 
 
@@ -74,10 +67,7 @@ if __name__ == "__main__":
     test_read_gds_equivalent2()
 
     c = test_read_gds_hash2()
-    # c.show(show_ports=True)
-    # test_mix_cells_from_gds_and_from_function2()
 
-    # test_read_gds_with_settings2()
     c1 = gf.components.mzi()
     c2 = gf.import_gds(gdspath)
     d1 = c1.to_dict()

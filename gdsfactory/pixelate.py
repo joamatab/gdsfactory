@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import itertools as it
+from typing import TYPE_CHECKING
 
 import numpy as np
 from shapely import geometry
 from shapely.geometry.polygon import Polygon
 
 from gdsfactory.geometry.functions import polygon_grow
-from gdsfactory.typings import Coordinates
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Coordinates
 
 DEG2RAD = np.pi / 180
 RAD2DEG = 1.0 / DEG2RAD
-# from matplotlib import pyplot as plt
 
 
 def pixelate_path(
@@ -25,6 +27,7 @@ def pixelate_path(
     """From a path add one pixel per point on the path.
 
     Args:
+    ----
         pts: points.
         pixel_size: in um.
         snap_res: snap resolution.
@@ -54,7 +57,7 @@ def pixelate_path(
     thetas_deg[slice] = thetas_deg0[slice]
 
     scalings = np.cos(
-        abs(thetas_deg) * DEG2RAD
+        abs(thetas_deg) * DEG2RAD,
     )  # + middle_offset * (1 - np.cos(abs(thetas_deg) * DEG2RAD) )
 
     def _snap(x: float) -> float:
@@ -63,8 +66,7 @@ def pixelate_path(
     def _gen_pixel(p, a):
         x0, y0 = p
         pix = [(x0 + a, y0 - a), (x0 + a, y0 + a), (x0 - a, y0 + a), (x0 - a, y0 - a)]
-        pix = [(_snap(_x), _snap(_y)) for _x, _y in pix]
-        return pix
+        return [(_snap(_x), _snap(_y)) for _x, _y in pix]
 
     a = pixel_size / 2
     return [_gen_pixel(p, a * s) for p, s in zip(pts, scalings)]
@@ -92,10 +94,12 @@ def _pixelate(
     """Pixelates a shape (as 2d array) onto an NxN grid.
 
     Arguments:
+    ---------
         pts: The 2D array to be pixelated.
         N: The number of pixels on an edge of the grid.
 
     Returns:
+    -------
         A list of pixel bounding boxes
 
     """
@@ -159,7 +163,8 @@ def rect_to_coords(r):
 
 def pixelate(pts, N=100, margin=0.4, **kwargs):
     """Pixelate shape defined by points Return rectangles [Rect1, Rect2, ...] \
-    ready to go in the quad tree."""
+    ready to go in the quad tree.
+    """
     pixels = _pixelate(pts, N=N, margin=margin, **kwargs)
     return [rect_to_coords(pixel) for pixel in pixels]
 
@@ -167,7 +172,10 @@ def pixelate(pts, N=100, margin=0.4, **kwargs):
 def gen_pixels_op_blocking(pts, snap_res=0.05, margin=1.0, min_pixel_size=0.4):
     op_block_pts = polygon_grow(pts, margin)
     return pixelate(
-        op_block_pts, min_pixel_size=min_pixel_size, N=100, snap_res=snap_res
+        op_block_pts,
+        min_pixel_size=min_pixel_size,
+        N=100,
+        snap_res=snap_res,
     )
 
 

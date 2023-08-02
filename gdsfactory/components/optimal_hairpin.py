@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -23,6 +27,7 @@ def optimal_hairpin(
     based on phidl.geometry
 
     Args:
+    ----
         width : int or float
             Width of the hairpin leads.
         pitch : int or float
@@ -39,11 +44,12 @@ def optimal_hairpin(
             Specific layer(s) to put polygon geometry on.
 
     Notes:
+    -----
         Hairpin pitch must be greater than width.
 
         Optimal structure from https://doi.org/10.1103/PhysRevB.84.174510
         Clem, J., & Berggren, K. (2011). Geometry-dependent critical currents in
-        superconducting nanocircuits. Physical Review B, 84(17), 1–27.
+        superconducting nanocircuits. Physical Review B, 84(17), 1-27.
     """
     # ==========================================================================
     #  Create the basic geometry
@@ -104,10 +110,18 @@ def optimal_hairpin(
     xports = min(xpts)
     yports = -a + width / 2
     D.add_port(
-        name="e1", center=[xports, -yports], width=width, orientation=180, layer=layer
+        name="e1",
+        center=[xports, -yports],
+        width=width,
+        orientation=180,
+        layer=layer,
     )
     D.add_port(
-        name="e2", center=[xports, yports], width=width, orientation=180, layer=layer
+        name="e2",
+        center=[xports, yports],
+        width=width,
+        orientation=180,
+        layer=layer,
     )
     return D
 

@@ -16,6 +16,7 @@ def gdsdiff_git(
     """Show diffs for two files when running git diff.
 
     Args:
+    ----
         path: script to run path.
         curr_file: current GDS file.
         old_file: old GDS.

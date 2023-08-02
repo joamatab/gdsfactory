@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Tuple, Union
+from typing import Union
 
 import gdsfactory as gf
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.via_stack import via_stack
 from gdsfactory.snap import snap_to_grid
 
-Coordinate = Union[Tuple[float, float], Tuple[int, int]]
+Coordinate = Union[tuple[float, float], tuple[int, int]]
 
 
 @gf.cell_without_validator
@@ -27,6 +27,7 @@ def seal_ring(
     Prevents cracks from spreading and shields when connected to ground.
 
     Args:
+    ----
         bbox: to add seal ring around. You can pass Component.bbox.
         seal: function for the seal.
         width: of the seal.
@@ -82,5 +83,5 @@ if __name__ == "__main__":
     big_square = partial(rectangle, size=(1300, 2600))
     c = gf.Component("demo")
     c << big_square()
-    c << seal_ring(c.bbox + ((0, 0), (10, 0)), with_south=False)
+    c << seal_ring((*c.bbox, (0, 0), (10, 0)), with_south=False)
     c.show(show_ports=True)

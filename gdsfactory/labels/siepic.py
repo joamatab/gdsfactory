@@ -2,21 +2,25 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.component_layout import Label
 from gdsfactory.components import grating_coupler_te
 from gdsfactory.components.straight import straight
-from gdsfactory.port import Port
-from gdsfactory.typings import (
-    ComponentReference,
-    ComponentSpec,
-    CrossSectionSpec,
-    LayerSpec,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component
+    from gdsfactory.port import Port
+    from gdsfactory.typings import (
+        ComponentReference,
+        ComponentSpec,
+        CrossSectionSpec,
+        LayerSpec,
+    )
 
 
 def get_input_label_text(
@@ -29,6 +33,7 @@ def get_input_label_text(
     """Return label for port and a grating coupler.
 
     Args:
+    ----
         port: component port.
         gc: grating coupler reference.
         gc_index: grating coupler index.
@@ -43,7 +48,7 @@ def get_input_label_text(
         "TM",
     ], f"Not valid polarization {polarization.upper()!r} in [TE, TM]"
     assert (
-        isinstance(wavelength, (int, float)) and 1.0 < wavelength < 2.0
+        isinstance(wavelength, int | float) and 1.0 < wavelength < 2.0
     ), f"{wavelength} is Not valid 1000 < wavelength < 2000"
 
     name = component_name or port.parent.metadata_child.get("name")
@@ -62,6 +67,7 @@ def get_input_labels(
     """Return list of labels for all component ports.
 
     Args:
+    ----
         io_gratings: list of grating_coupler references.
         ordered_ports: list of ports.
         component_name: name.
@@ -75,7 +81,10 @@ def get_input_labels(
     port = ordered_ports[1]
 
     text = get_input_label_text(
-        port=port, gc=gc, gc_index=port_index, component_name=component_name
+        port=port,
+        gc=gc,
+        gc_index=port_index,
+        component_name=component_name,
     )
     layer, texttype = gf.get_layer(layer_label)
     label = Label(
@@ -108,6 +117,7 @@ def add_fiber_array_siepic(
     Can add align_ports loopback reference structure on the edges.
 
     Args:
+    ----
         component: to connect.
         component_name: for the label.
         gc_port_name: grating coupler input port name 'o1'.

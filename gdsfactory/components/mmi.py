@@ -1,18 +1,22 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Optional
 
 
 @gf.cell
 def mmi(
     inputs: int = 1,
     outputs: int = 4,
-    width: Optional[float] = None,
+    width: Optional[float] | None = None,
     width_taper: float = 1.0,
     length_taper: float = 10.0,
     length_mmi: float = 5.5,
@@ -23,12 +27,13 @@ def mmi(
     straight: ComponentFactory = straight_function,
     with_bbox: bool = True,
     cross_section: CrossSectionSpec = "strip",
-    input_positions: Optional[list[float]] = None,
-    output_positions: Optional[list[float]] = None,
+    input_positions: Optional[list[float]] | None = None,
+    output_positions: Optional[list[float]] | None = None,
 ) -> Component:
-    r"""mxn MultiMode Interferometer (MMI).
+    r"""Mxn MultiMode Interferometer (MMI).
 
     Args:
+    ----
         inputs: number of inputs.
         outputs: number of outputs.
         width: input and output straight width. Defaults to cross_section.
@@ -160,8 +165,6 @@ def mmi(
 
 
 if __name__ == "__main__":
-    # import gdsfactory as gf
-    # c = gf.components.mmi1x2(cross_section="rib_conformal")
     c = mmi(inputs=2, outputs=4, gap_input_tapers=0.5, input_positions=[-1, 1])
     print(len(c.ports))
     c.show(show_ports=True)

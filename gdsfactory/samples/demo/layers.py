@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Tuple, Union
+from typing import Union
 
 from pydantic import BaseModel
 
 from gdsfactory.technology import LayerLevel, LayerStack
 
 module_path = pathlib.Path(__file__).parent.absolute()
-Layer = Tuple[int, int]
+Layer = tuple[int, int]
 LayerSpec = Union[int, Layer, str, None]
 nm = 1e-3
 
@@ -84,6 +84,7 @@ def get_layer_stack(
     based on paper https://www.degruyter.com/document/doi/10.1515/nanoph-2013-0034/html
 
     Args:
+    ----
         thickness_wg: waveguide thickness.
         thickness_clad: cladding.
         thickness_nitride: for nitride.
@@ -157,7 +158,7 @@ def get_layer_stack(
                 zmin=thickness_wg + 1100e-3 + 750e-3 + 1.5,
                 material="Aluminum",
             ),
-        )
+        ),
     )
 
 

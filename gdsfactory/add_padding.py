@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, LayerSpec
 
 
 def get_padding_points(
@@ -19,6 +22,7 @@ def get_padding_points(
     """Returns padding points for a component outline.
 
     Args:
+    ----
         component: to add padding.
         default: default padding in um.
         top: north padding in um.
@@ -47,10 +51,12 @@ def add_padding(
     """Adds padding layers to component. Returns same component.
 
     Args:
+    ----
         component: to add padding.
         layers: list of layers.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         default: default padding.
         top: north padding in um.
         bottom: south padding in um.
@@ -74,10 +80,12 @@ def add_padding_container(
     """Returns new component with padding added.
 
     Args:
+    ----
         component: to add padding.
         layers: list of layers.
 
     Keyword Args:
+    ------------
         default: default padding in um.
         top: north padding in um.
         bottom: south padding in um.
@@ -111,6 +119,7 @@ def add_padding_to_size(
     New size is multiple of grid size.
 
     Args:
+    ----
         component: to add padding.
         layers: list of layers.
         xsize: x size to fill up in um.
@@ -150,6 +159,7 @@ def add_padding_to_size_container(
     multiple of grid size.
 
     Args:
+    ----
         component: to add padding.
         layers: list of layers.
         xsize: x size to fill up in um.
@@ -180,8 +190,6 @@ def add_padding_to_size_container(
 
 
 if __name__ == "__main__":
-    # test_container()
-
     p = partial(add_padding, layers=["SLAB150"])
     c = gf.components.straight(length=10, decorator=p)
     c.show()

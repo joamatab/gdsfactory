@@ -64,4 +64,3 @@ def test_path() -> None:
 
 if __name__ == "__main__":
     test_no_ports()
-    # test_path()

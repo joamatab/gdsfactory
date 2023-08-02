@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.read import cell_from_yaml_template, from_yaml
 from gdsfactory.routing.factories import routing_strategy
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 SAMPLE_DIR = pathlib.Path(__file__).parent / "all_angle_routing"
 

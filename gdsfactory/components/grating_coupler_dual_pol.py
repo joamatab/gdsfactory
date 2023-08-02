@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -8,14 +9,20 @@ import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, LayerSpec
 
 # The default values are loosely based on Taillaert et al,
 #  "A Compact Two-Dimensional Grating Coupler Used
 # as a Polarization Splitter", IEEE Phot. Techn. Lett. 15(9), 2003
 
 rectangle_unit_cell = partial(
-    rectangle, size=(0.3, 0.3), layer="SLAB150", centered=True, port_type=None
+    rectangle,
+    size=(0.3, 0.3),
+    layer="SLAB150",
+    centered=True,
+    port_type=None,
 )
 
 
@@ -41,6 +48,7 @@ def grating_coupler_dual_pol(
     a rectangle or a circle.
 
     Args:
+    ----
         unit_cell: component describing the unit cell of the photonic crystal.
         period_x: spacing between unit cells in the x direction [um].
         period_y: spacing between unit cells in the y direction [um].
@@ -93,7 +101,10 @@ def grating_coupler_dual_pol(
 
     # Base layer
     _ = c << rectangle(
-        size=(x_span, y_span), layer=base_layer, centered=True, port_type=None
+        size=(x_span, y_span),
+        layer=base_layer,
+        centered=True,
+        port_type=None,
     )
 
     # Photonic crystal

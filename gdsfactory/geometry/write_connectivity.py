@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel
 
 import gdsfactory as gf
 from gdsfactory.geometry.write_drc import write_drc_deck_macro
-from gdsfactory.typings import CrossSectionSpec, Dict, Layer, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec, Dict, Layer, LayerSpec
 
 layer_name_to_min_width: Dict[str, float]
 
@@ -29,6 +33,7 @@ def write_connectivity_checks(
     Assumes the port pins are inside the Component.
 
     Args:
+    ----
         pin_widths: list of pin widths allowed.
         pin_layer: for the pin markers.
         pin_length: in um.
@@ -57,13 +62,14 @@ DEVREC.overlapping(DEVREC).output("Component overlap")\n
 
 def write_connectivity_checks_per_section(
     connectivity_checks: list[ConnectivyCheck],
-    device_layer: LayerSpec = None,
+    device_layer: LayerSpec | None = None,
 ) -> str:
     """Return script for port connectivity check.
     Assumes the port pins are inside the Component and each cross_section has pins on a different layer.
-    This is not the recommended way as it only supports two widths per cross_section (cross_section.width and cross_section.width_wide)
+    This is not the recommended way as it only supports two widths per cross_section (cross_section.width and cross_section.width_wide).
 
     Args:
+    ----
         connectivity_checks: list of connectivity objects to check for.
         device_layer: device recognizion layer.
     """
@@ -73,7 +79,8 @@ def write_connectivity_checks_per_section(
     for cc in connectivity_checks:
         xs = gf.get_cross_section(cc.cross_section)
         if not xs.name:
-            raise ValueError("You need to define cross_section name")
+            msg = "You need to define cross_section name"
+            raise ValueError(msg)
         script += f"""{xs.name}_pin = input{cc.pin_layer}
 {xs.name}_pin = {xs.name}_pin.merged\n
 {xs.name}_pin2 = {xs.name}_pin.rectangles.without_area({xs.width} * {2 * cc.pin_length})"""
@@ -99,10 +106,11 @@ if __name__ == "__main__":
     nm = 1e-3
 
     connectivity_checks = [
-        # ConnectivyCheck(cross_section="strip", pin_length=1 * nm, pin_layer=(1, 10))
         ConnectivyCheck(
-            cross_section="strip_auto_widen", pin_length=1 * nm, pin_layer=(1, 10)
-        )
+            cross_section="strip_auto_widen",
+            pin_length=1 * nm,
+            pin_layer=(1, 10),
+        ),
     ]
     rules = [
         write_connectivity_checks_per_section(connectivity_checks=connectivity_checks),
@@ -110,7 +118,7 @@ if __name__ == "__main__":
     ]
 
     rules = [
-        write_connectivity_checks(pin_widths=[0.5, 0.9, 0.45], pin_layer=LAYER.PORT)
+        write_connectivity_checks(pin_widths=[0.5, 0.9, 0.45], pin_layer=LAYER.PORT),
     ]
     script = write_drc_deck_macro(rules=rules, layers=None)
     print(script)

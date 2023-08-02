@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import ndarray
 
@@ -11,11 +13,13 @@ from gdsfactory.routing.manhattan import (
     _is_vertical,
     remove_flat_angles,
 )
-from gdsfactory.typings import (
-    ComponentSpec,
-    CrossSectionSpec,
-    MultiCrossSectionAngleSpec,
-)
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import (
+        ComponentSpec,
+        CrossSectionSpec,
+        MultiCrossSectionAngleSpec,
+    )
 
 
 def path_length_matched_points(
@@ -31,6 +35,7 @@ def path_length_matched_points(
     """Several types of paths won't match correctly. We do not try to handle all the corner cases here. You will need to modify the input list of waypoints in some cases.
 
     Args:
+    ----
         list_of_waypoints:  [[p1, p2, p3,...], [q1, q2, q3,...], ...]
             the number of turns have to be identical
             (usually means same number of points.
@@ -79,8 +84,9 @@ def path_length_matched_points_modify_segment(
     extra_length,
 ):
     if not isinstance(list_of_waypoints, list):
+        msg = f"list_of_waypoints should be a list, got {type(list_of_waypoints)}"
         raise ValueError(
-            f"list_of_waypoints should be a list, got {type(list_of_waypoints)}"
+            msg,
         )
 
     list_of_waypoints = [
@@ -97,8 +103,9 @@ def path_length_matched_points_modify_segment(
     # The paths have to have the same number of turns, otherwise this algo
     # cannot path length match
     if min(nb_turns) != max(nb_turns):
+        msg = f"Number of turns in paths have to be identical got {nb_turns}"
         raise ValueError(
-            f"Number of turns in paths have to be identical got {nb_turns}"
+            msg,
         )
 
     if modify_segment_i < 0:
@@ -171,7 +178,8 @@ def path_length_matched_points_add_waypoints(
         cross_section: factory
         **kwargs: cross_section settings
 
-    returns:
+    Returns:
+    -------
         another list of waypoints where:
             - the path_length of each waypoints list are identical
             - the number of turns are identical
@@ -193,8 +201,9 @@ def path_length_matched_points_add_waypoints(
 
     """
     if not isinstance(list_of_waypoints, list):
+        msg = f"list_of_waypoints should be a list, got {type(list_of_waypoints)}"
         raise ValueError(
-            f"list_of_waypoints should be a list, got {type(list_of_waypoints)}"
+            msg,
         )
     list_of_waypoints = [
         remove_flat_angles(waypoints) for waypoints in list_of_waypoints
@@ -209,8 +218,9 @@ def path_length_matched_points_add_waypoints(
     # The paths have to have the same number of turns, otherwise cannot path-length
     # match with this algorithm
     if min(nb_turns) != max(nb_turns):
+        msg = f"Number of turns in paths have to be identical got {nb_turns}"
         raise ValueError(
-            f"Number of turns in paths have to be identical got {nb_turns}"
+            msg,
         )
 
     # Get the points for the segment we need to modify
@@ -242,7 +252,7 @@ def path_length_matched_points_add_waypoints(
             dy = sy * 2 * a
 
             # First new point to insert
-            q0 = p_s1 + (0, -2 * nb_loops * dy)
+            q0 = (*p_s1, 0, -2 * nb_loops * dy)
 
             # Sequence of displacements to apply
             seq = [(dx, 0), (0, dy), (-dx, 0), (0, dy)] * nb_loops
@@ -256,7 +266,7 @@ def path_length_matched_points_add_waypoints(
             dy = sy * (2 * a + dL)
 
             # First new point to insert
-            q0 = p_s1 + (-2 * dx * nb_loops, 0)
+            q0 = (*p_s1, -2 * dx * nb_loops, 0)
 
             # Sequence of displacements to apply
             seq = [(0, dy), (dx, 0), (0, -dy), (dx, 0)] * nb_loops
@@ -276,7 +286,7 @@ def path_length_matched_points_add_waypoints(
                 waypoints[: modify_segment_i - 1],
                 inserted_points,
                 waypoints[modify_segment_i - 1 :],
-            ]
+            ],
         )
         list_new_waypoints += [new_points]
 

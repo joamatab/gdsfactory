@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.straight import straight as straight_function
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec
 
 
 @cell
@@ -22,6 +26,7 @@ def mzi_arm(
     """Mzi.
 
     Args:
+    ----
         length_y_left: vertical length.
         length_y_right: vertical length.
         length_x: horizontal length.

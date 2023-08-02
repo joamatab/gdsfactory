@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 diagram = r"""
 
@@ -41,6 +45,7 @@ def delay_snake_sbend(
     Input port faces west and output port faces east.
 
     Args:
+    ----
         length: total length.
         length1: first straight section length in um.
         length3: third straight section length in um.
@@ -74,10 +79,17 @@ def delay_snake_sbend(
 
     bend180_radius = (radius + waveguide_spacing) / 2
     bend = gf.get_component(
-        bend, radius=bend180_radius, angle=180, cross_section=cross_section, **kwargs
+        bend,
+        radius=bend180_radius,
+        angle=180,
+        cross_section=cross_section,
+        **kwargs,
     )
     sbend = gf.get_component(
-        sbend, size=(sbend_xsize, radius), cross_section=cross_section, **kwargs
+        sbend,
+        size=(sbend_xsize, radius),
+        cross_section=cross_section,
+        **kwargs,
     )
 
     b1 = c << bend
@@ -94,7 +106,7 @@ def delay_snake_sbend(
     if length2 < 0:
         raise ValueError(
             f"length2 = {length2} < 0. You need to reduce length1 = {length1} "
-            f"or length3 = {length3} or increase length = {length}\n" + diagram
+            f"or length3 = {length3} or increase length = {length}\n" + diagram,
         )
 
     straight1 = straight(length=length1, cross_section=cross_section, **kwargs)
@@ -135,10 +147,5 @@ def test_delay_snake_sbend_length() -> None:
 
 if __name__ == "__main__":
     c = test_delay_snake_sbend_length()
-    # c = gf.grid(
-    #     [
-    #         delay_snake_sbend(length=length, cross_section="rib")
     #         for length in [500, 3000]
-    #     ]
-    # )
     c.show(show_ports=True)

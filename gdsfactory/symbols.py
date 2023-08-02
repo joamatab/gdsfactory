@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import functools
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdstk
 from pydantic import validate_arguments
 
 from gdsfactory.cell import _F, cell_without_validator
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpecs
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import LayerSpecs
 
 
 def symbol(func: _F, *args, **kwargs) -> _F:
@@ -29,6 +33,7 @@ def symbol(func: _F, *args, **kwargs) -> _F:
     - adds Component.info with default, changed and full component settings.
 
     Keyword Args:
+    ------------
         autoname (bool): if True renames component based on args and kwargs.
         name (str): Optional (ignored when autoname=True).
         cache (bool): returns component from the cache if it already exists.
@@ -43,7 +48,8 @@ def symbol(func: _F, *args, **kwargs) -> _F:
         prefix = f"SYMBOL_{func.__name__}"
         kwargs["prefix"] = prefix
     _wrapped = functools.partial(
-        cell_without_validator(validate_arguments(func)), **kwargs
+        cell_without_validator(validate_arguments(func)),
+        **kwargs,
     )
     _wrapped._symbol = True
     return _wrapped
@@ -53,18 +59,19 @@ def symbol_from_cell(func: _F, to_symbol: Callable[[Component, ...], Component])
     """Creates a symbol function from a component function.
 
     Args:
+    ----
         func: the cell function
         to_symbol: the function that transforms the output of the cell function into a symbol
 
     Returns:
+    -------
         a symbol function
     """
 
     @functools.wraps(func)
     def _symbol(*args, **kwargs):
         component = func(*args, **kwargs)
-        symbol = to_symbol(component, prefix=f"SYMBOL_{func.__name__}")
-        return symbol
+        return to_symbol(component, prefix=f"SYMBOL_{func.__name__}")
 
     _symbol._symbol = True
     return _symbol
@@ -72,16 +79,19 @@ def symbol_from_cell(func: _F, to_symbol: Callable[[Component, ...], Component])
 
 @symbol
 def floorplan_with_block_letters(
-    component: Component, copy_layers: LayerSpecs = ("WG",)
+    component: Component,
+    copy_layers: LayerSpecs = ("WG",),
 ) -> Component:
     """Returns symbol with same floorplan as component layout, function name \
         and optionally shapes on layers copied from the original layout.
 
     Args:
+    ----
         component: the layout component.
         copy_layers: if specified, copies layers from the layout into the symbol.
 
     Returns:
+    -------
         A component representing the symbol.
 
     """
@@ -111,7 +121,10 @@ def floorplan_with_block_letters(
     scaling = min(w_scaling, h_scaling)
     text_size = text_init_size * scaling
     text_component = text(
-        component.settings.function_name, size=text_size, layer=(2, 0), justify="center"
+        component.settings.function_name,
+        size=text_size,
+        layer=(2, 0),
+        justify="center",
     )
 
     text = sym << text_component

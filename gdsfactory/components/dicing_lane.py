@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.triangles import triangle
-from gdsfactory.typings import ComponentSpec, Float2, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Float2, LayerSpec
 
 triangle_metal = partial(triangle, layer="M3", xtop=2)
 
@@ -20,6 +23,7 @@ def dicing_lane(
     """Dicing lane with triangular markers on both sides.
 
     Args:
+    ----
         size: (tuple) Width and height of rectangle.
         marker: function to generate the dicing lane markers.
         layer_dicing: Specific layer to put polygon geometry on.

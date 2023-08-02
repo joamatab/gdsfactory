@@ -10,18 +10,25 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
 def component_with_port(
-    length: float = 5.0, width: float = 0.5, layer: LayerSpec = "WG"
+    length: float = 5.0,
+    width: float = 0.5,
+    layer: LayerSpec = "WG",
 ) -> Component:
     """Returns a component with one port on the west side.
 
     Args:
+    ----
         length: in um.
         width: waveguide width in um.
         layer: layer.

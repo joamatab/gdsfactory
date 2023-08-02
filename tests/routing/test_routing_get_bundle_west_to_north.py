@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from functools import partial
-
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.port import port_array
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_get_bundle_west_to_north(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
 
@@ -43,17 +46,24 @@ def test_get_bundle_west_to_north(
 
 
 def test_get_bundle_west_to_north2(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     layer = (1, 0)
 
     lengths = {}
     c = gf.Component("test_get_bundle_west_to_north2")
     pbottom_facing_north = port_array(
-        center=(0, 0), orientation=90, pitch=(30, 0), layer=layer
+        center=(0, 0),
+        orientation=90,
+        pitch=(30, 0),
+        layer=layer,
     )
     ptop_facing_west = port_array(
-        center=(100, 100), orientation=180, pitch=(0, -30), layer=layer
+        center=(100, 100),
+        orientation=180,
+        pitch=(0, -30),
+        layer=layer,
     )
 
     routes = gf.routing.get_bundle(
@@ -72,4 +82,3 @@ def test_get_bundle_west_to_north2(
 
 if __name__ == "__main__":
     test_get_bundle_west_to_north(None, check=False)
-    # test_get_bundle_west_to_north2(None, check=False)

@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import arctan2, degrees, isclose
 
-from gdsfactory.component import Component
 from gdsfactory.port import Port, read_port_markers, sort_ports_clockwise
 from gdsfactory.snap import snap_to_grid
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 def add_ports_from_markers_square(
@@ -27,6 +30,7 @@ def add_ports_from_markers_square(
     """Add ports from square markers at the port center in port_layer.
 
     Args:
+    ----
         component: to read polygons from and to write ports to.
         pin_layer: for port markers.
         port_layer: for the new created port.
@@ -86,6 +90,7 @@ def add_ports_from_markers_center(
     """Add ports from pins guessing port orientation from component boundary.
 
     Args:
+    ----
         component: to read polygons from and to write ports to.
         pin_layer: GDS layer for maker [int, int].
         port_layer: for the new created port.
@@ -230,7 +235,8 @@ def add_ports_from_markers_center(
             x = pxmin if inside else x
 
         if orientation == -1:
-            raise ValueError(f"Unable to detector port at ({x}, {y})")
+            msg = f"Unable to detector port at ({x}, {y})"
+            raise ValueError(msg)
 
         x = snap_to_grid(x)
         y = snap_to_grid(y)
@@ -252,9 +258,9 @@ def add_ports_from_markers_center(
     for port_name, port in ports.items():
         if port_name in component.ports:
             component_ports = list(component.ports.keys())
+            msg = f"port {port_name!r} already in {component_ports}. You can pass a port_name_prefix to add it with a different name."
             raise ValueError(
-                f"port {port_name!r} already in {component_ports}. "
-                "You can pass a port_name_prefix to add it with a different name."
+                msg,
             )
 
         else:
@@ -286,6 +292,7 @@ def add_ports_from_labels(
     because labels do not have width, you have to manually specify the ports width
 
     Args:
+    ----
         component: to read polygons from and to write ports to.
         port_width: for ports.
         port_layer: for the new created port.
@@ -332,9 +339,9 @@ def add_ports_from_labels(
 
         if fail_on_duplicates and port_name in component.ports:
             component_ports = list(component.ports.keys())
+            msg = f"port {port_name!r} already in {component_ports}. You can pass a port_name_prefix to add it with a different name."
             raise ValueError(
-                f"port {port_name!r} already in {component_ports}. "
-                "You can pass a port_name_prefix to add it with a different name."
+                msg,
             )
         if get_name_from_label and port_name in component.ports:
             port_name_to_index[label.text] = (
@@ -367,6 +374,7 @@ def add_ports_from_siepic_pins(
     Looks for label, path pairs.
 
     Args:
+    ----
         component: component.
         pin_layer_optical: layer for optical pins.
         port_layer_optical: layer for optical ports.
@@ -405,7 +413,7 @@ def add_ports_from_siepic_pins(
                 labels.pop(i)
         if label is None:
             print(
-                f"Warning: label not found for path: in center={center} p1={p1} p2={p2}"
+                f"Warning: label not found for path: in center={center} p1={p1} p2={p2}",
             )
             continue
         if pin_layer_optical in path_layers:

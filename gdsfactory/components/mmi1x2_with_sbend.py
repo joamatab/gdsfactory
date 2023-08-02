@@ -17,6 +17,7 @@ def mmi1x2_with_sbend(
     https://opg.optica.org/oe/fulltext.cfm?uri=oe-21-1-1310&id=248418
 
     Args:
+    ----
         with_sbend: add sbend.
         s_bend: S-bend spec.
         cross_section: spec.
@@ -28,7 +29,7 @@ def mmi1x2_with_sbend(
         # Note: Custom width/offset functions MUST be vectorizable--you must be able
         # to call them with an array input like my_custom_width_fun([0, 0.1, 0.2, 0.3, 0.4])
         widths = np.array(
-            [0.5, 0.5, 0.6, 0.7, 0.9, 1.26, 1.4, 1.4, 1.4, 1.4, 1.31, 1.2, 1.2]
+            [0.5, 0.5, 0.6, 0.7, 0.9, 1.26, 1.4, 1.4, 1.4, 1.4, 1.31, 1.2, 1.2],
         )
         xold = np.linspace(0, 1, num=len(widths))
         xnew = np.linspace(0, 1, num=100)
@@ -44,7 +45,9 @@ def mmi1x2_with_sbend(
 
     # Add "stub" straight sections for ports
     straight = gf.components.straight(
-        length=0.25, cross_section=cross_section, add_pins=None
+        length=0.25,
+        cross_section=cross_section,
+        add_pins=None,
     )
     sl = c << straight
     sl.center = (-0.125, 0)
@@ -84,8 +87,6 @@ def mmi1x2_with_sbend(
 
 
 if __name__ == "__main__":
-    # c = mmi1x2_with_sbend(with_sbend=False)
-    # c = mmi1x2_with_sbend(with_sbend=True)
     c = mmi1x2_with_sbend(
         with_sbend=True,
         cross_section=dict(cross_section="strip", settings=dict(layer=(2, 0))),

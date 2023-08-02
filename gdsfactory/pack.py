@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from pydantic import validate_arguments
@@ -15,7 +15,9 @@ from pydantic import validate_arguments
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.name import get_name_short
-from gdsfactory.typings import Anchor, ComponentSpec, Float2, Number
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Anchor, ComponentSpec, Float2, Number
 
 
 def _pack_single_bin(
@@ -32,6 +34,7 @@ def _pack_single_bin(
     reaches `max_size`.
 
     Args:
+    ----
         rect_dict: dict of rectangles {id: (w, h)} to pack.
         aspect_ratio: x, y.
         max_size: tuple of max X, Y size.
@@ -39,6 +42,7 @@ def _pack_single_bin(
         density: of packing, closer to 1 packs tighter (more compute heavy).
 
     Returns:
+    -------
         packed rectangles dict {id:(x,y,w,h)}.
         dict of remaining unpacked rectangles.
 
@@ -115,6 +119,7 @@ def pack(
     """Pack a list of components into as few Components as possible.
 
     Args:
+    ----
         component_list: list or tuple.
         spacing: Minimum distance between adjacent shapes.
         aspect_ratio: (width, height) ratio of the rectangular bin.
@@ -158,9 +163,9 @@ def pack(
 
     """
     if density < 1.01:
+        msg = "pack() `density` argument is too small. The density argument must be >= 1.01"
         raise ValueError(
-            "pack() `density` argument is too small. "
-            "The density argument must be >= 1.01"
+            msg,
         )
 
     # Sanitize max_size variable
@@ -176,10 +181,9 @@ def pack(
         w, h = (D.size + spacing) / precision
         w, h = int(w), int(h)
         if (w > max_size[0]) or (h > max_size[1]):
+            msg = f"pack() failed because Component {D.name!r} has x or y dimension larger than `max_size` and cannot be packed.\nsize = {w * precision, h * precision}, max_size = {max_size * precision}"
             raise ValueError(
-                f"pack() failed because Component {D.name!r} has x or y "
-                "dimension larger than `max_size` and cannot be packed.\n"
-                f"size = {w*precision, h*precision}, max_size = {max_size*precision}"
+                msg,
             )
         rect_dict[n] = (w, h)
 
@@ -231,7 +235,7 @@ def pack(
                     if text_rotation:
                         label.rotate(text_rotation)
                     label.move(
-                        np.array(text_offset) + getattr(d.size_info, text_anchor)
+                        np.array(text_offset) + getattr(d.size_info, text_anchor),
                     )
 
         components_packed_list.append(packed)
@@ -278,7 +282,6 @@ def test_pack_with_settings() -> None:
         component_list,  # Must be a list or tuple of Components
         spacing=1.25,  # Minimum distance between adjacent shapes
         aspect_ratio=(2, 1),  # (width, height) ratio of the rectangular bin
-        # max_size=(None, None),  # Limits the size into which the shapes will be packed
         max_size=(20, 20),  # Limits the size into which the shapes will be packed
         density=1.05,  # Values closer to 1 pack tighter but require more computation
         sort_by_area=True,  # Pre-sorts the shapes by area
@@ -288,12 +291,6 @@ def test_pack_with_settings() -> None:
 
 
 if __name__ == "__main__":
-    # test_pack()
-
-    # c = test_pack_with_settings()
-    # c = test_pack()
-    # c.show(show_ports=True)
-    # c.pprint()
     # c.("mask.gds")
 
     p = pack(

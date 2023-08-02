@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -18,6 +21,7 @@ def triangle(
     r"""Return triangle.
 
     Args:
+    ----
         x: base xsize.
         xtop: top xsize.
         y: ysize.
@@ -48,9 +52,11 @@ def triangle2(spacing: float = 3, **kwargs):
     r"""Return 2 triangles (bot, top).
 
     Args:
+    ----
         spacing: between top and bottom.
 
     Keyword Args:
+    ------------
         x: base xsize.
         xtop: top xsize.
         y: ysize.
@@ -90,6 +96,7 @@ def triangle4(**kwargs):
     r"""Return 4 triangles.
 
     Keyword Args:
+    ------------
         x: base xsize.
         xtop: top xsize.
         y: ysize.
@@ -128,6 +135,5 @@ triangle2_thin = partial(triangle2, xtop=0.2, x=2, y=5)
 triangle4_thin = partial(triangle2, xtop=0.2, x=2, y=5)
 
 if __name__ == "__main__":
-    # cc = triangle(xtop=5, ybot=5)
     cc = triangle4_thin(spacing=0)
     cc.show(show_ports=True)

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.routing.manhattan import round_corners
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 diagram = """
 
@@ -36,6 +40,7 @@ def delay_snake(
     Input faces west output faces east.
 
     Args:
+    ----
         length: delay length in um.
         L0: initial xoffset in um.
         n: number of loops.
@@ -63,7 +68,7 @@ def delay_snake(
     if L2 < 0:
         raise ValueError(
             "Snake is too short: either reduce L0, increase "
-            "the total length, or decrease n \n" + diagram
+            "the total length, or decrease n \n" + diagram,
         )
 
     y = 0
@@ -78,7 +83,10 @@ def delay_snake(
 
     c = gf.Component()
     route = round_corners(
-        points=path, bend=bend90, cross_section=cross_section, **kwargs
+        points=path,
+        bend=bend90,
+        cross_section=cross_section,
+        **kwargs,
     )
     c.add(route.references)
     c.add_port("o1", port=route.ports[0])
@@ -95,5 +103,4 @@ def test_delay_snake_length() -> None:
 
 if __name__ == "__main__":
     c = test_delay_snake_length()
-    # c = delay_snake(cross_section="strip_auto_widen", auto_widen_minimum_length=50)
     c.show(show_ports=True)

@@ -1,11 +1,15 @@
 """Add loopback reference for a grating coupler array."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import ComponentReference
-from gdsfactory.port import Port
 from gdsfactory.routing.manhattan import round_corners
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import ComponentReference
+    from gdsfactory.port import Port
+    from gdsfactory.typings import ComponentSpec
 
 
 def add_loopback(
@@ -26,6 +30,7 @@ def add_loopback(
     Output grating generated on the right of port2
 
     Args:
+    ----
         port1: start port.
         port2: end port.
         grating: fiber coupler.
@@ -92,12 +97,12 @@ def add_loopback(
 
     points = [
         p0,
-        p0 + (0, a),
-        p0 + (b, a),
-        p0 + (b, south_waveguide_spacing),
-        p1 + (-b, south_waveguide_spacing),
-        p1 + (-b, a),
-        p1 + (0, a),
+        (*p0, 0, a),
+        (*p0, b, a),
+        (*p0, b, south_waveguide_spacing),
+        (*p1, -b, south_waveguide_spacing),
+        (*p1, -b, a),
+        (*p1, 0, a),
         p1,
     ]
     route = round_corners(points=points, bend=bend90, **kwargs)
@@ -115,6 +120,6 @@ if __name__ == "__main__":
             wg.ports["o2"],
             grating=gf.components.grating_coupler_te,
             inside=False,
-        )
+        ),
     )
     c.show(show_ports=True)

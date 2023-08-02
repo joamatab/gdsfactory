@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 diagram = """
        | length0 | length1 |
@@ -34,6 +37,7 @@ def delay_snake2(
     Input faces west output faces east.
 
     Args:
+    ----
         length: total length.
         length0: start length.
         length2: end length.
@@ -66,13 +70,15 @@ def delay_snake2(
         raise ValueError(
             "Snake is too short: either reduce length0, length2, "
             f"increase the total length, or decrease the number of loops (n = {n}). "
-            f"length1 = {int(length1)}, delta_length = {int(delta_length)}\n" + diagram
+            f"length1 = {int(length1)}, delta_length = {int(delta_length)}\n" + diagram,
         )
 
     s1 = gf.components.straight(length=length1, cross_section=cross_section, **kwargs)
     s2 = gf.components.straight(length=length2, cross_section=cross_section, **kwargs)
     sd = gf.components.straight(
-        cross_section=cross_section, length=delta_length, **kwargs
+        cross_section=cross_section,
+        length=delta_length,
+        **kwargs,
     )
 
     symbol_to_component = {
@@ -87,7 +93,8 @@ def delay_snake2(
     sequence = sequence[:-1]
     sequence += "."
     return gf.components.component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component
+        sequence=sequence,
+        symbol_to_component=symbol_to_component,
     )
 
 
@@ -103,9 +110,5 @@ def test_length_delay_snake2() -> Component:
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # c = test_length_delay_snake2()
-    # c.show(show_ports=True)
-    # c = delay_snake2(n=2, length=500, layer=(2, 0), length0=100)
-    # c = delay_snake2()
     c = gf.grid([gf.c.delay_snake, delay_snake2(length0=100), gf.c.delay_snake3])
     c.show(show_ports=True)

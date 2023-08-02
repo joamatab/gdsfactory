@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from pprint import pprint
+from typing import TYPE_CHECKING
 
 import jsondiff
 import numpy as np
 import pytest
 from omegaconf import OmegaConf
-from pytest_regressions.data_regression import DataRegressionFixture
 
 from gdsfactory.difftest import difftest
 from gdsfactory.read.from_yaml import from_yaml, sample_doe_function, sample_mmis
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 sample_connections = """
 name: sample_connections
@@ -503,18 +506,13 @@ placements:
 
 yaml_strings = dict(
     yaml_anchor=yaml_anchor,
-    # yaml_fail=yaml_fail,
-    # sample_regex_connections_backwards=sample_regex_connections_backwards,
-    # sample_regex_connections=sample_regex_connections,
     sample_docstring=sample_docstring,
     sample_waypoints=sample_waypoints,
     sample_different_link_factory=sample_different_link_factory,
-    # sample_different_factory=sample_different_factory,
     sample_mirror_simple=sample_mirror_simple,
     sample_connections=sample_connections,
     sample_mmis=sample_mmis,
     sample_doe=sample_doe,
-    # sample_doe_grid=sample_doe_grid,
     sample_doe_function=sample_doe_function,
     sample_rotation=sample_rotation,
 )
@@ -530,7 +528,9 @@ def test_gds(yaml_key: str, data_regression: DataRegressionFixture) -> None:
 
 @pytest.mark.parametrize("yaml_key", yaml_strings.keys())
 def test_settings(
-    yaml_key: str, data_regression: DataRegressionFixture, check: bool = True
+    yaml_key: str,
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     """Avoid regressions when exporting settings."""
     yaml_string = yaml_strings[yaml_key]
@@ -551,6 +551,7 @@ def test_netlists(
     Component -> netlist.
 
     Args:
+    ----
         yaml_key: to test.
         data_regression: for regression test.
         check: False, skips test.
@@ -564,19 +565,16 @@ def test_netlists(
 
     yaml_str = OmegaConf.to_yaml(n, sort_keys=True)
 
-    # print(yaml_str)
     c2 = from_yaml(yaml_str, name=c.name)
     n2 = c2.get_netlist()
-    # pprint(d)
     d = jsondiff.diff(n, n2)
     assert len(d) == 0, pprint(d)
 
 
 def _demo_netlist() -> None:
-    """path on the route."""
+    """Path on the route."""
     import gdsfactory as gf
 
-    # c = from_yaml(sample_2x2_connections)
     c = from_yaml(sample_waypoints)
     c = from_yaml(sample_different_factory)
     c.show(show_ports=True)
@@ -598,21 +596,4 @@ def test_ref_names_retained_on_copy() -> None:
 
 
 if __name__ == "__main__":
-    # test_connections_different_factory()
-    # test_sample()
     test_connections()
-    # test_netlists("sample_mmis", None, False)
-    # yaml_key = "sample_doe_function"
-    # yaml_key = "sample_mmis"
-    # yaml_key = "yaml_anchor"
-    # yaml_key = "sample_doe_function"
-    # yaml_string = yaml_strings[yaml_key]
-    # c = from_yaml(yaml_string)
-    # print(sorted([i.name for i in c.get_dependencies(True)]))
-    # n = c.get_netlist()
-    # yaml_str = OmegaConf.to_yaml(n, sort_keys=True)
-    # c2 = from_yaml(yaml_str)
-    # n2 = c2.get_netlist()
-    # d = jsondiff.diff(n, n2)
-    # pprint(d)
-    # c.show()

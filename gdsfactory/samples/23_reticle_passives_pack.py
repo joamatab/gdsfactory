@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.samples.big_device import big_device
-from gdsfactory.typings import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Component
 
 debug = False
 nlabels = 12
@@ -15,8 +19,7 @@ def mzi_te(**kwargs) -> Component:
     gc = gf.c.grating_coupler_elliptical_tm()
     c = gf.c.mzi_phase_shifter_top_heater_metal(delta_length=40)
     c = gf.routing.add_fiber_array(c, grating_coupler=gc, **kwargs)
-    c = gf.routing.add_electrical_pads_shortest(c)
-    return c
+    return gf.routing.add_electrical_pads_shortest(c)
 
 
 def spirals() -> Component:
@@ -32,12 +35,11 @@ def demo_pack() -> Component:
     """Sample reticle."""
     c = gf.Component()
     c << gf.c.rectangle(size=(22e3, 22e3), layer=gf.LAYER.FLOORPLAN)
-    components = [mzi_te()] + [spirals()] + [gf.routing.add_fiber_array(big_device())]
+    components = [mzi_te(), spirals(), gf.routing.add_fiber_array(big_device())]
     c << gf.pack(components)[0]
     return c
 
 
 if __name__ == "__main__":
-    # c = spirals()
     c = demo_pack()
     c.show()

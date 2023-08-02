@@ -1,23 +1,32 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from gdsfactory.components.bend_s import bend_s
-from gdsfactory.port import Port
 from gdsfactory.routing.sort_ports import sort_ports as sort_ports_function
 from gdsfactory.typings import Route
 
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
+
 
 def get_bundle_sbend(
-    ports1: Port, ports2: Port, sort_ports: bool = True, **kwargs
+    ports1: Port,
+    ports2: Port,
+    sort_ports: bool = True,
+    **kwargs,
 ) -> list[Route]:
     """Returns a list of routes from ports1 to ports2.
 
     Args:
+    ----
         ports1: start ports.
         ports2: end ports.
         sort_ports: sort ports.
         kwargs: cross_section settings.
 
     Returns:
+    -------
         list of routes.
 
     """
@@ -37,7 +46,7 @@ def get_bundle_sbend(
                 references=[sbend],
                 ports=tuple(sbend.get_ports_list()),
                 length=bend.info["length"],
-            )
+            ),
         )
 
     return routes
@@ -56,13 +65,21 @@ if __name__ == "__main__":
     layer = (1, 0)
     right_ports = [
         gf.Port(
-            f"R_{i}", center=(0, ys_right[i]), width=0.5, orientation=180, layer=layer
+            f"R_{i}",
+            center=(0, ys_right[i]),
+            width=0.5,
+            orientation=180,
+            layer=layer,
         )
         for i in range(N)
     ]
     left_ports = [
         gf.Port(
-            f"L_{i}", center=(-50, ys_left[i]), width=0.5, orientation=0, layer=layer
+            f"L_{i}",
+            center=(-50, ys_left[i]),
+            width=0.5,
+            orientation=0,
+            layer=layer,
         )
         for i in range(N)
     ]

@@ -4,6 +4,8 @@ Adapted from PHIDL https://github.com/amccaugh/phidl/ by Adam McCaughan
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from gdsfactory.cell import cell
@@ -11,7 +13,9 @@ from gdsfactory.component import Component
 from gdsfactory.component_layout import Group
 from gdsfactory.components.text_rectangular import text_rectangular
 from gdsfactory.components.triangles import triangle
-from gdsfactory.typings import Anchor, ComponentSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Anchor, ComponentSpec, Float2
 
 
 @cell
@@ -33,6 +37,7 @@ def grid(
     """Returns Component with a 1D or 2D grid of components.
 
     Args:
+    ----
         components: Iterable to be placed onto a grid. (can be 1D or 2D).
         spacing: between adjacent elements on the grid, can be a tuple for
             different distances in height and width.
@@ -51,6 +56,7 @@ def grid(
         add_ports_suffix: adds port names with suffix.
 
     Returns:
+    -------
         Component containing components grid.
 
     .. plot::
@@ -75,11 +81,12 @@ def grid(
 
     # Check arguments
     if device_array.ndim not in (1, 2):
-        raise ValueError("grid() The components needs to be 1D or 2D.")
+        msg = "grid() The components needs to be 1D or 2D."
+        raise ValueError(msg)
     if shape is not None and len(shape) != 2:
+        msg = f"grid() shape argument must be None or have a length of 2, for example shape=(4,6), got {shape}"
         raise ValueError(
-            "grid() shape argument must be None or"
-            f" have a length of 2, for example shape=(4,6), got {shape}"
+            msg,
         )
 
     # Check that shape is valid and reshape array if needed
@@ -88,8 +95,9 @@ def grid(
     elif (shape is None) and (device_array.ndim == 1):
         shape = (device_array.size, -1)
     elif 0 < shape[0] * shape[1] < device_array.size:
+        msg = f"Shape {shape} is too small for all {device_array.size} components"
         raise ValueError(
-            f"Shape {shape} is too small for all {device_array.size} components"
+            msg,
         )
     else:
         if np.min(shape) == -1:
@@ -139,10 +147,16 @@ def grid(
 
     # Distribute rows and columns
     Group(cols).distribute(
-        direction="x", spacing=spacing[0], separation=separation, edge=edge_x
+        direction="x",
+        spacing=spacing[0],
+        separation=separation,
+        edge=edge_x,
     )
     Group(rows[::-1]).distribute(
-        direction="y", spacing=spacing[1], separation=separation, edge=edge_y
+        direction="y",
+        spacing=spacing[1],
+        separation=separation,
+        edge=edge_y,
     )
 
     for prefix, ref in prefix_to_ref.items():
@@ -171,6 +185,7 @@ def grid_with_text(
     """Returns Component with 1D or 2D grid of components with text labels.
 
     Args:
+    ----
         components: Iterable to be placed onto a grid. (can be 1D or 2D).
         text_prefix: for labels. For example. 'A' will produce 'A1', 'A2', ...
         text_offsets: relative to component anchor. Defaults to center.
@@ -180,7 +195,8 @@ def grid_with_text(
         text: function to add text labels.
         labels: optional, specify a tuple of labels rather than using a text_prefix.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         spacing: between adjacent elements on the grid, can be a tuple for
           different distances in height and width.
         separation: If True, guarantees elements are separated with fixed spacing
@@ -250,28 +266,11 @@ def test_grid() -> None:
         v_mirror=False,
         spacing=(10, 10),
     )
-    # assert np.isclose(c.ports["1_1_o1"].center[0], 13.0), c.ports["1_1_o1"].center[0]
     assert c
 
 
 if __name__ == "__main__":
     c = test_grid()
-    # import gdsfactory as gf
 
-    # components = [gf.components.rectangle(size=(i, i)) for i in range(40, 66, 5)]
-    # components = [gf.components.rectangle(size=(i, i)) for i in range(40, 66, 5)]
-    # c = [gf.components.triangle(x=i) for i in range(1, 10)]
-    # print(len(c))
-
-    # c = [gf.components.straight(length=i) for i in range(1, 5)]
-    # c = grid(
     #     c,
-    #     shape=(2, 2),
-    #     rotation=0,
-    #     h_mirror=False,
-    #     v_mirror=False,
-    #     spacing=(10, 10),
-    #     # text_offsets=((0, 100), (0, -100)),
-    #     # text_anchors=("nc", "sc"),
-    # )
     c.show(show_ports=True)

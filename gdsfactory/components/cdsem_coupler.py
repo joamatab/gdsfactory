@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.components.coupler_straight import coupler_straight
 from gdsfactory.components.text_rectangular import text_rectangular
 from gdsfactory.grid import grid
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 text_rectangular_mini = partial(text_rectangular, size=1)
 
@@ -26,6 +29,7 @@ def cdsem_coupler(
     """Returns 2 coupled waveguides gap sweep.
 
     Args:
+    ----
         width: for the waveguide.
         length: for the line.
         gaps: list of gaps for the sweep.

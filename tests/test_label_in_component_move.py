@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -34,6 +38,3 @@ def test_move_int_with_float() -> None:
 
 if __name__ == "__main__":
     test_move_float_with_int()
-    # test_move_int_with_float()
-    # c = component_with_label()
-    # c.x = 10.0

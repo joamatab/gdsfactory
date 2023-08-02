@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.grating_coupler_elliptical import grating_tooth_points
 from gdsfactory.geometry.functions import DEG2RAD
-from gdsfactory.typings import CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec, LayerSpec
 
 
 @gf.cell
@@ -35,6 +38,7 @@ def grating_coupler_elliptical_trenches(
     Others define the slab that they keep (see grating_coupler_elliptical)
 
     Args:
+    ----
         polarization: 'te' or 'tm'.
         taper_length: taper length from straight I/O.
         taper_angle: grating flare angle.
@@ -96,7 +100,6 @@ def grating_coupler_elliptical_trenches(
     p_taper = p_start - 1
     p_taper_eff = p_taper
     a_taper = a1 * p_taper_eff
-    # b_taper = b1 * p_taper_eff
     x_taper = x1 * p_taper_eff
     x_output = a_taper + x_taper - taper_length + grating_line_width / 2
 
@@ -142,7 +145,9 @@ def grating_coupler_elliptical_trenches(
 
 
 grating_coupler_te = partial(
-    grating_coupler_elliptical_trenches, polarization="te", taper_angle=35
+    grating_coupler_elliptical_trenches,
+    polarization="te",
+    taper_angle=35,
 )
 
 grating_coupler_tm = partial(
@@ -155,10 +160,4 @@ grating_coupler_tm = partial(
 
 if __name__ == "__main__":
     c = grating_coupler_te()
-    # c = grating_coupler_elliptical_trenches(polarization="TE")
-    # print(c.polarization)
-    # c = grating_coupler_te(end_straight_length=10)
-    # c = grating_coupler_tm()
-    # print(c.ports.keys())
-    # c = gf.routing.add_fiber_array(grating_coupler=grating_coupler_elliptical_trenches)
     c.show(show_ports=True)

@@ -1,12 +1,12 @@
 try:
     import kfactory as kf
     from kfactory import kdb
-except ImportError as e:
+except ImportError:
     print(
         "You can install `pip install gdsfactory[kfactory]` for using maskprep. "
-        "And make sure you use python >= 3.10"
+        "And make sure you use python >= 3.10",
     )
-    raise e
+    raise
 
 
 from gdsfactory.typings import Dict, Layer, LayerSpecs, PathType, Tuple
@@ -38,20 +38,22 @@ class Region(kdb.Region):
         return size(self, offset)
 
     def __add__(self, element):
-        if isinstance(element, (float, int)):
+        if isinstance(element, float | int):
             return size(self, element)
 
         elif isinstance(element, kdb.Region):
             return boolean_or(self, element)
         else:
-            raise ValueError(f"Cannot add type {type(element)} to region")
+            msg = f"Cannot add type {type(element)} to region"
+            raise ValueError(msg)
 
     def __sub__(self, element):
-        if isinstance(element, (float, int)):
+        if isinstance(element, float | int):
             return size(self, -element)
 
         elif isinstance(element, kdb.Region):
             return boolean_not(self, element)
+        return None
 
     def copy(self):
         return self.dup()
@@ -61,6 +63,7 @@ class RegionCollection:
     """RegionCollection of region per layer.
 
     Args:
+    ----
         layermap: dict of layernames to layer numbers {'WG': (1, 0)}
         filepath: to read GDS from.
     """
@@ -84,6 +87,7 @@ class RegionCollection:
         """Write gds.
 
         Args:
+        ----
             filepath: gdspath.
             cellname: for top cell.
         """
@@ -94,8 +98,9 @@ class RegionCollection:
             try:
                 c.shapes(self.lib.layer(layer[0], layer[1])).insert(region)
             except TypeError:
+                msg = f"Unexpected type for region {layername!r}: {type(region)}"
                 raise ValueError(
-                    f"Unexpected type for region {layername!r}: {type(region)}"
+                    msg,
                 )
         c.write(filename)
         return c
@@ -115,6 +120,7 @@ class RegionCollection:
         """Generates rectangular fill on a set of layers in the region specified.
 
         Args:
+        ----
             region: to fill, usually the result of prior boolean operations.
             size: (x,y) dimensions of the fill cell (um).
             spacing: (x,y) spacing of the fill cell (um).
@@ -122,12 +128,13 @@ class RegionCollection:
             fill_name: fill cell name.
             fill_cell_name: fill cell name.
         """
-
         fill_cell = kf.KCell(fill_cell_name)
         for layer in fill_layers:
             layer = kf.kcl.layer(*layer)
             fill_cell << kf.cells.waveguide.waveguide(
-                width=size[0], length=size[1], layer=layer
+                width=size[0],
+                length=size[1],
+                layer=layer,
             )
 
         fc_index = fill_cell.cell_index()  # fill cell index
@@ -136,7 +143,13 @@ class RegionCollection:
 
         fill = kf.KCell(fill_name)
         return fill.fill_region(
-            region, fc_index, fc_box, None, region, fill_margin, None
+            region,
+            fc_index,
+            fc_box,
+            None,
+            region,
+            fill_margin,
+            None,
         )
 
 
@@ -154,7 +167,10 @@ if __name__ == "__main__":
 
     d = dp.RegionCollection(filepath="src.gds", layermap=dict(l))
     fill_cell = d.get_fill(
-        d.FLOORPLAN - d.WG, size=(0.1, 0.1), spacing=(0.1, 0.1), fill_layers=(l.WG,)
+        d.FLOORPLAN - d.WG,
+        size=(0.1, 0.1),
+        spacing=(0.1, 0.1),
+        fill_layers=(l.WG,),
     )
     fill_cell.write("fill.gds")
     gf.show("fill.gds")

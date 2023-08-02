@@ -2,16 +2,23 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.taper import taper as taper_func
 from gdsfactory.components.via_stack import via_stack_slab_m2, via_stack_slab_m3
 from gdsfactory.cross_section import pn_ge_detector_si_contacts
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Tuple, Union
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Tuple, Union
 
 default_taper = partial(
-    taper_func, length=20.0, width1=0.5, width2=0.8, cross_section="strip"
+    taper_func,
+    length=20.0,
+    width1=0.5,
+    width2=0.8,
+    cross_section="strip",
 )
 
 
@@ -20,7 +27,8 @@ def ge_detector_straight_si_contacts(
     length: float = 80.0,
     cross_section: CrossSectionSpec = pn_ge_detector_si_contacts,
     via_stack: Union[
-        ComponentSpec, Tuple[ComponentSpec, ComponentSpec]
+        ComponentSpec,
+        Tuple[ComponentSpec, ComponentSpec],
     ] = via_stack_slab_m3,
     via_stack_width: float = 10.0,
     via_stack_spacing: float = 5.0,
@@ -38,6 +46,7 @@ def ge_detector_straight_si_contacts(
     https://doi.org/10.1109/JLT.2014.2367134
 
     Args:
+    ----
         length: total length of the waveguide including the tapers.
         cross_section: for the waveguide.
         via_stack: for the via_stacks. First element
@@ -95,7 +104,7 @@ def ge_detector_straight_si_contacts(
 
 if __name__ == "__main__":
     comp = ge_detector_straight_si_contacts(
-        via_stack=(via_stack_slab_m3, via_stack_slab_m2), via_stack_offset=10
+        via_stack=(via_stack_slab_m3, via_stack_slab_m2),
+        via_stack_offset=10,
     )
-    # print(c.ports.keys())
     comp.show(show_ports=True)

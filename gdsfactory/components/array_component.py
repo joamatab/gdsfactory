@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, Float2, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Float2, Optional
 
 
 @cell
@@ -13,11 +17,12 @@ def array(
     columns: int = 6,
     rows: int = 1,
     add_ports: bool = True,
-    size: Optional[Float2] = None,
+    size: Optional[Float2] | None = None,
 ) -> Component:
     """Returns an array of components.
 
     Args:
+    ----
         component: to replicate.
         spacing: x, y spacing.
         columns: in x.
@@ -26,6 +31,7 @@ def array(
         size: Optional x, y size. Overrides columns and rows.
 
     Raises:
+    ------
         ValueError: If columns > 1 and spacing[0] = 0.
         ValueError: If rows > 1 and spacing[1] = 0.
 
@@ -45,10 +51,12 @@ def array(
         rows = int(size[1] / spacing[1])
 
     if rows > 1 and spacing[1] == 0:
-        raise ValueError(f"rows = {rows} > 1 require spacing[1] > 0")
+        msg = f"rows = {rows} > 1 require spacing[1] > 0"
+        raise ValueError(msg)
 
     if columns > 1 and spacing[0] == 0:
-        raise ValueError(f"columns = {columns} > 1 require spacing[0] > 0")
+        msg = f"columns = {columns} > 1 require spacing[0] > 0"
+        raise ValueError(msg)
 
     c = Component()
     component = gf.get_component(component)
@@ -71,14 +79,6 @@ if __name__ == "__main__":
     PDK.activate()
     from gdsfactory.components.pad import pad
 
-    # c2 = array(rows=2, columns=2, spacing=(100, 100))
-    # c2 = array(pad, rows=2, spacing=(200, 200), columns=1)
-    # c3 = c2.copy()
-
     c2 = array(pad, spacing=(200, 200), size=(700, 300))
 
-    # nports = len(c2.get_ports_list(orientation=0))
-    # assert nports == 2, nports
-    # c2.show(show_ports=True)
-    # c2.show(show_subports=True)
     c2.show(show_ports=True)

@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.difftest import difftest
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 sequences = ["ABHBA", "!HH", "AB", "HH!", "H"]
 
 
 @pytest.mark.parametrize("index", range(len(sequences)))
 def test_component_from_sequence(
-    index: int, data_regression: DataRegressionFixture, check: bool = True
+    index: int,
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     bend180 = gf.components.bend_circular180()
     wg_pin = gf.components.straight_pin(length=40)
@@ -27,7 +33,8 @@ def test_component_from_sequence(
 
     sequence = sequences[index]
     c = gf.components.component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component_map
+        sequence=sequence,
+        symbol_to_component=symbol_to_component_map,
     )
 
     difftest(c)

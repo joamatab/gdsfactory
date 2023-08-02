@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
-from gdsfactory.component import Component
-from gdsfactory.typings import Floats, Layers
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Floats, Layers
 
 
 def to_np(
@@ -16,6 +19,7 @@ def to_np(
     """Returns a pixelated numpy array from Component polygons.
 
     Args:
+    ----
         component: Component.
         nm_per_pixel: you can go from 20 (coarse) to 4 (fine).
         layers: to convert. Order matters (latter overwrite former).
@@ -44,7 +48,9 @@ def to_np(
                 r = polygon[:, 0] - xmin
                 c = polygon[:, 1] - ymin
                 rr, cc = skdraw.polygon(
-                    r * pixels_per_um, c * pixels_per_um, shape=shape
+                    r * pixels_per_um,
+                    c * pixels_per_um,
+                    shape=shape,
                 )
                 img[rr, cc] = value
 
@@ -58,7 +64,6 @@ if __name__ == "__main__":
 
     c = gf.components.straight()
     c = gf.components.bend_circular()
-    # i = to_np(c, nm_per_pixel=250)
     i = to_np(c, nm_per_pixel=20)
     c.show(show_ports=True)
     plt.imshow(i.transpose(), origin="lower")

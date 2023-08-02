@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -9,7 +10,9 @@ from gdsfactory.components.taper import taper_strip_to_ridge
 from gdsfactory.components.via_stack import via_stack_m1_m3
 from gdsfactory.components.via_stack_slot import via_stack_slot_slab_m1
 from gdsfactory.cross_section import pin, pn
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -38,6 +41,7 @@ def straight_pin_slot(
     https://ieeexplore.ieee.org/document/8853396/
 
     Args:
+    ----
         length: of the waveguide.
         cross_section: for the waveguide.
         via_stack: for via_stacking the metal.

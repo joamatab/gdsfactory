@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.copy_layers import copy_layers
 from gdsfactory.components.text_rectangular_font import pixel_array, rectangular_font
-from gdsfactory.typings import ComponentSpec, LayerSpec, LayerSpecs
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, LayerSpec, LayerSpecs
 
 
 @gf.cell
@@ -22,6 +26,7 @@ def text_rectangular(
     """Pixel based font, guaranteed to be manhattan, without acute angles.
 
     Args:
+    ----
         text: string.
         size: pixel size.
         position: coordinate.
@@ -44,7 +49,7 @@ def text_rectangular(
             else:
                 pixels = characters[character.upper()]
                 ref = component.add_ref(
-                    pixel_array(pixels=pixels, pixel_size=pixel_size, layer=layer)
+                    pixel_array(pixels=pixels, pixel_size=pixel_size, layer=layer),
                 )
                 ref.move((xoffset, yoffset))
                 component.absorb(ref)
@@ -61,7 +66,8 @@ def text_rectangular(
         elif justify == "center":
             ref.move(origin=ref.center, destination=position, axis="x")
         else:
-            raise ValueError(f"justify = {justify!r} not valid (left, center, right)")
+            msg = f"justify = {justify!r} not valid (left, center, right)"
+            raise ValueError(msg)
 
     return component
 
@@ -75,11 +81,13 @@ def text_rectangular_multi_layer(
     """Returns rectangular text in different layers.
 
     Args:
+    ----
         text: string of text
         layers: list of layers to replicate the text
         text_factory: function to create the text Components
 
     Keyword Args:
+    ------------
         size: pixel size
         position: coordinate
         justify: left, right or center
@@ -97,8 +105,6 @@ if __name__ == "__main__":
     import string
 
     c = text_rectangular_multi_layer(
-        # text="The mask is nearly done. only 12345 drc errors remaining?",
-        # text="v",
         text=string.ascii_lowercase,
         layers=("SLAB90", "M2"),
         justify="center",

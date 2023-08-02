@@ -9,13 +9,16 @@ import sys
 import threading
 import time
 import traceback
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from gdsfactory.config import cwd
 from gdsfactory.pdk import get_active_pdk
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class FileWatcher(FileSystemEventHandler):
@@ -54,6 +57,7 @@ class FileWatcher(FileSystemEventHandler):
         """Parses a YAML file to a cell function and registers into active pdk.
 
         Args:
+        ----
             src_path: the path to the file
             update: if True, will update an existing cell function of the same name without raising an error
         Returns:
@@ -77,6 +81,7 @@ class FileWatcher(FileSystemEventHandler):
         return function
 
     def on_moved(self, event) -> None:
+        """File moved event."""
         super().on_moved(event)
 
         what = "directory" if event.is_directory else "file"
@@ -86,6 +91,7 @@ class FileWatcher(FileSystemEventHandler):
             self.get_component(event.src_path)
 
     def on_created(self, event) -> None:
+        """File created event."""
         super().on_created(event)
 
         what = "directory" if event.is_directory else "file"
@@ -133,18 +139,19 @@ class FileWatcher(FileSystemEventHandler):
                     cell_func = self.update_cell(filepath, update=True)
                     c = cell_func()
                     c.show(show_ports=True)
-                    # on_yaml_cell_modified.fire(c)
                     return c
                 elif str(filepath).endswith(".py"):
                     d = dict(locals(), **globals())
                     d.update(__name__="__main__")
                     exec(filepath.read_text(), d, d)
                 else:
-                    print("Changed file {filepath} ignored (not .pic.yml or .py)")
+                    logging.info(
+                        "Changed file {filepath} ignored (not .pic.yml or .py)",
+                    )
 
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
-            print(e)
+            logging.error(e)
 
 
 def watch(path=cwd, pdk=None) -> None:

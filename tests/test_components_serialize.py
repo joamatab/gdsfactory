@@ -13,7 +13,7 @@ skip_test = {
 cells_to_test = set(cells.keys()) - skip_test
 
 
-@pytest.fixture(params=cells_to_test, scope="function")
+@pytest.fixture(params=cells_to_test)
 def component_name(request) -> str:
     return request.param
 
@@ -28,14 +28,6 @@ def test_components_serialize(component_name: str) -> None:
 
 
 if __name__ == "__main__":
-    # import json
-    # c1 = gf.components.mmi1x2()
-    # settings = c1.settings.full
-    # settings_string = json.dumps(settings)
-    # settings2 = json.loads(settings_string)
-    # cell_name = c1.settings.function_name
-    # c2 = gf.get_component({"component": cell_name, "settings": settings2})
-
     import json
 
     import orjson

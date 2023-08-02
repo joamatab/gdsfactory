@@ -23,7 +23,10 @@ if __name__ == "__main__":
         rule_enclosing(layer1="M1", layer2="VIAC", value=0.2),
         rule_area(layer="WG", min_area_um2=0.05),
         rule_density(
-            layer="WG", layer_floorplan="FLOORPLAN", min_density=0.5, max_density=0.6
+            layer="WG",
+            layer_floorplan="FLOORPLAN",
+            min_density=0.5,
+            max_density=0.6,
         ),
     ]
 

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentOrPath
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrPath
 
 
 def check_space(
@@ -32,6 +36,7 @@ def check_space(
     pass nil to the respective value.
 
     Args:
+    ----
         gdspath: path to GDS or Component.
         layer: tuple.
         min_space: in um.
@@ -57,7 +62,8 @@ def check_space(
     valid_metrics = ["Square", "Euclidean"]
 
     if metrics not in valid_metrics:
-        raise ValueError("metrics = {metrics!r} not in {valid_metrics}")
+        msg = "metrics = {metrics!r} not in {valid_metrics}"
+        raise ValueError(msg)
     metrics = getattr(pya.Region, metrics)
 
     d = region.space_check(
@@ -68,7 +74,6 @@ def check_space(
         min_projection,
         max_projection,
     )
-    # print(d.polygons().area())
     return d.polygons().area()
 
 

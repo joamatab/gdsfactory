@@ -17,7 +17,11 @@ def test_path_transition_class() -> None:
     )
 
     X2 = gf.CrossSection(
-        width=3, offset=0, layer=gf.LAYER.WG, name="core", port_names=("o1", "o2")
+        width=3,
+        offset=0,
+        layer=gf.LAYER.WG,
+        name="core",
+        port_names=("o1", "o2"),
     )
 
     T = gf.path.transition(X1, X2)
@@ -100,24 +104,6 @@ def test_path_transitions() -> None:
 
 
 if __name__ == "__main__":
-    # c = test_path_transitions()
-    # c= test_path_transition_function()
     test_path_transition_class()
 
-    # test_path_transition_class()
-
-    # X1 = gf.cross_section.cross_section(width=1)
-    # X2 = gf.cross_section.cross_section(width=3)
-    # T = gf.path.transition(X1, X2)
-    # P = gf.path.straight(length=10, npoints=101)
-    # c3 = gf.path.extrude(P, T)
-
-    # sections = {
     #     section["name"]: section for section in X1.sections if "name" in section
-    # }
-
-    # assert c3.ports["o1"].name == sections["_default"]["ports"][0]
-    # assert c3.ports["o1"].layer == sections["_default"]["layer"]
-    # assert c3.ports["o1"].orientation == 180
-    # assert c3.ports["o1"].port_type == sections["_default"]["port_types"][0]
-    # assert c3.ports["o1"].port_type == X1.port_type

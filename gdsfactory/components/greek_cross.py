@@ -1,6 +1,5 @@
 """Greek cross test structure."""
 from itertools import product
-from typing import Optional
 
 import numpy as np
 
@@ -21,7 +20,7 @@ def greek_cross(
         "N",
     ),
     widths: Floats = (2.0, 3.0),
-    offsets: Optional[Floats] = None,
+    offsets: Floats | None = None,
     via_stack: ComponentSpec = via_stack_npp_m1,
 ) -> gf.Component:
     """Simple greek cross with via stacks at the endpoints.
@@ -29,6 +28,7 @@ def greek_cross(
     Process control monitor for dopant sheet resistivity and linewidth variation.
 
     Args:
+    ----
         length: length of cross arms.
         layers: list of layers.
         widths: list of widths (same order as layers).
@@ -49,7 +49,7 @@ def greek_cross(
 
 
     References:
-
+    ----------
     - Walton, Anthony J.. “MICROELECTRONIC TEST STRUCTURES.” (1999).
     - W. Versnel, Analysis of the Greek cross, a Van der Pauw structure with finite
         contacts, Solid-State Electronics, Volume 22, Issue 11, 1979, Pages 911-914,
@@ -64,7 +64,8 @@ def greek_cross(
     c = gf.Component()
 
     if len(layers) != len(widths):
-        raise ValueError("len(layers) must equal len(widths).")
+        msg = "len(layers) must equal len(widths)."
+        raise ValueError(msg)
 
     offsets = offsets or (0.0,) * len(layers)
 
@@ -106,6 +107,7 @@ def greek_cross_with_pads(
     """Greek cross under 4 DC pads, ready to test.
 
     Arguments:
+    ---------
         pad: component to use for probe pads
         pad_spacing: spacing between pads
         greek_cross_component: component to use for greek cross
@@ -166,6 +168,7 @@ def greek_cross_offset_pads(
     """Greek cross, with silicon islands on each side of the cross to place larger contacting regions.
 
     Args:
+    ----
         cross_struct_length: length of structural part of cross e.g. silicon core.
         cross_struct_width: width of structural part of cross  e.g. silicon core.
         cross_struct_layers: layers to be considered "structural".
@@ -190,6 +193,7 @@ def greek_cross_offset_pads(
             contact_offset (fudge)
 
     References:
+    ----------
     - Walton, Anthony J.. “MICROELECTRONIC TEST STRUCTURES.” (1999).
     - W. Versnel, Analysis of the Greek cross, a Van der Pauw structure with finite
         contacts, Solid-State Electronics, Volume 22, Issue 11, 1979, Pages 911-914,
@@ -241,8 +245,8 @@ def greek_cross_offset_pads(
                     [
                         -1 * pad_offset + cross_implant_length / 2 - contact_buffer / 2,
                         -1 * pad_offset - contact_offset / 2,
-                    ]
-                )
+                    ],
+                ),
             )
         contact = c << c2
         contact.rotate(pad_rotation)
@@ -252,6 +256,5 @@ def greek_cross_offset_pads(
 
 
 if __name__ == "__main__":
-    # c = greek_cross_offset_pads()
     c = greek_cross_with_pads()
     c.show(show_ports=True)

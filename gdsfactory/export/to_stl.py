@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
-from gdsfactory.component import Component
-from gdsfactory.technology import LayerStack
-from gdsfactory.typings import Layer
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.technology import LayerStack
+    from gdsfactory.typings import Layer
 
 
 def to_stl(
@@ -19,6 +21,7 @@ def to_stl(
     """Exports a Component into STL.
 
     Args:
+    ----
         component: to export.
         filepath: filepath prefix to write STL to.
             Each file will have each exported layer as suffix.
@@ -68,7 +71,7 @@ def to_stl(
             filepath.parent / f"{filepath.stem}_{layer_name}{filepath.suffix}"
         )
         print(
-            f"Write {filepath_layer.absolute()!r} zmin = {zmin:.3f}, height = {height:.3f}"
+            f"Write {filepath_layer.absolute()!r} zmin = {zmin:.3f}, height = {height:.3f}",
         )
         meshes = []
         for polygon in polygons:

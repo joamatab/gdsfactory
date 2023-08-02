@@ -26,6 +26,7 @@ def import_gds(
     appends $ with a number to the name if the cell name is on CACHE
 
     Args:
+    ----
         gdspath: path of GDS file.
         cellname: cell of the name to import. None imports top cell.
         gdsdir: optional GDS directory.
@@ -35,7 +36,8 @@ def import_gds(
     """
     gdspath = Path(gdsdir) / Path(gdspath) if gdsdir else Path(gdspath)
     if not gdspath.exists():
-        raise FileNotFoundError(f"No file {str(gdspath)!r} found")
+        msg = f"No file {str(gdspath)!r} found"
+        raise FileNotFoundError(msg)
 
     metadata_filepath = gdspath.with_suffix(".yml")
 
@@ -44,13 +46,15 @@ def import_gds(
     elif gdspath.suffix.lower() == ".oas":
         gdsii_lib = gdstk.read_oas(str(gdspath))
     else:
-        raise ValueError(f"gdspath.suffix {gdspath.suffix!r} not .gds or .oas")
+        msg = f"gdspath.suffix {gdspath.suffix!r} not .gds or .oas"
+        raise ValueError(msg)
 
     top_level_cells = gdsii_lib.top_level()
     top_cellnames = [c.name for c in top_level_cells]
 
     if not top_cellnames:
-        raise ValueError(f"no top cells found in {str(gdspath)!r}")
+        msg = f"no top cells found in {str(gdspath)!r}"
+        raise ValueError(msg)
 
     D_list = []
     cell_name_to_component = {}
@@ -72,15 +76,16 @@ def import_gds(
     cellnames = list(cell_name_to_component.keys())
     if cellname is not None:
         if cellname not in cell_name_to_component:
+            msg = f"cell {cellname!r} is not in file {gdspath} with cells {cellnames}"
             raise ValueError(
-                f"cell {cellname!r} is not in file {gdspath} with cells {cellnames}"
+                msg,
             )
     elif len(top_level_cells) == 1:
         cellname = top_level_cells[0].name
     elif len(top_level_cells) > 1:
+        msg = f"import_gds() There are multiple top-level cells in {gdspath!r}, you must specify `cellname` to select of one of them among {cellnames}"
         raise ValueError(
-            f"import_gds() There are multiple top-level cells in {gdspath!r}, "
-            f"you must specify `cellname` to select of one of them among {cellnames}"
+            msg,
         )
 
     # create a new ComponentReference for each gdstk CellReference
@@ -152,17 +157,7 @@ if __name__ == "__main__":
 
     c = gf.components.array()
     gdspath = c.write_gds()
-    # c.show(show_ports=True)
 
     gf.clear_cache()
-    # c = import_gds(gdspath)
     c = import_gds(gdspath)
     c.show(show_ports=False)
-
-    # gdspath = PATH.gdsdir / "mzi2x2.gds"
-    # c = import_gds(gdspath, flatten=True, name="TOP")
-    # c.settings = {}
-    # print(clean_value_name(c))
-    # c = import_gds(gdspath, flatten=False, polarization="te")
-    # c = import_gds("/home/jmatres/gdsfactory/gdsfactory/gdsdiff/gds_diff_git.py")
-    # print(c.hash_geometry())

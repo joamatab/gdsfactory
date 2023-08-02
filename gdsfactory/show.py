@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
 from gdsfactory import klive
-from gdsfactory.component import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 def show(
@@ -14,10 +17,12 @@ def show(
     """Write GDS and show Component in KLayout.
 
     Args:
+    ----
         component: Component or GDS path.
         technology: Name of KLayout technology to load when displaying component.
 
     Keyword Args:
+    ------------
         gdspath: GDS file path to write to.
         gdsdir: directory for the GDS file. Defaults to /tmp/.
         unit: unit size for objects in library. 1um by default.
@@ -31,17 +36,22 @@ def show(
     elif isinstance(component, str):
         return klive.show(component, technology=technology)
     elif component is None:
+        msg = "Component is None, make sure that your function returns the component"
         raise ValueError(
-            "Component is None, make sure that your function returns the component"
+            msg,
         )
 
     elif hasattr(component, "write_gds"):
         # don't raise warnings for uncached cells when simply showing
         gdspath = component.write_gds(
-            logging=False, on_uncached_component="ignore", **kwargs
+            logging=False,
+            on_uncached_component="ignore",
+            **kwargs,
         )
         klive.show(gdspath, technology=technology)
+        return None
     else:
+        msg = f"Component is {type(component)!r}, make sure pass a Component or a path"
         raise ValueError(
-            f"Component is {type(component)!r}, make sure pass a Component or a path"
+            msg,
         )

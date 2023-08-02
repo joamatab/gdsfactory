@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
@@ -9,7 +9,11 @@ from gdsfactory.components.straight_heater_metal import straight_heater_metal
 from gdsfactory.port import select_ports_electrical
 from gdsfactory.routing.get_bundle import get_bundle_electrical
 from gdsfactory.routing.sort_ports import sort_ports_x
-from gdsfactory.typings import ComponentSpec, Float2, Optional, Strs
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import ComponentSpec, Float2, Optional, Strs
 
 
 @cell
@@ -19,12 +23,13 @@ def add_electrical_pads_top_dc(
     pad_array: ComponentSpec = "pad_array",
     select_ports: Callable = select_ports_electrical,
     get_bundle_function: Callable = get_bundle_electrical,
-    port_names: Optional[Strs] = None,
+    port_names: Optional[Strs] | None = None,
     **kwargs,
 ) -> Component:
     """Returns new component with electrical ports connected to top pad array.
 
     Args:
+    ----
         component: component spec to connect to.
         spacing: component to pad spacing.
         pad_array: component spec for pad_array.
@@ -50,8 +55,9 @@ def add_electrical_pads_top_dc(
     ports = ports or select_ports(cref.ports)
 
     if not ports:
+        msg = f"select_ports or port_names did not match any ports in {list(component.ports.keys())}"
         raise ValueError(
-            f"select_ports or port_names did not match any ports in {list(component.ports.keys())}"
+            msg,
         )
 
     ports_component = list(ports.values()) if isinstance(ports, dict) else ports
@@ -87,6 +93,5 @@ def add_electrical_pads_top_dc(
 
 if __name__ == "__main__":
     c = gf.components.straight_heater_metal(length=100.0)
-    # c = gf.components.straight(length=100.0)
     cc = add_electrical_pads_top_dc(component=c, width=10)
     cc.show(show_ports=True)

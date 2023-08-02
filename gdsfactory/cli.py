@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import pathlib
-
-from click.core import Context, Option
+from typing import TYPE_CHECKING
 
 import gdsfactory
 from gdsfactory.config import cwd, print_config, print_version_pdks, print_version_raw
@@ -12,8 +11,12 @@ from gdsfactory.config import print_version as _print_version
 from gdsfactory.generic_tech import LAYER
 from gdsfactory.install import install_gdsdiff, install_klayout_package
 from gdsfactory.technology import lyp_to_dataclass
-from gdsfactory.typings import PathType
 from gdsfactory.write_cells import write_cells as write_cells_to_separate_gds
+
+if TYPE_CHECKING:
+    from click.core import Context, Option
+
+    from gdsfactory.typings import PathType
 
 try:
     import rich_click as click
@@ -35,14 +38,12 @@ def print_version(ctx: Context, param: Option, value: bool) -> None:
 @click.group()
 def version() -> None:
     """Commands for printing gdsfactory extension versions."""
-    pass
 
 
 # install
 @click.group()
 def install() -> None:
     """Commands install."""
-    pass
 
 
 @click.command(name="config")
@@ -56,7 +57,6 @@ def config_get(key: str) -> None:
 @click.group()
 def gds() -> None:
     """Commands for dealing with GDS files."""
-    pass
 
 
 @click.command(name="layermap_to_dataclass")
@@ -67,9 +67,11 @@ def layermap_to_dataclass(filepath, force: bool) -> None:
     filepath_lyp = pathlib.Path(filepath)
     filepath_py = filepath_lyp.with_suffix(".py")
     if not filepath_lyp.exists():
-        raise FileNotFoundError(f"{filepath_lyp} not found")
+        msg = f"{filepath_lyp} not found"
+        raise FileNotFoundError(msg)
     if not force and filepath_py.exists():
-        raise FileExistsError(f"found {filepath_py}")
+        msg = f"found {filepath_py}"
+        raise FileExistsError(msg)
     lyp_to_dataclass(lyp_filepath=filepath_lyp)
 
 
@@ -155,7 +157,6 @@ def watch(path=cwd) -> None:
 @click.group()
 def init() -> None:
     """Commands for initializing projects."""
-    pass
 
 
 @click.command()
@@ -237,7 +238,6 @@ version.add_command(pdks)
 init.add_command(notebooks)
 
 cli.add_command(web)
-# watch.add_command(watch_yaml)
 
 cli.add_command(gds)
 cli.add_command(install)
@@ -247,5 +247,4 @@ cli.add_command(init)
 
 
 if __name__ == "__main__":
-    # cli()
     print_version()

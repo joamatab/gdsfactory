@@ -1,6 +1,4 @@
-"""
-In a multiple-topology Clements Scheme we can implement any universal photonic function.
-"""
+"""In a multiple-topology Clements Scheme we can implement any universal photonic function."""
 from __future__ import annotations
 
 import numpy as np
@@ -29,8 +27,7 @@ def find_largest_component(component_list: list) -> Component:
 def component_lattice_generic(
     network: list[list] | None = None,
 ) -> Component:
-    """
-    The shape of the `network` matrix determines the physical interconnection.
+    """The shape of the `network` matrix determines the physical interconnection.
     Note that there should be at least S+1=N modes
     based on this formalism of interconnection,
     and the position of the component implements a connectivity in between the modes,
@@ -41,9 +38,11 @@ def component_lattice_generic(
     but different placement algorithms can compact the size.
 
     Args:
+    ----
         network: A list of lists of components that are to be placed in the lattice.
 
     Returns:
+    -------
         Component: A component lattice that implements the physical network.
 
     The placement matrix is in this form:
@@ -93,7 +92,6 @@ def component_lattice_generic(
     # TODO automatic electrical fanout?
     # TODO multiple placement optimization algorithms.
     """
-
     network = network or [
         [mzi2x2_2x2(), 0, mzi2x2_2x2()],
         [0, mzi2x2_2x2(delta_length=30.0), 0],
@@ -105,9 +103,9 @@ def component_lattice_generic(
     # Check number of dimensions is 2
     if network.ndim != 2:
         # Get the length and then width of the array
+        msg = "Physical network dimensions don't work.Check the dimensional structure of your network matrix."
         raise AttributeError(
-            "Physical network dimensions don't work."
-            "Check the dimensional structure of your network matrix."
+            msg,
         )
 
     C = Component()
@@ -142,7 +140,7 @@ def component_lattice_generic(
             straight_i = C << straight(length=1, width=0.5)
             interconnection_ports_array[column_j].extend([straight_i])
             interconnection_ports_array[column_j][row_i].move(
-                destination=(x_mode_pitch * column_j, -y_mode_pitch * row_i)
+                destination=(x_mode_pitch * column_j, -y_mode_pitch * row_i),
             )
 
             if column_j == 0:
@@ -174,7 +172,7 @@ def component_lattice_generic(
                         + largest_component.xsize / 2
                         + inter_stage_clearance_x_offset / 2,
                         -y_component_pitch * i - inter_stage_clearance_y_offset,
-                    )
+                    ),
                 )
                 k += 1
             i += 1
@@ -273,7 +271,7 @@ def component_lattice_generic(
             # Check if element is nonzero
             if element_i != 0:
                 electrical_ports_list_i = select_ports_electrical(
-                    element_references[k].ports
+                    element_references[k].ports,
                 ).items()
                 if len(electrical_ports_list_i) > 0:
                     # Electrical ports exist in component
@@ -290,23 +288,5 @@ def component_lattice_generic(
 
 
 if __name__ == "__main__":
-    # from gdsfactory.components.mzi import mzi2x2_2x2
-    # from gdsfactory.components.mzi_phase_shifter import mzi2x2_2x2_phase_shifter
-
-    # example_component_lattice = [
-    #     [mzi2x2_2x2(), 0, mzi2x2_2x2()],
-    #     [0, mzi2x2_2x2(), 0],
-    #     [mzi2x2_2x2(), 0, mzi2x2_2x2()],
-    # ]
-    # c = component_lattice_generic(example_component_lattice)
-    # c.show(show_ports=True)
-
-    # example_mixed_component_lattice = [
-    #     [mzi2x2_2x2_phase_shifter(), 0, mzi2x2_2x2(delta_length=20.0)],
-    #     [0, mzi2x2_2x2(delta_length=50.0), 0],
-    #     [mzi2x2_2x2(delta_length=100.0), 0, mzi2x2_2x2_phase_shifter()],
-    # ]
-    # c_mixed = component_lattice_generic(example_mixed_component_lattice)
-    # c_mixed.show(show_ports=True)
     c = component_lattice_generic()
     c.show()

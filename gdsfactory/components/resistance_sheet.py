@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.via_stack import via_stack_slab_npp_m3
-from gdsfactory.typings import ComponentSpec, Floats, LayerSpecs, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, Floats, LayerSpecs, Optional
 
 pad_via_stack_slab_npp = partial(via_stack_slab_npp_m3, size=(80, 80))
 
@@ -18,7 +21,7 @@ def resistance_sheet(
     layer_offsets: Floats = (0, 0.2),
     pad: ComponentSpec = pad_via_stack_slab_npp,
     pad_pitch: float = 100.0,
-    ohms_per_square: Optional[float] = None,
+    ohms_per_square: Optional[float] | None = None,
     port_orientation1: int = 180,
     port_orientation2: int = 0,
 ) -> Component:
@@ -27,6 +30,7 @@ def resistance_sheet(
     keeps connectivity for pads and first layer in layers
 
     Args:
+    ----
         width: in um.
         layers: for the middle part.
         layer_offsets: from edge, positive: over, negative: inclusion.
@@ -44,7 +48,8 @@ def resistance_sheet(
     pad1 = c << pad
     pad2 = c << pad
     r0 = c << compass(
-        size=(length + layer_offsets[0], width + layer_offsets[0]), layer=layers[0]
+        size=(length + layer_offsets[0], width + layer_offsets[0]),
+        layer=layers[0],
     )
     c.absorb(r0)
 
@@ -79,14 +84,5 @@ def resistance_sheet(
 
 
 if __name__ == "__main__":
-    # import gdsfactory as gf
-    # sweep = [resistance_sheet(width=width, layers=((1,0), (1,1))) for width in [1, 10, 100]]
-    # c = gf.pack(sweep)[0]
-
     c = resistance_sheet()
     c.show(show_ports=True)
-
-    # import gdsfactory as gf
-    # sweep_resistance = list(map(resistance_sheet, (5, 10, 80)))
-    # c = gf.grid(sweep_resistance)
-    # c.show(show_ports=True)

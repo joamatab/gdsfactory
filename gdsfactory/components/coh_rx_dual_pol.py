@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coh_rx_single_pol import coh_rx_single_pol
 from gdsfactory.routing.get_route import get_route, get_route_from_waypoints
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -24,6 +28,7 @@ def coh_rx_dual_pol(
     """Dual polarization coherent receiver.
 
     Args:
+    ----
         bend: 90 degrees bend library.
         cross_section: for routing (splitter to mzms and mzms to combiners).
         lo_splitter: splitter function for the LO input.
@@ -163,12 +168,12 @@ def coh_rx_dual_pol(
     c.add_ports(single_rx_2.get_ports_list(port_type="placement"), prefix="pol2_")
 
     c.add_ports(
-        lo_split.get_ports_list(port_type="optical", orientation=180), prefix="lo_"
+        lo_split.get_ports_list(port_type="optical", orientation=180),
+        prefix="lo_",
     )
     return c
 
 
 if __name__ == "__main__":
     c = coh_rx_dual_pol()
-    # c = coh_rx_single_pol()
     c.show(show_ports=True)

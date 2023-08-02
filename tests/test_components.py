@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 from gdsfactory.components import cells
 from gdsfactory.config import PATH
 from gdsfactory.difftest import difftest
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 skip_test = {
     "version_stamp",
@@ -24,7 +28,7 @@ skip_test = {
 cells_to_test = set(cells.keys()) - skip_test
 
 
-@pytest.fixture(params=cells_to_test, scope="function")
+@pytest.fixture(params=cells_to_test)
 def component_name(request) -> str:
     return request.param
 

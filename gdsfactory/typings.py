@@ -32,19 +32,21 @@ from __future__ import annotations
 import dataclasses
 import json
 import pathlib
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
-import gdstk
 import numpy as np
 from omegaconf import OmegaConf
 from pydantic import BaseModel, Extra
-from typing_extensions import Literal
 
 from gdsfactory.component import Component, ComponentReference
 from gdsfactory.component_layout import Label
 from gdsfactory.cross_section import CrossSection, Section, Transition, WidthTypes
 from gdsfactory.port import Port
 from gdsfactory.technology import LayerLevel, LayerStack
+
+if TYPE_CHECKING:
+    import gdstk
 
 STEP_DIRECTIVES = {
     "x",
@@ -70,7 +72,8 @@ STEP_DIRECTIVES_ALL_ANGLE = {
 class Step:
     """Manhattan Step.
 
-    Parameters:
+    Parameters
+    ----------
         x: absolute.
         y: absolute.
         dx: x-displacement.
@@ -132,69 +135,77 @@ Axis = Literal["x", "y"]
 NSEW = Literal["N", "S", "E", "W"]
 
 
-Float2 = Tuple[float, float]
-Float3 = Tuple[float, float, float]
-Floats = Tuple[float, ...]
-Strs = Tuple[str, ...]
-Int2 = Tuple[int, int]
-Int3 = Tuple[int, int, int]
-Ints = Tuple[int, ...]
+Float2 = tuple[float, float]
+Float3 = tuple[float, float, float]
+Floats = tuple[float, ...]
+Strs = tuple[str, ...]
+Int2 = tuple[int, int]
+Int3 = tuple[int, int, int]
+Ints = tuple[int, ...]
 
-Layer = Tuple[int, int]  # Tuple of integer (layer, datatype)
-Layers = Tuple[Layer, ...]
+Layer = tuple[int, int]
+Layers = tuple[Layer, ...]
 
 LayerSpec = Union[
-    Layer, int, str, None
+    Layer,
+    int,
+    str,
+    None,
 ]  # tuple of integers (layer, datatype), a integer (layer, 0) or a string (layer_name)
 
-LayerSpecs = Optional[Tuple[LayerSpec, ...]]
+LayerSpecs = Optional[tuple[LayerSpec, ...]]
 ComponentFactory = Callable[..., Component]
-ComponentFactoryDict = Dict[str, ComponentFactory]
+ComponentFactoryDict = dict[str, ComponentFactory]
 PathType = Union[str, pathlib.Path]
-PathTypes = Tuple[PathType, ...]
+PathTypes = tuple[PathType, ...]
 
 
-MaterialSpec = Union[str, float, Tuple[float, float], Callable]
+MaterialSpec = str | float | tuple[float, float] | Callable
 
 ComponentOrPath = Union[PathType, Component]
 ComponentOrReference = Union[Component, ComponentReference]
-NameToFunctionDict = Dict[str, ComponentFactory]
-Number = Union[float, int]
-Coordinate = Tuple[float, float]
-Coordinates = Tuple[Coordinate, ...]
+NameToFunctionDict = dict[str, ComponentFactory]
+Number = float | int
+Coordinate = tuple[float, float]
+Coordinates = tuple[Coordinate, ...]
 ComponentOrPath = Union[Component, PathType]
 CrossSectionFactory = Callable[..., CrossSection]
 TransitionFactory = Callable[..., Transition]
 CrossSectionOrFactory = Union[CrossSection, Callable[..., CrossSection]]
-PortSymmetries = Dict[str, List[str]]
-PortsDict = Dict[str, Port]
-PortsList = Dict[str, Port]
+PortSymmetries = dict[str, list[str]]
+PortsDict = dict[str, Port]
+PortsList = dict[str, Port]
 
-Sparameters = Dict[str, np.ndarray]
+Sparameters = dict[str, np.ndarray]
 
 ComponentSpec = Union[
-    str, ComponentFactory, Component, Dict[str, Any]
+    str,
+    ComponentFactory,
+    Component,
+    dict[str, Any],
 ]  # PCell function, function name, dict or Component
 
-ComponentSpecOrList = Union[ComponentSpec, List[ComponentSpec]]
+ComponentSpecOrList = Union[ComponentSpec, list[ComponentSpec]]
 CellSpec = Union[
-    str, ComponentFactory, Dict[str, Any]
+    str,
+    ComponentFactory,
+    dict[str, Any],
 ]  # PCell function, function name or dict
 
-ComponentSpecDict = Dict[str, ComponentSpec]
+ComponentSpecDict = dict[str, ComponentSpec]
 CrossSectionSpec = Union[
     str,
     CrossSectionFactory,
     CrossSection,
     Transition,
     TransitionFactory,
-    Dict[str, Any],
+    dict[str, Any],
 ]  # cross_section function, function name or dict
-CrossSectionSpecs = Tuple[CrossSectionSpec, ...]
+CrossSectionSpecs = tuple[CrossSectionSpec, ...]
 
-MultiCrossSectionAngleSpec = List[Tuple[CrossSectionSpec, Tuple[int, ...]]]
+MultiCrossSectionAngleSpec = list[tuple[CrossSectionSpec, tuple[int, ...]]]
 
-LabelListFactory = Callable[..., List[Label]]
+LabelListFactory = Callable[..., list[Label]]
 
 
 class Route(BaseModel):
@@ -259,7 +270,8 @@ class RouteModel(BaseModel):
 class NetlistModel(BaseModel):
     """Netlist defined component.
 
-    Parameters:
+    Parameters
+    ----------
         instances: dict of instances (name, settings, component).
         placements: dict of placements.
         connections: dict of connections.
@@ -323,7 +335,6 @@ __all__ = (
     "CrossSectionFactory",
     "CrossSectionOrFactory",
     "CrossSectionSpec",
-    "Dict",
     "Float2",
     "Float3",
     "Floats",
@@ -337,7 +348,6 @@ __all__ = (
     "LayerSpecs",
     "LayerStack",
     "Layers",
-    "List",
     "MultiCrossSectionAngleSpec",
     "NameToFunctionDict",
     "Number",
@@ -349,7 +359,6 @@ __all__ = (
     "Routes",
     "Section",
     "Strs",
-    "Tuple",
     "Union",
     "WidthTypes",
 )
@@ -426,10 +435,6 @@ ports:
 
     yaml_dict = yaml.safe_load(yaml_text)
     jsonschema.validate(yaml_dict, schema_dict)
-
-    # from gdsfactory.components import factory
-    # c = NetlistModel(factory=factory)
-    # c.add_instance("mmi1", "mmi1x2", length=13.3)
 
 
 if __name__ == "__main__":

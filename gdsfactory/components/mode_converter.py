@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -9,7 +10,9 @@ from gdsfactory.components.coupler_straight_asymmetric import (
     coupler_straight_asymmetric as coupler_straight_asymmetric_function,
 )
 from gdsfactory.components.taper import taper as taper_function
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -33,6 +36,7 @@ def mode_converter(
     https://doi.org/10.1109/JPHOT.2019.2941742
 
     Args:
+    ----
         gap: directional coupler gap.
         length: coupler length interaction.
         coupler_straight_asymmetric: spec.
@@ -55,7 +59,6 @@ def mode_converter(
         = : multimode width
         - : singlemode width
     """
-
     c = Component()
 
     coupler = gf.get_component(

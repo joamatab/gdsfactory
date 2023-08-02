@@ -5,6 +5,7 @@ Adapted from PHIDL https://github.com/amccaugh/phidl/ by Adam McCaughan
 from __future__ import annotations
 
 import itertools
+from typing import TYPE_CHECKING
 
 import gdstk
 import numpy as np
@@ -15,13 +16,15 @@ from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.component_layout import _parse_layer
 from gdsfactory.components.rectangle import rectangle
-from gdsfactory.typings import (
-    ComponentOrReference,
-    ComponentSpec,
-    Float2,
-    Floats,
-    LayerSpecs,
-)
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import (
+        ComponentOrReference,
+        ComponentSpec,
+        Float2,
+        Floats,
+        LayerSpecs,
+    )
 
 
 def _loop_over(var):
@@ -33,6 +36,7 @@ def _loop_over(var):
     Returns list Variable converted to list if single-valued input.
 
     Args:
+    ----
         var : int or float or list
             Variable to check for iterability.
     """
@@ -44,11 +48,9 @@ def _rasterize_polygons(polygons, bounds=([-100, -100], [100, 100]), dx=1, dy=1)
     try:
         from skimage import draw
     except ImportError as e:
+        msg = 'The fill function requires the module "scikit-image" to operate.  Please retry after installing scikit-image:\n\n$ pip install --upgrade scikit-image'
         raise ImportError(
-            "The fill function requires the module "
-            '"scikit-image" to operate.  Please retry '
-            "after installing scikit-image:\n\n"
-            "$ pip install --upgrade scikit-image"
+            msg,
         ) from e
 
     # Prepare polygon array by shifting all points into the first quadrant and
@@ -71,7 +73,10 @@ def _rasterize_polygons(polygons, bounds=([-100, -100], [100, 100]), dx=1, dy=1)
     for n in range(len(xpts)):
         rr, cc = draw.polygon(ypts[n], xpts[n], shape=raster.shape)
         rrp, ccp = draw.polygon_perimeter(
-            ypts[n], xpts[n], shape=raster.shape, clip=False
+            ypts[n],
+            xpts[n],
+            shape=raster.shape,
+            clip=False,
         )
         raster[rr, cc] = 1
         raster[rrp, ccp] = 1
@@ -91,11 +96,9 @@ def _expand_raster(raster, distance=(4, 2)):
     try:
         from skimage import draw, morphology
     except ImportError as e:
+        msg = 'The fill function requires the module "scikit-image" to operate.  Please retry after installing scikit-image:\n\n$ pip install --upgrade scikit-image'
         raise ImportError(
-            "The fill function requires the module "
-            '"scikit-image" to operate.  Please retry '
-            "after installing scikit-image:\n\n"
-            "$ pip install --upgrade scikit-image"
+            msg,
         ) from e
     if distance[0] <= 0.5 and distance[1] <= 0.5:
         return raster
@@ -103,7 +106,10 @@ def _expand_raster(raster, distance=(4, 2)):
     num_pixels = np.array(np.ceil(distance), dtype=int)
     neighborhood = np.zeros((num_pixels[1] * 2 + 1, num_pixels[0] * 2 + 1), dtype=bool)
     rr, cc = draw.ellipse(
-        num_pixels[1], num_pixels[0], distance[1] + 0.5, distance[0] + 0.5
+        num_pixels[1],
+        num_pixels[0],
+        distance[1] + 0.5,
+        distance[0] + 0.5,
     )
     neighborhood[rr, cc] = 1
 
@@ -122,6 +128,7 @@ def fill_cell_rectangle(
     based on phidl.geometry
 
     Args:
+    ----
         size: x, y dimensions of the fill area for all layers.
         layers: Specific layer(s) to put fill cell rectangle geometry on.
         densities: Fill densities for each layer specified in ``layers``.
@@ -134,9 +141,11 @@ def fill_cell_rectangle(
     D = Component()
     for layer, density, inv in zip(layers, densities, inverted):
         rectangle_size = np.array(size) * sqrt(density)
-        # r = D.add_ref(rectangle(size = rectangle_size, layer = layer))
         R = rectangle(
-            size=tuple(rectangle_size), layer=layer, port_type=None, centered=True
+            size=tuple(rectangle_size),
+            layer=layer,
+            port_type=None,
+            centered=True,
         )
 
         if inv is True:
@@ -168,6 +177,7 @@ def fill_rectangle(
     Dummy fill keeps density constant during fabrication
 
     Args:
+    ----
         component: Component to fill.
         fill_layers: list of layers. fill pattern layers.
         fill_size: Rectangular size of the fill element.
@@ -190,14 +200,14 @@ def fill_rectangle(
 
     fill_inverted = _loop_over(fill_inverted)
     if len(fill_layers) != len(fill_densities):
+        msg = "fill_rectangle() `fill_layers` and `fill_densities` parameters must be lists of the same length"
         raise ValueError(
-            "fill_rectangle() `fill_layers` and `fill_densities` parameters "
-            "must be lists of the same length"
+            msg,
         )
     if len(fill_layers) != len(fill_inverted):
+        msg = "fill_rectangle() `fill_layers` and `fill_inverted` parameters must be lists of the same length"
         raise ValueError(
-            "fill_rectangle() `fill_layers` and `fill_inverted` parameters must "
-            "be lists of the same length"
+            msg,
         )
 
     fill_cell = fill_cell_rectangle(
@@ -236,10 +246,16 @@ def fill_rectangle(
         bbox = D.bbox
 
     raster = _rasterize_polygons(
-        polygons=exclude_polys, bounds=bbox, dx=fill_size[0], dy=fill_size[1]
+        polygons=exclude_polys,
+        bounds=bbox,
+        dx=fill_size[0],
+        dy=fill_size[1],
     )
     raster = raster & ~_rasterize_polygons(
-        polygons=include_polys, bounds=bbox, dx=fill_size[0], dy=fill_size[1]
+        polygons=include_polys,
+        bounds=bbox,
+        dx=fill_size[0],
+        dy=fill_size[1],
     )
     raster = _expand_raster(raster, distance=margin / np.array(fill_size))
 
@@ -270,6 +286,7 @@ def fill_rectangle_custom(
     Dummy fill keeps density constant during fabrication.
 
     Args:
+    ----
         component: Component to fill.
         fill_cell: Component to use as fill cell.
         spacing: x, y pitch for fill.
@@ -298,10 +315,16 @@ def fill_rectangle_custom(
     include_polys = []
 
     raster = _rasterize_polygons(
-        polygons=exclude_polys, bounds=bbox, dx=spacing[0], dy=spacing[1]
+        polygons=exclude_polys,
+        bounds=bbox,
+        dx=spacing[0],
+        dy=spacing[1],
     )
     raster = raster & ~_rasterize_polygons(
-        polygons=include_polys, bounds=bbox, dx=spacing[0], dy=spacing[1]
+        polygons=include_polys,
+        bounds=bbox,
+        dx=spacing[0],
+        dy=spacing[1],
     )
     raster = _expand_raster(raster, distance=margin / np.array(spacing))
 
@@ -328,9 +351,7 @@ def test_fill() -> None:
         c,
         fill_layers=((2, 0),),
         fill_densities=(1.0,),
-        # fill_densities=0.5,
         avoid_layers=((1, 0),),
-        # bbox=(100.0, 100.0),
     )
     c << fill
     difftest(c, test_name="fill")
@@ -345,15 +366,6 @@ if __name__ == "__main__":
 
     # c << fill_rectangle(
     #     mzi,
-    #     fill_size=(0.5, 0.5),
-    #     fill_layers=layers,
-    #     margin=5,
-    #     fill_densities=[0.8] * len(layers),
-    #     avoid_layers=layers,
-    # )
-
-    # bbox = tuple(map(tuple, mzi.bbox))
-    # bbox = mzi.bbox
 
     c << fill_rectangle_custom(
         mzi,

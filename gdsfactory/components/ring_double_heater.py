@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -8,7 +9,9 @@ from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler_ring import coupler_ring
 from gdsfactory.components.straight import straight
 from gdsfactory.components.via_stack import via_stack_heater_m3
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2, Optional
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
@@ -20,14 +23,14 @@ def ring_double_heater(
     length_x: float = 0.01,
     length_y: float = 0.01,
     coupler_ring: ComponentSpec = coupler_ring,
-    coupler_ring_top: ComponentSpec = None,
+    coupler_ring_top: ComponentSpec | None = None,
     straight: ComponentSpec = straight,
     bend: ComponentSpec = bend_euler,
     cross_section_heater: CrossSectionSpec = "heater_metal",
     cross_section_waveguide_heater: CrossSectionSpec = "strip_heater_metal",
     cross_section: CrossSectionSpec = "strip",
     via_stack: gf.typings.ComponentSpec = via_stack_heater_m3_mini,
-    port_orientation: Optional[float] = None,
+    port_orientation: Optional[float] | None = None,
     via_stack_offset: Float2 = (0, 0),
     **kwargs,
 ) -> Component:
@@ -37,6 +40,7 @@ def ring_double_heater(
     connected with two vertical straights (sl: left, sr: right)
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -121,8 +125,9 @@ def ring_double_heater(
     valid_orientations = {p.orientation for p in via.ports.values()}
 
     if not p1:
+        msg = f"No ports found for port_orientation {port_orientation} in {valid_orientations}"
         raise ValueError(
-            f"No ports found for port_orientation {port_orientation} in {valid_orientations}"
+            msg,
         )
 
     c.add_ports(p1, prefix="l_")
@@ -144,19 +149,6 @@ if __name__ == "__main__":
 
     c2 = ring_double_heater(via_stack="via_stack_slot")
     c2.pprint_ports()
-    # c = ring_double_heater(width=1, layer=(2, 0), length_y=3)
-    # c = ring_double_heater(
-    #     length_x=0,
-    #     port_orientation=90,
-    #     bend=gf.components.bend_circular,
-    #     via_stack_offset=(2, 0),
-    #     coupler_ring_top=coupler_ring,
-    #     coupler_ring=gf.partial(
     #         coupler_ring_point,
-    #         coupler_ring=coupler_ring,
-    #         open_layers=("HEATER",),
-    #         open_sizes=((5, 7),),
     #     ),
-    # )
     c2.show(show_ports=True)
-    # c.pprint()

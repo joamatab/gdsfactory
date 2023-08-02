@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import cos, pi, sin
 
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec, Optional
 
 
 @gf.cell
@@ -19,6 +23,7 @@ def ring(
     """Returns a ring.
 
     Args:
+    ----
         radius: ring radius.
         width: of the ring.
         angle_resolution: number of points per degree.

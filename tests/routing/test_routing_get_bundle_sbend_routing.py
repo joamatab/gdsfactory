@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def demo_get_bundle_sbend_routing(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     """FIXME."""
-
     lengths = {}
 
     c = gf.Component("test_get_bundle_sort_ports")

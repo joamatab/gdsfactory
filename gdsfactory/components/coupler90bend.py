@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -17,6 +21,7 @@ def coupler90bend(
     r"""Returns 2 coupled bends.
 
     Args:
+    ----
         radius: um.
         gap: um.
         bend: for bend.
@@ -43,10 +48,14 @@ def coupler90bend(
     spacing = gap + width
 
     bend90_inner = gf.get_component(
-        bend, radius=radius, cross_section=cross_section_inner
+        bend,
+        radius=radius,
+        cross_section=cross_section_inner,
     )
     bend90_outer = gf.get_component(
-        bend, radius=radius + spacing, cross_section=cross_section_outer
+        bend,
+        radius=radius + spacing,
+        cross_section=cross_section_outer,
     )
     bend_inner_ref = c << bend90_inner
     bend_outer_ref = c << bend90_outer

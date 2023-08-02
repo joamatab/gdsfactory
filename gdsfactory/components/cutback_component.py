@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler180
 from gdsfactory.components.component_sequence import component_sequence
 from gdsfactory.components.straight import straight
 from gdsfactory.components.taper import taper
 from gdsfactory.components.taper_from_csv import taper_0p5_to_3_l36
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Optional
 
 
 @gf.cell
@@ -23,8 +26,8 @@ def cutback_component(
     mirror: bool = False,
     mirror1: bool = False,
     mirror2: bool = False,
-    straight_length: Optional[float] = None,
-    straight_length_pair: Optional[float] = None,
+    straight_length: Optional[float] | None = None,
+    straight_length_pair: Optional[float] | None = None,
     cross_section: CrossSectionSpec = "strip",
     **kwargs,
 ) -> Component:
@@ -33,6 +36,7 @@ def cutback_component(
     Works only for components with 2 ports (input, output).
 
     Args:
+    ----
         component: for cutback.
         cols: number of columns.
         rows: number of rows.
@@ -52,7 +56,8 @@ def cutback_component(
     component = gf.get_component(component, **kwargs)
     bendu = gf.get_component(bend180, cross_section=xs)
     straight_component = straight(
-        length=straight_length or xs.radius * 2, cross_section=xs
+        length=straight_length or xs.radius * 2,
+        cross_section=xs,
     )
     straight_pair = straight(length=straight_length_pair or 0, cross_section=xs)
 
@@ -101,8 +106,6 @@ def cutback_component(
     return c
 
 
-# straight_wide = partial(straight, width=3, length=20)
-# bend180_wide = partial(bend_euler180, width=3)
 component_flipped = partial(taper, width2=0.5, width1=3)
 straight_long = partial(straight, length=20)
 cutback_component_mirror = partial(cutback_component, mirror=True)
@@ -110,6 +113,4 @@ cutback_component_mirror = partial(cutback_component, mirror=True)
 
 if __name__ == "__main__":
     c = cutback_component()
-    # c = cutback_component_mirror(component=component_flipped)
-    # c = gf.routing.add_fiber_single(c)
     c.show(show_ports=True)

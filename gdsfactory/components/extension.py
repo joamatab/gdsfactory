@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy import ndarray
@@ -11,8 +12,10 @@ from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.components.mmi1x2 import mmi1x2
 from gdsfactory.cross_section import cross_section as cross_section_function
-from gdsfactory.port import Port
-from gdsfactory.typings import ComponentSpec, Coordinate, CrossSectionSpec, Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.port import Port
+    from gdsfactory.typings import ComponentSpec, Coordinate, CrossSectionSpec, Layer
 
 DEG2RAD = np.pi / 180
 
@@ -43,6 +46,7 @@ def move_polar_rad_copy(pos: Coordinate, angle: float, length: float) -> ndarray
     """Returns the points of a position (pos) with angle, shifted by length.
 
     Args:
+    ----
         pos: position.
         angle: in radians.
         length: extension length in um.
@@ -57,6 +61,7 @@ def extend_port(port: Port, length: float, layer: Layer | None = None) -> Compon
     """Returns a straight extension component out of a port.
 
     Args:
+    ----
         port: port to extend.
         length: extension length in um.
         layer: for the straight section.
@@ -102,6 +107,7 @@ def extend_ports(
     defaults to port cross_section of each port to extend.
 
     Args:
+    ----
         component: component to extend ports.
         port_names: list of ports names to extend, if None it extends all ports.
         length: extension length.
@@ -115,6 +121,7 @@ def extend_ports(
         extension_port_names: extension port names add to the new component.
 
     Keyword Args:
+    ------------
         layer: port GDS layer.
         prefix: port name prefix.
         orientation: in degrees.
@@ -141,7 +148,8 @@ def extend_ports(
     for port_name in ports_to_extend_names:
         if port_name not in port_names_all:
             warnings.warn(
-                f"Port Name {port_name!r} not in {port_names_all}", stacklevel=3
+                f"Port Name {port_name!r} not in {port_names_all}",
+                stacklevel=3,
             )
 
     for port in ports_all:
@@ -159,7 +167,8 @@ def extend_ports(
                 )
 
                 if cross_section_extension is None:
-                    raise ValueError("cross_section=None for extend_ports")
+                    msg = "cross_section=None for extend_ports"
+                    raise ValueError(msg)
 
                 extension_component = gf.components.straight(
                     length=length,

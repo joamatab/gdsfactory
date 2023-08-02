@@ -8,9 +8,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Layer
 
 
 @gf.cell
@@ -43,11 +47,19 @@ def crossing_arm(
     c.add_polygon(taper_points, layer=layer_wg)
 
     c.add_port(
-        name="o1", center=(-xmax, 0), orientation=180, width=wg_width, layer=layer_wg
+        name="o1",
+        center=(-xmax, 0),
+        orientation=180,
+        width=wg_width,
+        layer=layer_wg,
     )
 
     c.add_port(
-        name="o2", center=(xmax, 0), orientation=0, width=wg_width, layer=layer_wg
+        name="o2",
+        center=(xmax, 0),
+        orientation=0,
+        width=wg_width,
+        layer=layer_wg,
     )
     return c
 

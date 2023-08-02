@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
@@ -8,7 +9,9 @@ from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.mmi1x2 import mmi1x2
 from gdsfactory.components.mzi_arm import mzi_arm
 from gdsfactory.components.straight import straight as straight_function
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @cell
@@ -33,6 +36,7 @@ def mzi_arms(
     You can find a more robust mzi in gf.components.mzi
 
     Args:
+    ----
         delta_length: bottom arm vertical extra length.
         length_y: vertical length for both and top arms.
         length_x: horizontal length.
@@ -156,34 +160,9 @@ def mzi_arms(
 if __name__ == "__main__":
     import gdsfactory as gf
 
-    # delta_length = 116.8 / 2
-    # print(delta_length)
-    # c = mzi_arms(delta_length=delta_length, with_splitter=False)
-    # c.pprint_netlist()
     mmi2x2 = partial(gf.components.mmi2x2, width_mmi=5, gap_mmi=2)
     c = mzi_arms(delta_length=10, combiner=mmi2x2)
     c.show(show_ports=True)
 
     def bend_s(length: float = 10, **kwargs):
         return gf.components.bend_s(size=(length, 10), **kwargs)
-
-    # c = mzi_arms(
-    #     delta_length=50,
-    #     # straight_x_top=bend_s,
-    #     # straight_x_bot=gf.compose(gf.functions.mirror, bend_s),
-    #     # straight_x_top=gf.components.straight_heater_meander,
-    #     # straight_x_bot=gf.components.straight_heater_meander,
-    #     # straight_x_top=gf.components.straight_heater_metal,
-    #     # straight_x_bot=gf.components.straight_heater_metal,
-    #     # length_x=300,
-    #     # delta_yright=-20,
-    #     # length_x_bot=300,
-    #     # length_y=1.8,
-    #     # with_splitter=False,
-    # )
-    # c.show(show_ports=True)
-    # c.show(show_subports=True)
-    # c.pprint()
-    # n = c.get_netlist()
-    # c.plot()
-    # print(c.settings)

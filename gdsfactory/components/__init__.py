@@ -625,13 +625,7 @@ cells = get_cells(sys.modules[__name__])
 
 
 if __name__ == "__main__":
-    # c = coupler_trenches(width=1)
-    # c = bend_euler_trenches(width=1)
-    # c = ring_single_trenches(width=1)
     c = ring_double_trenches(width=1)
     c.show(show_ports=True)
-    # print(len(cells.keys()))
 
-    # print("cells")
     # for i in cells.keys():
-    #     print(i)

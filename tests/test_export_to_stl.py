@@ -36,7 +36,3 @@ def test_export_exclude_layers() -> None:
 
 if __name__ == "__main__":
     test_export_filepath()
-    # test_export_empty_component()
-    # component = Component()
-    # filepath = 'test.stl'
-    # to_stl(component, filepath)

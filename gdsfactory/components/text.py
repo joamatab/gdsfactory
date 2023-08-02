@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.text_rectangular import text_rectangular
 from gdsfactory.constants import _glyph, _indent, _width
-from gdsfactory.typings import Coordinate, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Coordinate, LayerSpec
 
 
 @gf.cell
@@ -20,6 +24,7 @@ def text(
     """Text shapes.
 
     Args:
+    ----
         text: string.
         size: in um.
         position: x, y position.
@@ -44,7 +49,8 @@ def text(
                     label.add_polygon([xpts + xoffset, ypts + yoffset], layer=layer)
                 xoffset += (_width[ascii_val] + _indent[ascii_val]) * scaling
             else:
-                raise ValueError(f"No character with ascii value {ascii_val!r}")
+                msg = f"No character with ascii value {ascii_val!r}"
+                raise ValueError(msg)
         ref = t.add_ref(label)
         t.absorb(ref)
         yoffset -= 1500 * scaling
@@ -58,8 +64,9 @@ def text(
         elif justify == "center":
             label.move(origin=label.center, destination=position, axis="x")
         else:
+            msg = f"justify = {justify!r} not in ('center', 'right', 'left')"
             raise ValueError(
-                f"justify = {justify!r} not in ('center', 'right', 'left')"
+                msg,
             )
     return t
 
@@ -73,6 +80,7 @@ def text_lines(
     """Returns a Component from a text lines.
 
     Args:
+    ----
         text: list of strings.
         size: text size.
         layer: text layer.
@@ -87,15 +95,5 @@ def text_lines(
 
 
 if __name__ == "__main__":
-    # c1 = gf.components.text("hello", size=10, layer=(1, 0))
     c2 = gf.components.text("10.0")
-    # c = text(
-    #     text=".[,ABCDEFGHIKKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:/",
-    #     size=4.0,
-    #     justify="right",
-    #     position=(120.5, 3),
-    # )
-    # c = text_lines(text=["a", "b"], size=10)
-    # c = text_lines()
     c2.show(show_ports=True)
-    # c.plot()

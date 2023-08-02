@@ -1,8 +1,12 @@
 """Dummy fill to keep density constant using klayout."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.typings import LayerSpec, LayerSpecs, PathType
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec, LayerSpecs, PathType
 
 
 def fill(
@@ -23,6 +27,7 @@ def fill(
     """Write gds file with fill.
 
     Args:
+    ----
         gdspath: GDS input.
         layer_to_fill: Layer that defines the region to fill.
         layer_to_fill_margin: in um.
@@ -49,25 +54,30 @@ def fill(
 
     if create_new_fill_cell:
         if lib.has_cell(fill_cell_name):
-            raise ValueError(f"{fill_cell_name!r} already in {str(gdspath)!r}")
+            msg = f"{fill_cell_name!r} already in {str(gdspath)!r}"
+            raise ValueError(msg)
 
         if not fill_layers:
+            msg = "You need to pass fill_layers if create_new_fill_cell=True"
             raise ValueError(
-                "You need to pass fill_layers if create_new_fill_cell=True"
+                msg,
             )
         fill_cell = kf.KCell(fill_cell_name)
         for layer in fill_layers:
             layer = gf.get_layer(layer)
             layer = kf.kcl.layer(*layer)
             fill_cell << kf.cells.waveguide.waveguide(
-                width=fill_size[0], length=fill_size[1], layer=layer
+                width=fill_size[0],
+                length=fill_size[1],
+                layer=layer,
             )
     else:
         fill_cell = lib[fill_cell_name]
 
     fill_cell_index = fill_cell.cell_index()  # fill cell index
     fill_cell_box = fill_cell.bbox().enlarged(
-        fill_spacing[0] / 2 * 1e3, fill_spacing[1] / 2 * 1e3
+        fill_spacing[0] / 2 * 1e3,
+        fill_spacing[1] / 2 * 1e3,
     )
     fill_margin = kf.kdb.Point(0, 0)
 
@@ -82,7 +92,7 @@ def fill(
             layer = kf.kcl.layer(*layer)
             region_avoid = kdb.Region()
             region_avoid.insert(
-                cell.begin_shapes_rec(layer)
+                cell.begin_shapes_rec(layer),
             ) if layer != layer_to_fill else None
             region_avoid = region_avoid.size(margin * 1e3)
             region_avoid_all = region_avoid_all + region_avoid
@@ -129,7 +139,6 @@ if __name__ == "__main__":
             fill_layers=("WG",),
             layer_to_fill=gf.LAYER.PADDING,
             layers_to_avoid=((gf.LAYER.WG, 0), (gf.LAYER.M3, 0)),
-            # layers_to_avoid=((gf.LAYER.WG, 0),),
             fill_cell_name="pad_size2__2",
             create_new_fill_cell=False,
             fill_spacing=(spacing, spacing),

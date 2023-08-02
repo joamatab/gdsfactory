@@ -17,7 +17,7 @@ def dangerous_intermediate_cells(width=0.5) -> Component:
     """Example that will show the dangers of using intermediate cells."""
     c = gf.Component("safe")
     c2 = gf.Component(
-        "dangerous"
+        "dangerous",
     )  # This should be forbidden as it will create duplicated cells
     c2 << gf.components.hline(width=width)
     c << c2
@@ -39,7 +39,7 @@ def using_dangerous_intermediate_cells() -> Component:
 
 
 def test_uncached_component_warning() -> None:
-    """Ensures that an UncachedComponentWarning is raised by default when a GDS with uncached cells is written"""
+    """Ensures that an UncachedComponentWarning is raised by default when a GDS with uncached cells is written."""
     c = using_dangerous_intermediate_cells()
 
     with pytest.warns(UncachedComponentWarning):
@@ -75,4 +75,3 @@ def test_uncached_component_error() -> None:
 
 if __name__ == "__main__":
     test_uncached_component_warning()
-    # test_uncached_component_error()

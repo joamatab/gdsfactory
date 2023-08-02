@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.add_pins import LayerSpec
-from gdsfactory.component import Component
 from gdsfactory.components.compass import compass
 from gdsfactory.components.via_stack import via_stack_heater_m3
-from gdsfactory.typings import ComponentSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.add_pins import LayerSpec
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, Float2
 
 
 @gf.cell
@@ -22,6 +26,7 @@ def _via_iterable(
     """Via chain.
 
     Args:
+    ----
         via_spacing: via_spacing (um).
         wire_width: width of wire.
         layer1: top wiring.
@@ -36,10 +41,14 @@ def _via_iterable(
     via1 = c.add_ref(compass(size=(via_width, via_width), layer=via_layer))
     wire1.connect(port="e3", destination=wire2.ports["e1"], overlap=wire_width)
     viac.connect(
-        port="e1", destination=wire1.ports["e3"], overlap=(wire_width + via_width) / 2
+        port="e1",
+        destination=wire1.ports["e3"],
+        overlap=(wire_width + via_width) / 2,
     )
     via1.connect(
-        port="e1", destination=wire2.ports["e3"], overlap=(wire_width + via_width) / 2
+        port="e1",
+        destination=wire2.ports["e3"],
+        overlap=(wire_width + via_width) / 2,
     )
     c.add_port(name="e1", port=wire1.ports["e1"], port_type="electrical", layer=layer1)
     c.add_port(name="e3", port=wire2.ports["e3"], port_type="electrical", layer=layer2)
@@ -82,6 +91,7 @@ def via_cutback(
     based on phidl.geometry
 
     Args:
+    ----
         num_vias: total requested vias needs to be even.
         wire_width: width of wire.
         via_width: width of via.
@@ -155,7 +165,7 @@ def via_cutback(
         tail = c.add_ref(
             pad(
                 size=(min_pad_spacing - current_width + wire_width, wire_width),
-            )
+            ),
         )
     else:
         tail = c.add_ref(pad(size=(3 * wire_width, wire_width)))

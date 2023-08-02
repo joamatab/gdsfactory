@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.grating_coupler_elliptical import (
     grating_coupler_elliptical_te,
 )
 from gdsfactory.components.straight_array import straight_array
-from gdsfactory.typings import ComponentSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, LayerSpec
 
 
 @gf.cell
@@ -25,6 +29,7 @@ def grating_coupler_tree(
     useful to align the 4 corners of the chip
 
     Args:
+    ----
         n: number of gratings.
         straight_spacing: in um.
         grating_coupler: spec.
@@ -56,5 +61,4 @@ def grating_coupler_tree(
 
 if __name__ == "__main__":
     c = grating_coupler_tree()
-    # print(c.settings)
     c.show(show_ports=False)

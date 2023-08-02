@@ -32,6 +32,7 @@ def get_polygons(
     """Return a list of polygons in this cell.
 
     Args:
+    ----
         by_spec: bool or layer
             If True, the return value is a dictionary with the
             polygons of each individual pair (layer, datatype), which
@@ -47,13 +48,15 @@ def get_polygons(
             polygon objects have more information (especially when by_spec=False) and are faster to retrieve.
         as_shapely: returns shapely polygons.
 
-    Returns
+    Returns:
+    -------
         out: list of array-like[N][2] or dictionary
             List containing the coordinates of the vertices of each
             polygon, or dictionary with with the list of polygons (if
             `by_spec` is True).
 
     Note:
+    ----
         Instances of `FlexPath` and `RobustPath` are also included in
         the result by computing their polygonal boundary.
     """
@@ -116,9 +119,11 @@ def _parse_layer(layer):
     [0, 1] representing layer = 0 and datatype = 1, or just a layer number.
 
     Args:
+    ----
         layer: int, array-like[2], or set Variable to check.
 
     Returns:
+    -------
         (gds_layer, gds_datatype) : array-like[2]
             The layer number and datatype of the input.
     """
@@ -136,12 +141,14 @@ def _parse_layer(layer):
         raise ValueError(
             """_parse_layer() was passed something
             that could not be interpreted as a layer: layer = %s"""
-            % layer
+            % layer,
         )
     if not isinstance(gds_layer, int):
-        raise ValueError(f"invalid layer {layer}")
+        msg = f"invalid layer {layer}"
+        raise ValueError(msg)
     if not isinstance(gds_datatype, int):
-        raise ValueError(f"invalid layer {layer}")
+        msg = f"invalid layer {layer}"
+        raise ValueError(msg)
     return (gds_layer, gds_datatype)
 
 
@@ -163,6 +170,7 @@ class _GeometryHelper:
         """Sets the center of the bounding box.
 
         Args:
+        ----
             destination : array-like[2] Coordinates of the new bounding box center.
         """
         self.move(destination=destination, origin=self.center)
@@ -177,6 +185,7 @@ class _GeometryHelper:
         """Sets the x-coordinate of the center of the bounding box.
 
         Args:
+        ----
             destination : int or float x-coordinate of the bbox center.
         """
         destination = (destination, self.center[1])
@@ -192,6 +201,7 @@ class _GeometryHelper:
         """Sets the y-coordinate of the center of the bounding box.
 
         Args:
+        ----
         destination : int or float
             y-coordinate of the bbox center.
         """
@@ -208,6 +218,7 @@ class _GeometryHelper:
         """Sets the x-coordinate of the maximum edge of the bounding box.
 
         Args:
+        ----
         destination : int or float
             x-coordinate of the maximum edge of the bbox.
         """
@@ -223,6 +234,7 @@ class _GeometryHelper:
         """Sets the y-coordinate of the maximum edge of the bounding box.
 
         Args:
+        ----
             destination : int or float y-coordinate of the maximum edge of the bbox.
         """
         self.move(destination=(0, destination), origin=self.bbox[1], axis="y")
@@ -237,6 +249,7 @@ class _GeometryHelper:
         """Sets the x-coordinate of the minimum edge of the bounding box.
 
         Args:
+        ----
             destination : int or float x-coordinate of the minimum edge of the bbox.
         """
         self.move(destination=(destination, 0), origin=self.bbox[0], axis="x")
@@ -251,6 +264,7 @@ class _GeometryHelper:
         """Sets the y-coordinate of the minimum edge of the bounding box.
 
         Args:
+        ----
             destination : int or float y-coordinate of the minimum edge of the bbox.
         """
         self.move(destination=(0, destination), origin=self.bbox[0], axis="y")
@@ -277,6 +291,7 @@ class _GeometryHelper:
         """Moves an object by a specified x-distance.
 
         Args:
+        ----
             origin: array-like[2], Port, or key Origin point of the move.
             destination: array-like[2], Port, key, or None Destination point of the move.
         """
@@ -289,6 +304,7 @@ class _GeometryHelper:
         """Moves an object by a specified y-distance.
 
         Args:
+        ----
             origin : array-like[2], Port, or key Origin point of the move.
             destination : array-like[2], Port, or key Destination point of the move.
         """
@@ -301,6 +317,7 @@ class _GeometryHelper:
         """Adds an element to a Group.
 
         Args:
+        ----
             element: Component, ComponentReference, Port, Polygon,
                 Label, or Group to add.
         """
@@ -315,7 +332,8 @@ class _GeometryHelper:
 
 class Group(_GeometryHelper):
     """Group objects together so you can manipulate them as a single object \
-            (move/rotate/mirror)."""
+    (move/rotate/mirror).
+    """
 
     def __init__(self, *args) -> None:
         """Initialize Group."""
@@ -334,6 +352,7 @@ class Group(_GeometryHelper):
         """Adds an element to the Group.
 
         Args:
+        ----
             element: Component, ComponentReference, Port, Polygon,
                 Label, or Group to add.
 
@@ -344,7 +363,8 @@ class Group(_GeometryHelper):
     def bbox(self):
         """Returns the bounding boxes of the Group."""
         if len(self.elements) == 0:
-            raise ValueError("Group is empty, no bbox is available")
+            msg = "Group is empty, no bbox is available"
+            raise ValueError(msg)
         bboxes = np.empty([len(self.elements), 4])
         for n, e in enumerate(self.elements):
             bboxes[n] = e.bbox.flatten()
@@ -359,6 +379,7 @@ class Group(_GeometryHelper):
         """Adds an element to the Group.
 
         Args:
+        ----
             element: Component, ComponentReference, Port, Polygon,
                 Label, or Group to add.
         """
@@ -370,14 +391,14 @@ class Group(_GeometryHelper):
         elif element is None:
             return self
         elif isinstance(
-            element, (Component, ComponentReference, Polygon, Label, Group)
+            element,
+            Component | ComponentReference | Polygon | Label | Group,
         ):
             self.elements.append(element)
         else:
+            msg = "add() Could not add element to Group, the only allowed element types are (Component, ComponentReference, Polygon, Label, Group)"
             raise ValueError(
-                "add() Could not add element to Group, the only "
-                "allowed element types are "
-                "(Component, ComponentReference, Polygon, Label, Group)"
+                msg,
             )
         # Remove non-unique entries
         used = set()
@@ -390,6 +411,7 @@ class Group(_GeometryHelper):
         """Rotates all elements in a Group around the specified centerpoint.
 
         Args:
+        ----
             angle : int or float
                 Angle to rotate the Group in degrees.
             center : array-like[2] or None
@@ -406,6 +428,7 @@ class Group(_GeometryHelper):
         corresponding to one of the Ports in this Group.
 
         Args:
+        ----
             origin : array-like[2], Port, or key
                 Origin point of the move.
             destination : array-like[2], Port, or key
@@ -424,6 +447,7 @@ class Group(_GeometryHelper):
         [1,2] or array-like[N][2], and will return in kind.
 
         Args:
+        ----
             p1 : array-like[N][2]
                 First point of the line.
             p2 : array-like[N][2]
@@ -434,11 +458,16 @@ class Group(_GeometryHelper):
         return self
 
     def distribute(
-        self, direction="x", spacing=100, separation=True, edge="center"
+        self,
+        direction="x",
+        spacing=100,
+        separation=True,
+        edge="center",
     ) -> Group:
         """Distributes the elements in the Group.
 
         Args:
+        ----
             direction : {'x', 'y'}
                 Direction of distribution; either a line in the x-direction or
                 y-direction.
@@ -464,6 +493,7 @@ class Group(_GeometryHelper):
         """Aligns the elements in the Group.
 
         Args:
+        ----
             alignment : {'x', 'y', 'xmin', 'xmax', 'ymin', 'ymax'}
                 Which edge to align along (e.g. 'ymax' will align move the elements
                 such that all of their topmost points are aligned)
@@ -479,6 +509,7 @@ def _rotate_points(points, angle: float = 45, center=(0, 0)):
     and will return in kind.
 
     Args:
+    ----
         points : array-like[N][2]
             Coordinates of the element to be rotated.
         angle : int or float
@@ -487,6 +518,7 @@ def _rotate_points(points, angle: float = 45, center=(0, 0)):
             Centerpoint of rotation.
 
     Returns:
+    -------
         A new set of points that are rotated around ``center``.
     """
     if angle == 0:
@@ -500,6 +532,7 @@ def _rotate_points(points, angle: float = 45, center=(0, 0)):
         return (points - c0) * ca + (points - c0)[:, ::-1] * sa + c0
     if np.asarray(points).ndim == 1:
         return (points - c0) * ca + (points - c0)[::-1] * sa + c0
+    return None
 
 
 def _reflect_points(points, p1=(0, 0), p2=(1, 0)):
@@ -509,6 +542,7 @@ def _reflect_points(points, p1=(0, 0), p2=(1, 0)):
     and will return in kind.
 
     Args:
+    ----
         points : array-like[N][2]
             Coordinates of the element to be reflected.
         p1 : array-like[2]
@@ -517,6 +551,7 @@ def _reflect_points(points, p1=(0, 0), p2=(1, 0)):
             Coordinates of the end of the reflecting line.
 
     Returns:
+    -------
         A new set of points that are reflected across ``p1`` and ``p2``.
     """
     # From http://math.stackexchange.com/questions/11515/point-reflection-across-a-line
@@ -534,27 +569,31 @@ def _reflect_points(points, p1=(0, 0), p2=(1, 0)):
                 2 * (p1 + (p2 - p1) * np.dot((p2 - p1), (p - p1)) / norm(p2 - p1) ** 2)
                 - p
                 for p in points
-            ]
+            ],
         )
+    return None
 
 
 def _is_iterable(items):
     """Checks if the passed variable is iterable.
 
     Args:
+    ----
         items: any Item to check for iterability.
     """
-    return isinstance(items, (list, tuple, set, np.ndarray))
+    return isinstance(items, list | tuple | set | np.ndarray)
 
 
 def _parse_coordinate(c):
     """Translates various inputs (lists, tuples, Ports) to an (x,y) coordinate.
 
     Args:
+    ----
         c: array-like[N] or Port
             Input to translate into a coordinate.
 
     Returns:
+    -------
         c : array-like[2]
             Parsed coordinate.
     """
@@ -563,8 +602,9 @@ def _parse_coordinate(c):
     elif np.array(c).size == 2:
         return c
     else:
+        msg = "Could not parse coordinate, input should be array-like (e.g. [1.5,2.3] or a Port"
         raise ValueError(
-            "Could not parse coordinate, input should be array-like (e.g. [1.5,2.3] or a Port"
+            msg,
         )
 
 
@@ -572,6 +612,7 @@ def _parse_move(origin, destination, axis):
     """Translates input coordinates to changes in position in the x and y directions.
 
     Args:
+    ----
         origin : array-like[2] of int or float, Port, or key
             Origin point of the move.
         destination : array-like[2] of int or float, Port, key, or None
@@ -579,6 +620,7 @@ def _parse_move(origin, destination, axis):
         axis : {'x', 'y'} Direction of move.
 
     Returns:
+    -------
         dx : int or float
             Change in position in the x-direction.
         dy : int or float
@@ -605,6 +647,7 @@ def _distribute(elements, direction="x", spacing=100, separation=True, edge=None
     grid or with a fixed spacing between them.
 
     Args:
+    ----
         elements : array-like of gdsfactory objects
             Elements to distribute.
         direction : {'x', 'y'}
@@ -620,30 +663,32 @@ def _distribute(elements, direction="x", spacing=100, separation=True, edge=None
             separation == True)
 
     Returns:
+    -------
         elements : Component, ComponentReference, Port, Polygon, Label, or Group
             Distributed elements.
     """
     if len(elements) == 0:
         return elements
     if direction not in ({"x", "y"}):
-        raise ValueError("distribute(): 'direction' argument must be either 'x' or'y'")
+        msg = "distribute(): 'direction' argument must be either 'x' or'y'"
+        raise ValueError(msg)
     if (
         (direction == "x")
         and (edge not in ({"x", "xmin", "xmax"}))
         and (not separation)
     ):
+        msg = "distribute(): When `separation` == False and direction == 'x', the `edge` argument must be one of {'x', 'xmin', 'xmax'}"
         raise ValueError(
-            "distribute(): When `separation` == False and direction == 'x',"
-            " the `edge` argument must be one of {'x', 'xmin', 'xmax'}"
+            msg,
         )
     if (
         (direction == "y")
         and (edge not in ({"y", "ymin", "ymax"}))
         and (not separation)
     ):
+        msg = "distribute(): When `separation` == False and direction == 'y', the `edge` argument must be one of {'y', 'ymin', 'ymax'}"
         raise ValueError(
-            "distribute(): When `separation` == False and direction == 'y',"
-            " the `edge` argument must be one of {'y', 'ymin', 'ymax'}"
+            msg,
         )
 
     if direction == "y":
@@ -673,6 +718,7 @@ def _align(elements, alignment="ymax"):
     """Aligns lists of gdsfactory elements.
 
     Args:
+    ----
         elements : array-like of gdsfactory objects
             Elements to align.
         alignment : {'x', 'y', 'xmin', 'xmax', 'ymin', 'ymax'}
@@ -680,15 +726,19 @@ def _align(elements, alignment="ymax"):
             that all of their topmost points are aligned)
 
 
-    Returns
+    Returns:
+    -------
         elements : array-like of gdsfactory objects
             Aligned elements.
     """
     if len(elements) == 0:
         return elements
     if alignment not in (["x", "y", "xmin", "xmax", "ymin", "ymax"]):
-        raise ValueError(
+        msg = (
             "'alignment' argument must be one of 'x','y','xmin', 'xmax', 'ymin','ymax'"
+        )
+        raise ValueError(
+            msg,
         )
     value = Group(elements).__getattribute__(alignment)
     for e in elements:
@@ -706,7 +756,7 @@ def _line_distances(points, start, end):
 
 
 def _simplify(points, tolerance=0):
-    """Ramer–Douglas–Peucker algorithm for line simplification.
+    """Ramer-Douglas-Peucker algorithm for line simplification.
 
     Takes an array of points of shape (N,2) and removes excess points in the line.
     The remaining points form a identical line to within `tolerance` from the original
@@ -732,12 +782,6 @@ def _simplify(points, tolerance=0):
 
 if __name__ == "__main__":
     import gdsfactory as gf
-
-    # c = gf.Component()
-    # label = c.add_label("hi")
-    # print(c.labels[0])
-    # _demo()
-    # s = Step()
 
     c = gf.Component("bend")
     b = c << gf.components.bend_circular(angle=30)

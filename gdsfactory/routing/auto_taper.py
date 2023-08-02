@@ -1,19 +1,20 @@
 import warnings
-from typing import List, Optional
 
 from gdsfactory.component import Component, ComponentReference, Port
 from gdsfactory.typings import CrossSectionSpec
 
 
 def taper_to_cross_section(
-    port: Port, cross_section: CrossSectionSpec
-) -> Optional[ComponentReference]:
+    port: Port,
+    cross_section: CrossSectionSpec,
+) -> ComponentReference | None:
     """Returns taper ComponentReference from a port to a given cross-section \
             placed so that it connects to the input port.
 
     Assumes that the taper component has `width1` and `width2` which map to the input and output port widths.
 
     Args:
+    ----
         port: a port to connect to, usually from a ComponentReference
         cross_section: a cross-section to transition to
 
@@ -54,15 +55,16 @@ def taper_to_cross_section(
         try:
             taper_name = layer_transitions[(port_layer, cs_layer)]
         except KeyError as e:
+            msg = f"No registered tapers between routing layers {port_layer} and {cs_layer}!"
             raise KeyError(
-                f"No registered tapers between routing layers {port_layer} and {cs_layer}!"
+                msg,
             ) from e
     elif abs(port_width - cs_width) > 0.001:
         try:
             taper_name = layer_transitions[port_layer]
         except KeyError:
             warnings.warn(
-                f"No registered width taper for layer {port_layer}. Skipping."
+                f"No registered width taper for layer {port_layer}. Skipping.",
             )
             return None
     else:
@@ -72,7 +74,7 @@ def taper_to_cross_section(
     return ComponentReference(taper).connect(input_port_name, port)
 
 
-def _get_taper_io_port_names(component: Component) -> List[str]:
+def _get_taper_io_port_names(component: Component) -> list[str]:
     # this is kind of a hack, but o1 < o2, in0 < out0... hopefully nobody has any other wacky conventions!
     return sorted(component.ports.keys())
 
@@ -107,10 +109,17 @@ def _auto_taper(
         inner_ports.append(new_port_group)
         tapers.append(taper_group)
     routes = routing_func(
-        inner_ports[0], inner_ports[1], cross_section=cross_section, **kwargs
+        inner_ports[0],
+        inner_ports[1],
+        cross_section=cross_section,
+        **kwargs,
     )
     for route, port1, port2, taper1, taper2 in zip(
-        routes, ports1, ports2, tapers[0], tapers[1]
+        routes,
+        ports1,
+        ports2,
+        tapers[0],
+        tapers[1],
     ):
         if taper1:
             route.references.append(taper1)

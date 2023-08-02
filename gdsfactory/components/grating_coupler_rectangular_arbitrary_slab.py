@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.rectangle import rectangle
 from gdsfactory.components.taper import taper_strip_to_slab150
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Floats, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Floats, LayerSpec
 
 _gaps = (0.2,) * 10
 _widths = (0.5,) * 10
@@ -30,6 +34,7 @@ def grating_coupler_rectangular_arbitrary_slab(
     r"""Grating coupler uniform (grating with rectangular shape not elliptical). Therefore it needs a longer taper. Grating teeth are straight instead of elliptical.
 
     Args:
+    ----
         gaps: list of gaps.
         widths: list of widths.
         width_grating: um.
@@ -99,7 +104,7 @@ def grating_coupler_rectangular_arbitrary_slab(
                 layer=layer,
                 port_type=None,
                 centered=True,
-            )
+            ),
         )
         cgrating.x = gf.snap.snap_to_grid(xi)
         cgrating.y = 0

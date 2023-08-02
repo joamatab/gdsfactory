@@ -2,21 +2,27 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.mmi1x2 import mmi1x2
 from gdsfactory.components.spiral_external_io import spiral_external_io
 from gdsfactory.routing.manhattan import route_manhattan
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 @gf.cell
 def loop_mirror(
-    component: ComponentSpec = mmi1x2, bend90: ComponentSpec = "bend_euler"
+    component: ComponentSpec = mmi1x2,
+    bend90: ComponentSpec = "bend_euler",
 ) -> Component:
     """Returns Sagnac loop_mirror.
 
     Args:
+    ----
         component: 1x2 splitter.
         bend90: 90 deg bend.
 
@@ -39,15 +45,18 @@ def loop_mirror(
 
 @gf.cell
 def loop_mirror_with_delay(
-    loop_mirror: ComponentSpec = loop_mirror, spiral: ComponentSpec = spiral_external_io
+    loop_mirror: ComponentSpec = loop_mirror,
+    spiral: ComponentSpec = spiral_external_io,
 ) -> Component:
     """Returns loop_mirror with spiral for delay.
 
     Args:
+    ----
         loop_mirror: loop_mirror spec.
         spiral: for delay.
 
     Notes:
+    -----
         Delay = 13e-12.
         # delay = length/speed
         # length=delay*speed
@@ -62,7 +71,5 @@ def loop_mirror_with_delay(
 
 
 if __name__ == "__main__":
-    # c = loop_mirror()
-    # c = loop_mirror_rotated()
     c = loop_mirror_with_delay()
     c.show(show_ports=True)

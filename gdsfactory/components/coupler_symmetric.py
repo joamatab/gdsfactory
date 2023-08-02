@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_s import bend_s
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def coupler_symmetric(
     r"""Two coupled straights with bends.
 
     Args:
+    ----
         bend: bend spec.
         gap: in um.
         dy: port to port vertical spacing.
@@ -73,8 +78,5 @@ def coupler_symmetric(
 if __name__ == "__main__":
     c = coupler_symmetric(gap=0.2, width=0.9)
     c.show(show_ports=False)
-    # c.pprint()
 
     # for dyi in [2, 3, 4, 5]:
-    #     c = coupler_symmetric(gap=0.2, width=0.5, dy=dyi, dx=10.0, layer=(2, 0))
-    #     print(f"dy={dyi}, min_bend_radius = {c.info['min_bend_radius']}")

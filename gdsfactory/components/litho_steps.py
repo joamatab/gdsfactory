@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory import components as pc
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -19,6 +23,7 @@ def litho_steps(
     based on phidl
 
     Args:
+    ----
         line_widths: in um.
         line_spacing: in um.
         height: in um.
@@ -28,7 +33,10 @@ def litho_steps(
 
     height /= 2
     T1 = pc.text(
-        text=f"{str(line_widths[-1])}", size=height, justify="center", layer=layer
+        text=f"{line_widths[-1]!s}",
+        size=height,
+        justify="center",
+        layer=layer,
     )
 
     D.add_ref(T1).rotate(90).movex(-height / 10)

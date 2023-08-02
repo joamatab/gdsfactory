@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.components.bend_s import bend_s as bend_s_function
 from gdsfactory.components.mmi1x2 import mmi1x2
 from gdsfactory.components.mmi2x2 import mmi2x2
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
 
 
 @gf.cell
@@ -21,6 +25,7 @@ def splitter_tree(
     """Tree of power splitters.
 
     Args:
+    ----
         coupler: coupler factory.
         noutputs: number of outputs.
         spacing: x, y spacing between couplers.
@@ -52,7 +57,7 @@ def splitter_tree(
     if bend_s:
         dy_coupler_ports = abs(
             coupler.ports[e0_port_name].center[1]
-            - coupler.ports[e1_port_name].center[1]
+            - coupler.ports[e1_port_name].center[1],
         )
         bend_s_ysize = dy / 4 - dy_coupler_ports / 2
         bend_s_xsize = bend_s_xsize or dx
@@ -90,7 +95,7 @@ def splitter_tree(
                         ],
                         coupler_ref.ports["o1"],
                         cross_section=cross_section,
-                    ).references
+                    ).references,
                 )
             if cols > col > 0:
                 for port in coupler_ref.get_ports_list():
@@ -146,23 +151,10 @@ if __name__ == "__main__":
 
     import gdsfactory as gf
 
-    # c = splitter_tree(
-    #     coupler=partial(mmi2x2, gap_mmi=2.0, width_mmi=5.0),
-    #     # noutputs=128 * 2,
-    #     # noutputs=2 ** 3,
-    #     noutputs=2**2,
-    #     # bend_s=None,
-    #     # dy=100.0,
-    #     # layer=(2, 0),
-    # )
     c = splitter_tree(
         noutputs=2**2,
         spacing=(120.0, 50.0),
-        # bend_length=30,
-        # bend_s=None,
         cross_section="rib_conformal2",
     )
     c.show(show_ports=True)
-    # print(len(c.ports))
     # for port in c.get_ports_list():
-    #     print(port)

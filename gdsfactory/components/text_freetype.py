@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.constants import _glyph, _indent, _width
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -22,6 +26,7 @@ def text_freetype(
     """Returns text Component.
 
     Args:
+    ----
         text: string.
         size: in um.
         position: x, y position.
@@ -54,7 +59,7 @@ def text_freetype(
                 else:
                     valid_chars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~µ"
                     warnings.warn(
-                        f'text(): Warning, some characters ignored, no geometry for character "{chr(ascii_val)}" with ascii value {ascii_val}. Valid characters: {valid_chars}'
+                        f'text(): Warning, some characters ignored, no geometry for character "{chr(ascii_val)}" with ascii value {ascii_val}. Valid characters: {valid_chars}',
                     )
             ref = t.add_ref(char)
             t.absorb(ref)
@@ -66,17 +71,16 @@ def text_freetype(
         # Load the font
         # If we've passed a valid file, try to load that, otherwise search system fonts
         font = None
-        if (face.endswith(".otf") or face.endswith(".ttf")) and os.path.exists(face):
+        if (face.endswith((".otf", ".ttf"))) and os.path.exists(face):
             font = _get_font_by_file(face)
         else:
-            try:
+            with contextlib.suppress(ValueError):
                 font = _get_font_by_name(face)
-            except ValueError:
-                pass
+
         if font is None:
+            msg = f"Failed to find font: {face!r}. Try specifying the exact (full) path to the .ttf or .otf file. "
             raise ValueError(
-                f"Failed to find font: {face!r}. "
-                "Try specifying the exact (full) path to the .ttf or .otf file. "
+                msg,
             )
 
         # Render each character
@@ -110,7 +114,5 @@ def text_freetype(
 
 
 if __name__ == "__main__":
-    # c2 = text_freetype("hello", font="Times New Roman")
-    # print(c2.name)
     c2 = text_freetype()
     c2.show()

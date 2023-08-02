@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -18,6 +22,7 @@ def regular_polygon(
     """Returns a regular N-sided polygon, with ports on each edge.
 
     Args:
+    ----
         sides: number of sides for the polygon.
         side_length: of the edges.
         layer: Specific layer to put polygon geometry on.
@@ -47,7 +52,6 @@ def regular_polygon(
 
 if __name__ == "__main__":
     c = regular_polygon(sides=8, side_length=20)
-    # c = rectangle(size=(3, 2), centered=True, layer=(2, 3))
     print(c.ports)
     print(c.name)
     c.show(show_ports=True)

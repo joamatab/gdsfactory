@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from numpy import float64
+from typing import TYPE_CHECKING
 
-from gdsfactory.port import Port
+if TYPE_CHECKING:
+    from numpy import float64
+
+    from gdsfactory.port import Port
 
 
 def flip(port: Port) -> Port:
@@ -41,9 +44,11 @@ def check_ports_have_equal_spacing(list_ports: list[Port]) -> float64:
 
     """
     if not isinstance(list_ports, list):
-        raise ValueError(f"list_ports should be a list of ports, got {list_ports}")
+        msg = f"list_ports should be a list of ports, got {list_ports}"
+        raise ValueError(msg)
     if not list_ports:
-        raise ValueError("list_ports should not be empty")
+        msg = "list_ports should not be empty"
+        raise ValueError(msg)
 
     orientation = get_list_ports_angle(list_ports)
     if orientation in [0, 180]:
@@ -54,7 +59,8 @@ def check_ports_have_equal_spacing(list_ports: list[Port]) -> float64:
     seps = [round(abs(c2 - c1), 5) for c1, c2 in zip(xys[1:], xys[:-1])]
     different_seps = set(seps)
     if len(different_seps) > 1:
-        raise ValueError("Ports should have the same separation. Got {different_seps}")
+        msg = "Ports should have the same separation. Got {different_seps}"
+        raise ValueError(msg)
 
     return different_seps.pop()
 
@@ -64,7 +70,8 @@ def get_list_ports_angle(list_ports: list[Port]) -> float64 | int:
     if not list_ports:
         return None
     if len({p.orientation for p in list_ports}) > 1:
-        raise ValueError(f"All port angles should be the same. Got {list_ports}")
+        msg = f"All port angles should be the same. Got {list_ports}"
+        raise ValueError(msg)
     return list_ports[0].orientation
 
 

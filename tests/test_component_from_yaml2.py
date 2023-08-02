@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.difftest import difftest
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
 
 mirror_port = """
 name: mirror_port
@@ -103,7 +107,9 @@ yaml_list = [mirror_port, mirror_x, rotation, dxdy]
 
 @pytest.mark.parametrize("yaml_index", range(len(yaml_list)))
 def test_components(
-    yaml_index: int, data_regression: DataRegressionFixture, check: bool = True
+    yaml_index: int,
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     yaml = yaml_list[yaml_index]
     c = gf.read.from_yaml(yaml)

@@ -18,16 +18,18 @@ def test_flat_netlist_photonic():
 
 
 def test_flatten_netlist_identical_references():
-    """
-    Testing electrical netlist w/ identical component references
-    """
+    """Testing electrical netlist w/ identical component references."""
     # Define compound component
     series_resistors = gf.Component("seriesResistors")
     rseries1 = series_resistors << gf.get_component(
-        gf.components.resistance_sheet, width=20, ohms_per_square=20
+        gf.components.resistance_sheet,
+        width=20,
+        ohms_per_square=20,
     )
     rseries2 = series_resistors << gf.get_component(
-        gf.components.resistance_sheet, width=20, ohms_per_square=20
+        gf.components.resistance_sheet,
+        width=20,
+        ohms_per_square=20,
     )
     rseries1.connect("pad2", rseries2.ports["pad1"])
     series_resistors.add_port("pad1", port=rseries1.ports["pad1"])
@@ -48,11 +50,15 @@ def test_flatten_netlist_identical_references():
     r3 = (
         vdiv
         << gf.get_component(
-            gf.components.resistance_sheet, width=20, ohms_per_square=20
+            gf.components.resistance_sheet,
+            width=20,
+            ohms_per_square=20,
         ).rotate()
     )
     r4 = vdiv << gf.get_component(
-        gf.components.resistance_sheet, width=20, ohms_per_square=20
+        gf.components.resistance_sheet,
+        width=20,
+        ohms_per_square=20,
     )
 
     r1.connect("pad2", r2.ports["pad1"])
@@ -68,4 +74,3 @@ def test_flatten_netlist_identical_references():
 
 if __name__ == "__main__":
     test_flatten_netlist_identical_references()
-    # test_flat_netlist_photonic()

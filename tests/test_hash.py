@@ -34,6 +34,4 @@ def _test_hash_file() -> None:
 
 
 if __name__ == "__main__":
-    # test_hash_geometry()
     _test_hash_file()
-    # _test_hash_array_file()

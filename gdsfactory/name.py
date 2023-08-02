@@ -62,7 +62,6 @@ def dict2name(prefix: str = "", **kwargs) -> str:
     for key in sorted(kwargs):
         if key not in ignore_from_name and isinstance(key, str):
             value = kwargs[key]
-            # key = join_first_letters(key).upper()
             if value is not None:
                 kv += [f"{key}{clean_value(value)}"]
     label = prefix + "_".join(kv)
@@ -78,8 +77,9 @@ def assert_first_letters_are_different(**kwargs):
     """
     first_letters = [join_first_letters(k) for k in kwargs]
     if len(set(first_letters)) != len(first_letters):
+        msg = f"Possible name collision! {kwargs.keys()} repeats first letters {first_letters}"
         raise ValueError(
-            f"Possible name collision! {kwargs.keys()} repeats first letters {first_letters}",
+            msg,
             "you can separate your arguments with underscores",
             " (delta_length -> DL, delta_width -> DW",
         )
@@ -93,7 +93,7 @@ def print_first_letters_warning(**kwargs) -> None:
             f"Possible name collision! {kwargs.keys()} "
             f"repeats first letters {first_letters}"
             "you can separate your arguments with underscores"
-            " (delta_length -> DL, delta_width -> DW"
+            " (delta_length -> DL, delta_width -> DW",
         )
 
 
@@ -143,10 +143,6 @@ def clean_value(value: Any) -> str:
 
 
 # def testclean_value_json() -> None:
-#     assert clean_value(0.5) == "500n"
-#     assert clean_value(5) == "5"
-#     assert clean_value(5.0) == "5"
-#     assert clean_value(11.001) == "11p001"
 
 
 def test_clean_name() -> None:
@@ -154,34 +150,12 @@ def test_clean_name() -> None:
 
 
 if __name__ == "__main__":
-    # test_cell()
-    # testclean_value_json()
-    # import gdsfactory as gf
-
-    # print(clean_value(gf.components.straight))
-    # c = gf.components.straight(polarization="TMeraer")
-    # print(c.settings["polarization"])
-    # print(clean_value(11.001))
-    # c = gf.components.straight(length=10)
-    # c = gf.components.straight(length=10)
-
-    # print(c.name)
-    # print(c)
-    # c.show(show_ports=True)
-
-    # print(clean_name("Waveguidenol1_(:_=_2852"))
-    # print(clean_value(1.2))
-    # print(clean_value(0.2))
-    # print(clean_value([1, [2.4324324, 3]]))
-    # print(clean_value([1, 2.4324324, 3]))
-    # print(clean_value((0.001, 24)))
-    # print(clean_value({"a": 1, "b": 2}))
     import gdsfactory as gf
 
     d = {
         "X": gf.components.crossing45(port_spacing=40.0),
         "-": gf.components.compensation_path(
-            crossing45=gf.components.crossing45(port_spacing=40.0)
+            crossing45=gf.components.crossing45(port_spacing=40.0),
         ),
     }
     d2 = clean_value(d)

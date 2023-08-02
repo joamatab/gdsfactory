@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components import bend_s
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec
 
 
 @gf.cell
@@ -34,6 +38,7 @@ def coupler_full(
     specified in the straight template.
 
     Args:
+    ----
         coupling_length: Length of the coupling region in um.
         dx: Length of the bend regions in um.
         dy: Port-to-port distance between the bend regions in um.
@@ -42,6 +47,7 @@ def coupler_full(
         cross_section: cross-section spec.
 
     Keyword Args:
+    ------------
         cross_section kwargs.
     """
     c = gf.Component()
@@ -68,7 +74,8 @@ def coupler_full(
     bend_input_top = (
         c
         << bend_s(
-            size=(dx, (dy - gap - x_top.width) / 2.0), cross_section=x_top
+            size=(dx, (dy - gap - x_top.width) / 2.0),
+            cross_section=x_top,
         ).mirror()
     )
     bend_input_top.movey(origin=0, destination=(x_top.width + gap) / 2.0)
@@ -76,7 +83,8 @@ def coupler_full(
     bend_input_bottom = (
         c
         << bend_s(
-            size=(dx, (-dy + gap + x_bottom.width) / 2.0), cross_section=x_bottom
+            size=(dx, (-dy + gap + x_bottom.width) / 2.0),
+            cross_section=x_bottom,
         ).mirror()
     )
     bend_input_bottom.movey(origin=0, destination=-(x_bottom.width + gap) / 2.0)
@@ -85,12 +93,14 @@ def coupler_full(
     taper_bottom.connect("o1", bend_input_bottom.ports["o1"])
 
     bend_output_top = c << bend_s(
-        size=(dx, (dy - gap - x_top.width) / 2.0), cross_section=x_bottom
+        size=(dx, (dy - gap - x_top.width) / 2.0),
+        cross_section=x_bottom,
     )
     bend_output_top.move(destination=taper_top.ports["o2"])
 
     bend_output_bottom = c << bend_s(
-        size=(dx, (-dy + gap + x_bottom.width) / 2.0), cross_section=x_top
+        size=(dx, (-dy + gap + x_bottom.width) / 2.0),
+        cross_section=x_top,
     )
     bend_output_bottom.move(destination=taper_bottom.ports["o2"])
 
@@ -119,12 +129,5 @@ def coupler_full(
 
 
 if __name__ == "__main__":
-    c = coupler_full(
-        # coupling_length=40,
-        # gap=0.2,
-        # dw=0.1,
-        # cladding_layers=[(111, 0)],
-        # cladding_offsets=[3],
-    )
+    c = coupler_full()
     c.show()
-    # c.show(show_ports=True)

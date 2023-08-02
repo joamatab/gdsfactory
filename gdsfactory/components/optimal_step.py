@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @cell
@@ -20,6 +24,7 @@ def optimal_step(
     """Returns an optimally-rounded step geometry.
 
     Args:
+    ----
         start_width: Width of the connector on the left end of the step.
         end_width: Width of the connector on the right end of the step.
         num_pts: number of points comprising the entire step geometry.
@@ -32,11 +37,11 @@ def optimal_step(
 
     based on phidl.geometry
 
-    Notes
+    Notes:
     -----
     Optimal structure from https://doi.org/10.1103/PhysRevB.84.174510
     Clem, J., & Berggren, K. (2011). Geometry-dependent critical currents in
-    superconducting nanocircuits. Physical Review B, 84(17), 1–27.
+    superconducting nanocircuits. Physical Review B, 84(17), 1-27.
     """
 
     def step_points(eta, W, a):
@@ -81,10 +86,9 @@ def optimal_step(
         try:
             from scipy.optimize import fminbound
         except Exception as e:
+            msg = "To run the optimal-curve geometry functions you need scipy, please install it with `pip install scipy`"
             raise ImportError(
-                "To run the optimal-curve geometry "
-                "functions you need scipy, please install "
-                "it with `pip install scipy`"
+                msg,
             ) from e
         found_eta = fminbound(fh, x1=0, x2=np.pi, args=())
         return step_points(found_eta, W=W, a=a)
@@ -111,10 +115,14 @@ def optimal_step(
         D.info["num_squares"] = 1
     else:
         xmin, ymin = invert_step_point(
-            y_desired=start_width * (1 + width_tol), W=start_width, a=end_width
+            y_desired=start_width * (1 + width_tol),
+            W=start_width,
+            a=end_width,
         )
         xmax, ymax = invert_step_point(
-            y_desired=end_width * (1 - width_tol), W=start_width, a=end_width
+            y_desired=end_width * (1 - width_tol),
+            W=start_width,
+            a=end_width,
         )
 
         xpts = np.linspace(xmin, xmax, num_pts).tolist()
@@ -151,8 +159,9 @@ def optimal_step(
 
         D.info["num_squares"] = float(
             np.round(
-                np.sum(np.diff(x_num_sq) / ((y_num_sq[:-1] + y_num_sq[1:]) / 2)), 3
-            )
+                np.sum(np.diff(x_num_sq) / ((y_num_sq[:-1] + y_num_sq[1:]) / 2)),
+                3,
+            ),
         )
 
     D.add_polygon([xpts, ypts], layer=layer)
@@ -193,6 +202,4 @@ def optimal_step(
 if __name__ == "__main__":
     c = optimal_step()
     print(c.to_dict())
-    # c = optimal_step()
-    # print(c.to_dict())
     c.show(show_ports=True)

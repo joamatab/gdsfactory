@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import cos, pi, sin
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -17,6 +21,7 @@ def circle(
     """Generate a circle geometry.
 
     Args:
+    ----
         radius: of the circle.
         angle_resolution: number of degrees per point.
         layer: layer.

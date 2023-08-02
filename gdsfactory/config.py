@@ -21,13 +21,14 @@ from pprint import pprint
 from typing import TYPE_CHECKING, Any, ClassVar, Union
 
 import loguru
-from loguru import logger as logger
+from loguru import logger
 from pydantic import BaseModel, BaseSettings, Field
 from rich.console import Console
 from rich.table import Table
-from typing_extensions import Literal
 
 if TYPE_CHECKING:
+    from typing import Literal
+
     from loguru import Logger
 
 __version__ = "6.115.0"
@@ -147,7 +148,8 @@ def tracing_formatter(record: loguru.Record) -> str:
     Filter out frames coming from Loguru internals.
     """
     frames = takewhile(
-        lambda f: "/loguru/" not in f.filename, traceback.extract_stack()
+        lambda f: "/loguru/" not in f.filename,
+        traceback.extract_stack(),
     )
     stack = " > ".join(f"{f.filename}:{f.name}:{f.lineno}" for f in frames)
     record["extra"]["stack"] = stack
@@ -173,7 +175,13 @@ class LogFilter(BaseModel):
     """
 
     level: Literal[
-        "TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"
+        "TRACE",
+        "DEBUG",
+        "INFO",
+        "SUCCESS",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
     ] = "INFO"
     regex: str | None = None
 
@@ -184,7 +192,7 @@ class LogFilter(BaseModel):
             return record["level"].no >= levelno
         else:
             return record["level"].no >= levelno and not bool(
-                re.search(self.regex, record["message"])
+                re.search(self.regex, record["message"]),
             )
 
 
@@ -197,7 +205,7 @@ class Settings(BaseSettings):
     display_type: Literal["widget", "klayout", "docs", "kweb"] = "kweb"
     last_saved_files: list[PathType] = []
 
-    def __init__(self, **data: Any):
+    def __init__(self, **data: Any) -> None:
         """Set log filter and run pydantic."""
         super().__init__(**data)
         self.logger.remove()
@@ -218,12 +226,14 @@ def set_log_level(level: str, sink=sys.stderr) -> None:
     """Sets log level for gdsfactory.
 
     Args:
+    ----
         level: ["DEBUG", "INFO", "WARNING", "ERROR"]
         sink: defaults to standard error.
     """
     log_levels = ["DEBUG", "INFO", "WARNING", "ERROR"]
     if level not in log_levels:
-        raise ValueError(f"{level!r} not a valid log level {log_levels}")
+        msg = f"{level!r} not a valid log level {log_levels}"
+        raise ValueError(msg)
     logger.remove()
     logger.add(sink=sink, level=level)
 
@@ -277,7 +287,8 @@ def complex_encoder(z):
         return str(z.__name__)
     else:
         type_name = type(z)
-        raise TypeError(f"Object {z} of type {type_name} is not serializable")
+        msg = f"Object {z} of type {type_name} is not serializable"
+        raise TypeError(msg)
 
 
 def write_config(config: Any, json_out_path: Path) -> None:
@@ -337,10 +348,3 @@ def set_plot_options(
         blocking=blocking,
         zoom_factor=zoom_factor,
     )
-
-    # print(PATH.sparameters)
-    # print_config()
-    # print_version()
-    # print_version_raw()
-    # print_version_pdks()
-    # write_tech("tech.json")

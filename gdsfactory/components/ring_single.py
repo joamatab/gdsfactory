@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.coupler_ring import coupler_ring as coupler_ring_function
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -24,6 +28,7 @@ def ring_single(
     two bends (bl, br) and horizontal straight (wg: top)
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -87,17 +92,6 @@ def ring_single(
 
 
 if __name__ == "__main__":
-    # c = ring_single(layer=(2, 0), cross_section_factory=gf.cross_section.pin, width=1)
-    # c = ring_single(width=2, gap=1, layer=(2, 0), radius=7, length_y=1)
-    # print(c.ports)
-
-    # c = gf.routing.add_fiber_array(ring_single)
-    # c = ring_single(cross_section="rib", width=2)
     c = ring_single(length_y=0, length_x=0)
     c.get_netlist()
     c.show(show_ports=True)
-
-    # cc = gf.add_pins(c)
-    # print(c.settings)
-    # print(c.settings)
-    # cc.show(show_ports=True)

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_circular import bend_circular
 from gdsfactory.components.ring_single_bend_coupler import coupler_ring_bend
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -25,6 +29,7 @@ def ring_double_bend_coupler(
     TODO: enable euler bends.
 
     Args:
+    ----
         radius: um.
         gap: um.
         angle_inner: of the inner bend, from beginning to end. Depending on the bend chosen, gap may not be preserved.
@@ -54,7 +59,7 @@ def ring_double_bend_coupler(
     if c_halfring.ysize > half_height:
         raise ValueError(
             "The coupling_angle_coverage is too large for the given bend radius: "
-            + "the coupling waveguides will overlap."
+            + "the coupling waveguides will overlap.",
         )
 
     cb = c << c_halfring
@@ -83,8 +88,6 @@ def ring_double_bend_coupler(
 
 
 if __name__ == "__main__":
-    # c = coupler_bend(radius=5)
-    # c = coupler_ring_bend()
     c = ring_double_bend_coupler()
     c.assert_ports_on_grid()
     c.show(show_ports=True)

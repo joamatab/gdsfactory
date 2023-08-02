@@ -30,28 +30,18 @@ def test_manhattan() -> None:
 
     outputs = [
         Port("in1", center=(290, -60), width=0.5, orientation=180, layer=layer),
-        # Port("in2", (-100, 20), 0.5, 0),
-        # Port("in3", (100, -25), 0.5, 0),
-        # Port("in4", (-150, -65), 0.5, 270),
-        # Port("in5", (25, 3), 0.5, 180),
-        # Port("in6", (0, 10), 0.5, 0),
     ]
 
     lengths = [349.974]
 
     for input_port, output_port, length in zip(inputs, outputs, lengths):
-        # input_port = Port("input_port", (10,5), 0.5, 90)
-        # output_port = Port("output_port", (90,-60), 0.5, 180)
-        # bend = bend_circular(radius=5.0)
-
         route = route_manhattan(
             input_port=input_port,
             output_port=output_port,
             radius=5.0,
             auto_widen=True,
             width_wide=2,
-            layer=layer
-            # width=0.2,
+            layer=layer,
         )
 
         top_cell.add(route.references)
@@ -104,23 +94,7 @@ def _demo_manhattan_fail() -> Component:
 
 
 if __name__ == "__main__":
-    # test_manhattan_fail()
-    # test_manhattan_pass()
     c = _demo_manhattan_fail()
     c.show(show_ports=True)
 
-    # c = gf.Component("pads_route_from_steps")
-    # pt = c << gf.components.pad_array(orientation=270, columns=3)
-    # pb = c << gf.components.pad_array(orientation=90, columns=3)
-    # pt.move((100, 200))
-    # route = gf.routing.get_route_from_steps(
-    #     pt.ports["e11"],
-    #     pb.ports["e11"],
-    #     steps=[
-    #         {"y": 100},
     #     ],
-    #     cross_section='metal_routing',
-    #     bend=gf.components.wire_corner,
-    # )
-    # c.add(route.references)
-    # c.show(show_ports=True)

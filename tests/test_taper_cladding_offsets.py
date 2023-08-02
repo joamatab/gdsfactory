@@ -25,7 +25,9 @@ def demo_taper_cladding_offsets():
     wg_in = c << gf.components.straight(length=in_stub_length, cross_section=xc_sin_ec)
 
     taper = c << gf.components.taper_cross_section_linear(
-        length=taper_length, cross_section1=xc_sin_ec, cross_section2=xc_sin
+        length=taper_length,
+        cross_section1=xc_sin_ec,
+        cross_section2=xc_sin,
     )
 
     wg_out = c << gf.components.straight(length=out_stub_length, cross_section=xc_sin)

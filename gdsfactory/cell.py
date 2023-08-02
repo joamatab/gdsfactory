@@ -4,9 +4,10 @@ from __future__ import annotations
 import functools
 import hashlib
 import inspect
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 import toolz
 from pydantic import BaseModel, validate_arguments
@@ -45,7 +46,8 @@ def get_source_code(func: Callable) -> str:
     elif callable(func):
         source = inspect.getsource(func)
     else:
-        raise ValueError(f"{func!r} needs to be callable")
+        msg = f"{func!r} needs to be callable"
+        raise ValueError(msg)
     return source
 
 
@@ -92,10 +94,12 @@ def cell_without_validator(func: _F) -> _F:
             else cell_decorator_settings.prefix,
         )
         max_name_length = kwargs.pop(
-            "max_name_length", cell_decorator_settings.max_name_length
+            "max_name_length",
+            cell_decorator_settings.max_name_length,
         )
         include_module = kwargs.pop(
-            "include_module", cell_decorator_settings.include_module
+            "include_module",
+            cell_decorator_settings.include_module,
         )
 
         sig = inspect.signature(func)
@@ -131,7 +135,6 @@ def cell_without_validator(func: _F) -> _F:
         # if any args were different from default, append a hash of those args.
         # else, keep only the base name
         named_args_string = "_".join(changed_arg_list)
-        # print(named_args_string)
 
         if changed_arg_list or include_module:
             if include_module and changed_arg_list:
@@ -167,20 +170,19 @@ def cell_without_validator(func: _F) -> _F:
             and "settings" not in sig.parameters
         ):
             for key in kwargs:
-                if key not in sig.parameters.keys():
+                if key not in sig.parameters:
+                    msg = f"{func.__name__!r}() got invalid argument {key!r}\nvalid arguments are {list(sig.parameters.keys())}"
                     raise TypeError(
-                        f"{func.__name__!r}() got invalid argument {key!r}\n"
-                        f"valid arguments are {list(sig.parameters.keys())}"
+                        msg,
                     )
 
         if cache and name in CACHE:
-            # print(f"CACHE LOAD {name} {func.__name__}({named_args_string})")
             return CACHE[name]
-        # print(f"BUILD {name} {func.__name__}({named_args_string})")
 
         if not callable(func):
+            msg = f"{func!r} is not callable! @cell decorator is only for functions"
             raise ValueError(
-                f"{func!r} is not callable! @cell decorator is only for functions"
+                msg,
             )
 
         component = func(*args, **kwargs)
@@ -195,15 +197,17 @@ def cell_without_validator(func: _F) -> _F:
         )
 
         if not isinstance(component, Component):
+            msg = f"function {func.__name__!r} return type = {type(component)}"
             raise CellReturnTypeError(
-                f"function {func.__name__!r} return type = {type(component)}",
+                msg,
                 "make sure that functions with @cell decorator return a Component",
             )
 
         if metadata_child and component._get_child_name:
             component_name = f"{metadata_child.get('name')}_{name}"
             component_name = get_name_short(
-                component_name, max_name_length=max_name_length
+                component_name,
+                max_name_length=max_name_length,
             )
         else:
             component_name = name
@@ -231,10 +235,10 @@ def cell_without_validator(func: _F) -> _F:
 
         if decorator:
             if not callable(decorator):
-                raise ValueError(f"decorator = {type(decorator)} needs to be callable")
+                msg = f"decorator = {type(decorator)} needs to be callable"
+                raise ValueError(msg)
             component_new = decorator(component)
             # if component_new is not component:
-            #     component_new.name = name
             component = component_new or component
 
         if flatten:
@@ -267,6 +271,7 @@ def cell(func: _F) -> _F:
     Keyword Args are applied the resulting Component.
 
     Keyword Args:
+    ------------
         autoname (bool): True renames Component based on args and kwargs.
             True by default.
         name (str): Optional name.
@@ -293,7 +298,7 @@ def cell(func: _F) -> _F:
             bend = c << gf.components.bend_euler()
             return c
 
-    it’s equivalent to
+    it`s equivalent to
 
     .. code::
 
@@ -310,11 +315,10 @@ def cell(func: _F) -> _F:
 
 
 def declarative_cell(cls: type[Any]) -> Callable[..., Component]:
-    """
-    TODO:
-
+    """TODO:
+    ----
     - add placements
-    - add routes
+    - add routes.
 
     """
     cls = dataclass(cls)
@@ -452,36 +456,3 @@ if __name__ == "__main__":
 
     c = gf.c.mzi()
     print(c.name)
-
-    # c = gf.components.mzi()
-    # names1 = set([i.name for i in c.get_dependencies()])
-    # gf.clear_cache()
-    # c = gf.components.mzi()
-    # names2 = set([i.name for i in c.get_dependencies()])
-    # assert names1 == names2
-
-    # test_hashes()
-
-    # test_names()
-    # c = wg()
-    # test_import_gds_settings()
-
-    # import gdsfactory as gf
-
-    # c = gf.components.straight()
-    # c = gf.components.straight()
-    # print(c.name)
-
-    # c = wg3()
-    # print(c.name)
-
-    # print(wg(length=3).name)
-    # print(wg(length=3.0).name)
-    # print(wg().name)
-
-    # import gdsfactory as gf
-
-    # gdspath = gf.PATH.gdsdir / "mzi2x2.gds"
-    # c = gf.import_gds(gdspath)
-    # c3 = gf.routing.add_fiber_single(c)
-    # c3.show()

@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -23,6 +27,7 @@ def ring_single_sample(
     two bends (bl, br) and horizontal straight (wg: top).
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -57,10 +62,16 @@ def ring_single_sample(
         **kwargs,
     )
     straight_side = gf.get_component(
-        straight, length=length_y, cross_section=cross_section, **kwargs
+        straight,
+        length=length_y,
+        cross_section=cross_section,
+        **kwargs,
     )
     straight_top = gf.get_component(
-        straight, length=length_x, cross_section=cross_section, **kwargs
+        straight,
+        length=length_x,
+        cross_section=cross_section,
+        **kwargs,
     )
 
     bend = gf.get_component(bend, radius=radius, cross_section=cross_section, **kwargs)
@@ -72,7 +83,6 @@ def ring_single_sample(
     bl = c << bend
     br = c << bend
     wt = c << straight_top
-    # wt.mirror(p1=(0, 0), p2=(1, 0))
 
     wl.connect(port="o2", destination=cb.ports["o2"])
     bl.connect(port="o2", destination=wl.ports["o1"])

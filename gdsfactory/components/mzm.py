@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
@@ -12,7 +13,9 @@ from gdsfactory.components.mmi2x2 import mmi2x2
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.straight_pin import straight_pin
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -37,6 +40,7 @@ def mzm(
     """Mzm modulator.
 
     Args:
+    ----
         phase_shifter: for bottom and top arms.
         length_x: horizontal length. None uses to the straight_x_bot/top defaults.
         length_y: vertical length for both and top arms.
@@ -71,7 +75,6 @@ def mzm(
                      b6__sxbot__b7
                           Lx
     """
-
     bend_spec = bend
     bend = gf.get_component(bend, cross_section=cross_section)
 
@@ -183,14 +186,5 @@ mzm_coupler = partial(
 
 
 if __name__ == "__main__":
-    # c = mzm(cache=False)
     c = mzm1x2_2x2(cache=False, delta_length=100)
     c.show(show_ports=True)
-
-    # c = gf.components.mzi2x2_2x2(straight_x_top="straight_heater_metal")
-    # c2 = gf.routing.add_fiber_array(c)
-    # c2.show()
-
-    # c2 = gf.read.import_gds("a.gds")
-    # c3 = gf.grid([c2, c1])
-    # c3.show(show_ports=False)

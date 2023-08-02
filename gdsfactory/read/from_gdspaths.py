@@ -1,24 +1,28 @@
 from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
 from gdsfactory.component import Component
 from gdsfactory.config import logger
 from gdsfactory.read.import_gds import import_gds
-from gdsfactory.typings import ComponentOrPath, PathType
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentOrPath, PathType
 
 
 def from_gdspaths(cells: tuple[ComponentOrPath, ...]) -> Component:
     """Combine all GDS files or gf.components into a gf.component.
 
     Args:
+    ----
         cells: List of gdspaths or Components.
 
     """
     component = Component("merged")
 
     for c in cells:
-        if isinstance(c, (str, pathlib.Path)):
+        if isinstance(c, str | pathlib.Path):
             logger.info(f"Loading {c!r}")
             c = import_gds(c)
 
@@ -38,7 +42,6 @@ def from_gdsdir(dirpath: PathType) -> Component:
 if __name__ == "__main__":
     from gdsfactory.config import diff_path
 
-    # c = gdspaths([gf.components.straight(), gf.components.bend_circular()])
     # leave these two lines to end up tests showing the diff
     c = from_gdspaths(diff_path.glob("*.gds"))
     c.show(show_ports=True)

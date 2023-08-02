@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import itertools
-
-from numpy import float64
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.coupler import coupler
 from gdsfactory.components.crossing_waveguide import compensation_path, crossing45
 from gdsfactory.port import get_ports_facing
+
+if TYPE_CHECKING:
+    from numpy import float64
+
+    from gdsfactory.component import Component
 
 COUNTER = itertools.count()
 
@@ -31,17 +34,22 @@ def dist(i, wgs1, wgs2):
 
 
 def get_sequence_cross(
-    straights_start, straights_end, iter_max: int = 100, symbols=("X", "-")
+    straights_start,
+    straights_end,
+    iter_max: int = 100,
+    symbols=("X", "-"),
 ):
     """Returns sequence of crossings to achieve the permutations between two columns of I/O.
 
     Args:
+    ----
         straights_start: list of the input port indices.
         straights_end: list of the output port indices.
         iter_max: maximum iterations.
         symbols: [`X` , `S`].
 
     Notes:
+    -----
         symbols to be used in the returned sequence:
         - `X`:represents the crossing symbol: two Xs next to each-other means that the two
             modes have to be swapped
@@ -57,7 +65,7 @@ def get_sequence_cross(
     while wgs != straights_end:
         if nb_iters > iter_max:
             print(
-                "Exceeded max number of iterations. The following I/O are mismatched:"
+                "Exceeded max number of iterations. The following I/O are mismatched:",
             )
             for i in range(len(straights_end)):
                 print(wgs[i], "<->", straights_end[i])
@@ -69,14 +77,12 @@ def get_sequence_cross(
 
         swaps = []
         i = 0
-        # total_dist = 0
 
         while i < N - 1:
             a = wgs[i]
             b = wgs[i + 1]
             d1 = dist(a, wgs, straights_end)
             d2 = dist(b, wgs, straights_end)
-            # total_dist += abs(d1) + abs(d2)
 
             # The equality cases are very important:
             # if one straight needs to cross, then even if the other one is
@@ -122,7 +128,10 @@ def component_sequence_to_str(sequence):
 
 def get_sequence_cross_str(straights_start, straights_end, iter_max: int = 100):
     seq = get_sequence_cross(
-        straights_start, straights_end, iter_max=iter_max, symbols=["X", "-"]
+        straights_start,
+        straights_end,
+        iter_max=iter_max,
+        symbols=["X", "-"],
     )
 
     return component_sequence_to_str(seq)
@@ -145,6 +154,7 @@ def component_lattice(
     have components with the same y spacing between input/output ports.
 
     Args:
+    ----
         lattice: ASCII map with character.
         symbol_to_component: dict of ASCII character to component.
         grid_per_unit: int.
@@ -184,8 +194,6 @@ def component_lattice(
     y_spacing = None
     for component in symbol_to_component.values():
         component = gf.get_component(component)
-        # component = component.copy()
-        # component.auto_rename_ports_orientation()
 
         for direction in ["W", "E"]:
             ports_dir = get_ports_facing(component.ports, direction)
@@ -207,7 +215,7 @@ def component_lattice(
 
     components_to_nb_input_ports = {
         c: len(get_ports_facing(symbol_to_component[c], "W"))
-        for c in symbol_to_component.keys()
+        for c in symbol_to_component
     }
 
     component = gf.Component()
@@ -224,7 +232,7 @@ def component_lattice(
                 skip = 0
                 continue
 
-            if c in symbol_to_component.keys():
+            if c in symbol_to_component:
                 # Compute the number of ports to skip: They will already be
                 # connected since they belong to this component
 
@@ -234,7 +242,6 @@ def component_lattice(
                 ports_cw = symbol_to_component[c].get_ports_list(clockwise=True)
                 _cmp = symbol_to_component[c].ref((x, y), port_id=ports_cw[skip].name)
 
-                # _cmp = symbol_to_component[c].ref((x, y), port_id="oW{}".format(skip))
                 component.add(_cmp)
 
                 if i == 0:
@@ -249,8 +256,9 @@ def component_lattice(
 
             else:
                 symbols = list(symbol_to_component.keys())
+                msg = f"symbol {c!r} not in symbol_to_component dict {symbols}"
                 raise ValueError(
-                    f"symbol {c!r} not in symbol_to_component dict {symbols}"
+                    msg,
                 )
 
             j += 1
@@ -261,11 +269,13 @@ def component_lattice(
 
 
 def parse_lattice(
-    lattice: str, symbol_to_component: dict[str, Component]
+    lattice: str,
+    symbol_to_component: dict[str, Component],
 ) -> tuple[dict[int, list[str]], dict[int, float64]]:
     """Extract each column.
 
     Args:
+    ----
         lattice: string describing lattice.
         symbol_to_component: dict of ASCII character to component.
     """
@@ -275,7 +285,7 @@ def parse_lattice(
     for line in lines:
         if len(line) > 0:
             for i, c in enumerate(line):
-                if i not in columns.keys():
+                if i not in columns:
                     columns[i] = []
 
                 columns[i].append(c)
@@ -284,7 +294,6 @@ def parse_lattice(
                     pcw = cmp.get_ports_list(clockwise=True)
                     pccw = cmp.get_ports_list(clockwise=False)
 
-                    # columns_to_length[i] = cmp.ports["oE0"].x - cmp.ports["oW0"].x
                     columns_to_length[i] = (
                         cmp.ports[pccw[0].name].x - cmp.ports[pcw[0].name].x
                     )
@@ -293,16 +302,6 @@ def parse_lattice(
 
 
 if __name__ == "__main__":
-    # components_dict = {
-    #     "C": gf.routing.fanout2x2(component=gf.components.coupler(), port_spacing=40.0),
-    #     "X": crossing45(port_spacing=40.0),
     #     "-": compensation_path(crossing45=crossing45(port_spacing=40.0)),
-    # }
-    # c = gf.components.component_lattice(symbol_to_component=components_dict)
-    # c= gf.routing.fanout2x2(component=gf.components.coupler(), port_spacing=40.0)
-    # c= crossing45(port_spacing=40.0)
-    # c = compensation_path(crossing45=crossing45(port_spacing=40.0))
-    # c.pprint_ports()
-    # c = compensation_path()
     c = component_lattice()
     c.show(show_ports=True)

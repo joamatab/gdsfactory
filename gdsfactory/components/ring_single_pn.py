@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -8,7 +9,9 @@ import gdsfactory as gf
 from gdsfactory.components.via import via
 from gdsfactory.components.via_stack import via_stack
 from gdsfactory.cross_section import Section
-from gdsfactory.typings import ComponentSpec, CrossSection, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSection, LayerSpec
 
 
 @gf.cell
@@ -60,6 +63,7 @@ def ring_single_pn(
     """Returns single pn ring with optional doped heater.
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         doping_angle: angle in degrees representing portion of ring that is doped.
@@ -75,7 +79,6 @@ def ring_single_pn(
         heater_vias: components specifications for heater vias.
         kwargs: cross_section settings.
     """
-
     gap = gf.snap.snap_to_grid(gap, nm=2)
     c = gf.Component()
 
@@ -83,7 +86,7 @@ def ring_single_pn(
 
     bus_waveguide_path = gf.Path()
     bus_waveguide_path.append(
-        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle))
+        gf.path.straight(length=2 * radius * np.sin(np.pi / 360 * undoping_angle)),
     )
     bus_waveguide = c << bus_waveguide_path.extrude(cross_section=cross_section)
     bus_waveguide.x = 0
@@ -106,8 +109,9 @@ def ring_single_pn(
         heater_path = gf.Path()
         heater_path.append(
             gf.path.arc(
-                radius=heater_radius, angle=undoping_angle - doped_heater_angle_buffer
-            )
+                radius=heater_radius,
+                angle=undoping_angle - doped_heater_angle_buffer,
+            ),
         )
 
         heater_ref = c << heater_path.extrude(width=0.5, layer=doped_heater_layer)
@@ -136,16 +140,6 @@ def ring_single_pn(
 
 
 if __name__ == "__main__":
-    # c = ring_single(layer=(2, 0), cross_section_factory=gf.cross_section.pin, width=1)
-    # c = ring_single(width=2, gap=1, layer=(2, 0), radius=7, length_y=1)
-    # print(c.ports)
-
-    # c = gf.routing.add_fiber_array(ring_single)
     c = ring_single_pn()
     print([i.name for i in c.get_dependencies()])
     c.show(show_ports=True)
-
-    # cc = gf.add_pins(c)
-    # print(c.settings)
-    # print(c.settings)
-    # cc.show(show_ports=True)

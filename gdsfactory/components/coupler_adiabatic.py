@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bezier import bezier
-from gdsfactory.typings import CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import CrossSectionSpec
 
 
 @gf.cell
@@ -33,6 +37,7 @@ def coupler_adiabatic(
     5. is the output S-bend straight.
 
     Args:
+    ----
         length1: region that gradually brings the two asymmetric straights together.
             In this region the straight widths gradually change to be different by `dw`.
         length2: coupling region, where asymmetric straights gradually
@@ -46,6 +51,7 @@ def coupler_adiabatic(
         cross_section: cross_section spec.
 
     Keyword Args:
+    ------------
         cross_section kwargs.
     """
     # Control points for input and output S-bends
@@ -91,20 +97,28 @@ def coupler_adiabatic(
     coupler = c << gf.components.coupler_straight(length=length2, cross_section=x)
 
     taper_top = c << gf.components.taper(
-        width1=width, width2=width_top, cross_section=cross_section, **kwargs
+        width1=width,
+        width2=width_top,
+        cross_section=cross_section,
+        **kwargs,
     )
     taper_bot = c << gf.components.taper(
-        width1=width, width2=width_bot, cross_section=cross_section, **kwargs
+        width1=width,
+        width2=width_bot,
+        cross_section=cross_section,
+        **kwargs,
     )
 
     taper_bot.connect("o1", coupler.ports["o1"])
     taper_top.connect("o1", coupler.ports["o2"])
 
     sbend_left_top = c << bezier(
-        control_points=control_points_input_top, cross_section=x_top
+        control_points=control_points_input_top,
+        cross_section=x_top,
     )
     sbend_left_bot = c << bezier(
-        control_points=control_points_input_bottom, cross_section=x_bot
+        control_points=control_points_input_bottom,
+        cross_section=x_bot,
     )
 
     sbend_left_top.connect("o2", taper_top.ports["o2"])

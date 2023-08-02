@@ -9,15 +9,17 @@ def manhattanize_polygon(
     p: Polygon,
     target_step: float = 0.05,
 ):
-    """Return a Manhattanized version of the input polygon (where non-x and non-y parallel segments are decomposed into a staircase of small x and y-parallel segments)
+    """Return a Manhattanized version of the input polygon (where non-x and non-y parallel segments are decomposed into a staircase of small x and y-parallel segments).
 
     Implemented in pure Python, and hence only suited to small polygons.
 
     Args:
+    ----
         p: input polygon.
         target_step: target staircase step size.
 
     Returns:
+    -------
         manhattanized polygon
 
     .. plot::
@@ -60,7 +62,7 @@ def manhattanize_polygon(
                             (cur_x + 0.5 * x_step, cur_y),
                             (cur_x + 0.5 * x_step, cur_y + y_step),
                             (cur_x + x_step, cur_y + y_step),
-                        )
+                        ),
                     )
                 else:
                     p_manhattan.extend(
@@ -68,7 +70,7 @@ def manhattanize_polygon(
                             (cur_x, cur_y + 0.5 * y_step),
                             (cur_x + x_step, cur_y + 0.5 * y_step),
                             (cur_x + x_step, cur_y + y_step),
-                        )
+                        ),
                     )
                 cur_x += x_step
                 cur_y += y_step
@@ -97,5 +99,3 @@ if __name__ == "__main__":
     init_poly = c.add_polygon(poly, layer=1)
     final_poly = c.add_polygon(manhattanize_polygon(poly), layer=2)
     c.show()
-
-    # test_manhattanize()

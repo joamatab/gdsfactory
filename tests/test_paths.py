@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import jsondiff
 import numpy as np
 import pytest
-from pytest_regressions.data_regression import DataRegressionFixture
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
 from gdsfactory.difftest import difftest
+
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
+    from gdsfactory.component import Component
 
 
 def test_append() -> None:
@@ -17,7 +22,7 @@ def test_append() -> None:
     P.append(gf.path.arc(radius=10, angle=90))  # Circular arc
     P.append(gf.path.straight(length=10))  # Straight section
     P.append(
-        gf.path.euler(radius=3, angle=-90, p=1)
+        gf.path.euler(radius=3, angle=-90, p=1),
     )  # Euler bend (aka "racetrack" curve)
     P.append(gf.path.straight(length=40))
     P.append(gf.path.arc(radius=8, angle=-45))
@@ -88,7 +93,6 @@ def transition() -> Component:
     )
 
     Xtrans = gf.path.transition(cross_section1=X1, cross_section2=X2, width_type="sine")
-    # Xtrans = gf.cross_section.strip(port_names=('in1', 'out1'))
 
     P1 = gf.path.straight(length=5)
     P2 = gf.path.straight(length=5)
@@ -116,7 +120,7 @@ component_factory = dict(
 component_names = component_factory.keys()
 
 
-@pytest.fixture(params=component_names, scope="function")
+@pytest.fixture(params=component_names)
 def component(request) -> Component:
     return component_factory[request.param]()
 
@@ -134,7 +138,10 @@ def test_settings(component: Component, data_regression: DataRegressionFixture) 
 def test_layers1() -> None:
     P = gf.path.straight(length=10.001)
     X = gf.CrossSection(
-        width=0.5, offset=0, layer=gf.LAYER.SLAB90, port_names=("in", "out")
+        width=0.5,
+        offset=0,
+        layer=gf.LAYER.SLAB90,
+        port_names=("in", "out"),
     )
     c = gf.path.extrude(P, X, simplify=5e-3)
     assert c.ports["in"].layer == gf.LAYER.SLAB90
@@ -151,7 +158,10 @@ def test_layers2() -> None:
 
 def test_copy() -> None:
     x1 = gf.CrossSection(
-        width=0.5, offset=0, layer=gf.LAYER.SLAB90, port_names=("in", "out")
+        width=0.5,
+        offset=0,
+        layer=gf.LAYER.SLAB90,
+        port_names=("in", "out"),
     )
     x2 = x1.copy()
 
@@ -177,13 +187,8 @@ def test_path_add() -> None:
 
 
 if __name__ == "__main__":
-    # test_append()
-    # c = transition()
-
     p1 = gf.path.straight(length=5)
     p2 = gf.path.euler(radius=5, angle=45, p=0.5, use_eff=False)
     p = p2 + p1
-    # assert p.start_angle == 45
-    # assert p.end_angle == 0
     c = p.extrude(cross_section="strip")
     c.show(show_ports=False)

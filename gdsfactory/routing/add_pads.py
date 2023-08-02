@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
@@ -10,31 +10,35 @@ from gdsfactory.components.straight_heater_metal import straight_heater_metal
 from gdsfactory.port import select_ports_electrical
 from gdsfactory.routing.route_fiber_array import route_fiber_array
 from gdsfactory.routing.sort_ports import sort_ports_x
-from gdsfactory.typings import (
-    ComponentSpec,
-    CrossSectionSpec,
-    LayerSpec,
-    Optional,
-    Strs,
-    Tuple,
-    Union,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.typings import (
+        ComponentSpec,
+        CrossSectionSpec,
+        LayerSpec,
+        Optional,
+        Strs,
+        Tuple,
+        Union,
+    )
 
 
 @cell
 def add_pads_bot(
     component: ComponentSpec = straight_heater_metal,
     select_ports: Callable = select_ports_electrical,
-    port_names: Optional[Strs] = None,
-    component_name: Optional[str] = None,
+    port_names: Optional[Strs] | None = None,
+    component_name: Optional[str] | None = None,
     cross_section: CrossSectionSpec = "metal_routing",
-    get_input_labels_function: Optional[Callable] = None,
+    get_input_labels_function: Optional[Callable] | None = None,
     layer_label: LayerSpec = "TEXT",
     pad_port_name: str = "e1",
-    pad_port_labels: Optional[Tuple[str, ...]] = None,
+    pad_port_labels: Optional[Tuple[str, ...]] | None = None,
     pad: ComponentSpec = pad_rectangular,
     bend: ComponentSpec = "wire_corner",
-    straight_separation: Optional[float] = None,
+    straight_separation: Optional[float] | None = None,
     pad_spacing: Union[float, str] = "pad_spacing",
     optical_routing_type: Optional[int] = 1,
     **kwargs,
@@ -42,6 +46,7 @@ def add_pads_bot(
     """Returns new component with ports connected bottom pads.
 
     Args:
+    ----
         component: component spec to connect to.
         select_ports: function to select_ports.
         port_names: optional port names. Overrides select_ports.
@@ -58,6 +63,7 @@ def add_pads_bot(
         optical_routing_type: None: auto, 0: no extension, 1: standard, 2: check.
 
     Keyword Args:
+    ------------
         straight: straight spec.
         taper: taper spec.
         get_input_label_text_loopback_function: function to get input label test.
@@ -100,19 +106,22 @@ def add_pads_bot(
     pad_component = gf.get_component(pad)
     if pad_port_name not in pad_component.ports:
         pad_ports = list(pad_component.ports.keys())
+        msg = f"pad_port_name = {pad_port_name!r} not in {pad_component.name!r} ports {pad_ports}"
         raise ValueError(
-            f"pad_port_name = {pad_port_name!r} not in {pad_component.name!r} ports {pad_ports}"
+            msg,
         )
 
     pad_orientation = int(pad_component[pad_port_name].orientation)
     if pad_orientation != 180:
+        msg = f"port.orientation={pad_orientation} for port {pad_port_name!r} needs to be 180 degrees."
         raise ValueError(
-            f"port.orientation={pad_orientation} for port {pad_port_name!r} needs to be 180 degrees."
+            msg,
         )
 
     if not ports:
+        msg = f"select_ports or port_names did not match any ports in {list(component.ports.keys())}"
         raise ValueError(
-            f"select_ports or port_names did not match any ports in {list(component.ports.keys())}"
+            msg,
         )
 
     (
@@ -159,11 +168,14 @@ def add_pads_bot(
         for gc_port_label, port in zip(pad_port_labels, ports):
             if layer_label:
                 component_new.add_label(
-                    text=gc_port_label, layer=layer_label, position=port.center
+                    text=gc_port_label,
+                    layer=layer_label,
+                    position=port.center,
                 )
 
     for port_component, port_grating in zip(
-        ports_component, ports_grating_input_waveguide
+        ports_component,
+        ports_grating_input_waveguide,
     ):
         grating_ref = port_grating.parent
         component_new.add_port(
@@ -184,14 +196,17 @@ def add_pads_bot(
 
 @gf.cell
 def add_pads_top(
-    component: ComponentSpec = straight_heater_metal, **kwargs
+    component: ComponentSpec = straight_heater_metal,
+    **kwargs,
 ) -> Component:
     """Returns new component with ports connected top pads.
 
     Args:
+    ----
         component: component spec to connect to.
 
     Keyword Args:
+    ------------
         select_ports: function to select_ports.
         port_names: optional port names. Overrides select_ports.
         component_name: optional for the label.
@@ -241,12 +256,6 @@ def add_pads_top(
 
 
 if __name__ == "__main__":
-    # c = gf.components.pad()
-    # c = gf.components.straight_heater_metal(length=100.0)
-    # c = gf.components.straight(length=100.0)
-
-    # cc = add_pads_top(component=c, port_names=("e1",))
-    # cc = add_pads_top(component=c, port_names=("e1", "e2"), fanout_length=50)
     c = gf.c.nxn(
         xsize=600,
         ysize=200,

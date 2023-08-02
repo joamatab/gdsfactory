@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
+    import numpy as np
+
     from gdsfactory.typings import MaterialSpec
 
 material_name_to_lumerical_default = {
@@ -18,7 +19,8 @@ material_name_to_lumerical_default = {
 class SimulationSettingsLumericalFdtd(BaseModel):
     """Lumerical FDTD simulation_settings.
 
-    Parameters:
+    Parameters
+    ----------
         background_material: for the background.
         port_margin: on both sides of the port width (um).
         port_height: port height (um).
@@ -50,7 +52,8 @@ class SimulationSettingsLumericalFdtd(BaseModel):
     field_profile_samples: int = 15
     distance_monitors_to_pml: float = 0.5
     material_name_to_lumerical: dict[
-        str, MaterialSpec
+        str,
+        MaterialSpec,
     ] = material_name_to_lumerical_default
 
     class Config:

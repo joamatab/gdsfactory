@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @cell
@@ -31,6 +34,7 @@ def straight_heater_metal_undercut(
     dimensions from https://doi.org/10.1364/OE.27.010456
 
     Args:
+    ----
         length: of the waveguide.
         length_undercut_spacing: from undercut regions.
         length_undercut: length of each undercut section.
@@ -88,7 +92,8 @@ def straight_heater_metal_undercut(
 
     c = Component()
     sequence = gf.components.component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component
+        sequence=sequence,
+        symbol_to_component=symbol_to_component,
     )
     c.add_ref(sequence)
     c.add_ports(sequence.ports)
@@ -103,19 +108,21 @@ def straight_heater_metal_undercut(
         via_stack_west = c << via_stackw
         via_stack_east = c << via_stacke
         via_stack_west.move(via_stack_west_center - (dx, 0))
-        via_stack_east.move(via_stack_east_center + (dx, 0))
+        via_stack_east.move((*via_stack_east_center, dx, 0))
 
         valid_orientations = {p.orientation for p in via.ports.values()}
         p1 = via_stack_west.get_ports_list(orientation=port_orientation1)
         p2 = via_stack_east.get_ports_list(orientation=port_orientation2)
 
         if not p1:
+            msg = f"No ports for port_orientation1 {port_orientation1} in {valid_orientations}"
             raise ValueError(
-                f"No ports for port_orientation1 {port_orientation1} in {valid_orientations}"
+                msg,
             )
         if not p2:
+            msg = f"No ports for port_orientation2 {port_orientation2} in {valid_orientations}"
             raise ValueError(
-                f"No ports for port_orientation2 {port_orientation2} in {valid_orientations}"
+                msg,
             )
 
         c.add_ports(p1, prefix="l_")
@@ -163,13 +170,5 @@ def test_ports() -> None:
 
 
 if __name__ == "__main__":
-    # c = straight_heater_metal_undercut()
-    # print(c.ports['o2'].center[0])
-    # c.pprint_ports()
-    # c = straight_heater_metal(heater_width=5, length=50.0)
-
     c = straight_heater_metal(length=40)
-    # n = c.get_netlist()
     c.show(show_ports=True)
-    # scene = c.to_3d()
-    # scene.show()

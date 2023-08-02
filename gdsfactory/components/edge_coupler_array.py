@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -9,7 +10,9 @@ from gdsfactory.component import Component
 from gdsfactory.components.extension import extend_ports
 from gdsfactory.components.taper import taper
 from gdsfactory.components.text import text_rectangular
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2, Optional
 
 edge_coupler_silicon = partial(taper, width2=0.2, length=100, with_two_ports=False)
 
@@ -29,6 +32,7 @@ def edge_coupler_array(
     Each edge coupler adds a ruler for polishing.
 
     Args:
+    ----
         edge_coupler: edge coupler spec.
         n: number of channels.
         pitch: Fiber pitch.
@@ -54,7 +58,7 @@ def edge_coupler_array(
         if text:
             t = c << gf.get_component(text, text=str(i + 1))
             t.rotate(text_rotation)
-            t.move(np.array(text_offset) + (0, i * pitch))
+            t.move((*np.array(text_offset), 0, i * pitch))
 
     c.auto_rename_ports()
     return c
@@ -77,6 +81,7 @@ def edge_coupler_array_with_loopback(
     """Fiber array edge coupler.
 
     Args:
+    ----
         edge_coupler: edge coupler.
         cross_section: spec.
         radius: bend radius loopback (um).
@@ -105,7 +110,9 @@ def edge_coupler_array_with_loopback(
             port_names=("o1", "o2"),
             length=extension_length,
             extension=partial(
-                gf.c.straight, cross_section=cross_section, length=extension_length
+                gf.c.straight,
+                cross_section=cross_section,
+                length=extension_length,
             ),
         )
 
@@ -138,7 +145,4 @@ def edge_coupler_array_with_loopback(
 
 if __name__ == "__main__":
     c = edge_coupler_array_with_loopback(text_rotation=90)
-    # c = edge_coupler_silicon()
-    # c = edge_coupler_array(x_reflection=False)
-    # c = edge_coupler_array_with_loopback(x_reflection=False)
     c.show(show_ports=True)

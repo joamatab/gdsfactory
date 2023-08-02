@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler180
 from gdsfactory.components.straight import straight
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 diagram = r"""
                  | length0   |
@@ -36,6 +39,7 @@ def delay_snake3(
     r"""Returns Snake with a starting bend and 180 bends.
 
     Args:
+    ----
         length: total length.
         length0: start length.
         length2: end length.
@@ -69,7 +73,7 @@ def delay_snake3(
         raise ValueError(
             "Snake is too short: either reduce length0, length2, "
             f"increase the total length, or decrease the number of loops (n = {n}). "
-            f"delta_length = {int(delta_length)}\n" + diagram
+            f"delta_length = {int(delta_length)}\n" + diagram,
         )
 
     s0 = straight(cross_section=cross_section, length=length0, **kwargs)
@@ -87,7 +91,8 @@ def delay_snake3(
     sequence = "_)" + n // 2 * "-(-)"
     sequence = f"{sequence[:-1]}."
     return gf.components.component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component
+        sequence=sequence,
+        symbol_to_component=symbol_to_component,
     )
 
 
@@ -101,7 +106,6 @@ def test_length_delay_snake3() -> None:
 
 
 if __name__ == "__main__":
-    # c = test_delay_snake3_length()
     import numpy as np
 
     length = 1562

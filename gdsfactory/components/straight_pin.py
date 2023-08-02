@@ -2,13 +2,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.taper import taper_strip_to_ridge
 from gdsfactory.components.via_stack import via_stack_slab_m3
 from gdsfactory.cross_section import pin, pn
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -38,6 +41,7 @@ def straight_pin(
     https://opg.optica.org/oe/fulltext.cfm?uri=oe-20-11-12014&id=233271
 
     Args:
+    ----
         length: of the waveguide.
         cross_section: for the waveguide.
         via_stack: for the via_stacks.
@@ -91,5 +95,4 @@ straight_pn = partial(straight_pin, cross_section=pn, length=2000)
 
 if __name__ == "__main__":
     c = straight_pin(length=40)
-    # print(c.ports.keys())
     c.show(show_ports=True)

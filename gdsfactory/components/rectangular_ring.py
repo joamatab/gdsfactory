@@ -12,9 +12,10 @@ def rectangular_ring(
     layer: LayerSpec = "WG",
     centered: bool = False,
 ) -> Component:
-    """Returns a Rectangular Ring
+    """Returns a Rectangular Ring.
 
     Args:
+    ----
         enclosed_size: (width, height) of the enclosed area.
         width: width of the ring.
         layer: Specific layer to put polygon geometry on.
@@ -22,7 +23,9 @@ def rectangular_ring(
     """
     rect_in = rectangle(size=enclosed_size, centered=centered, layer=layer).ref()
     rect_out = rectangle(
-        size=[dim + 2 * width for dim in enclosed_size], centered=centered, layer=layer
+        size=[dim + 2 * width for dim in enclosed_size],
+        centered=centered,
+        layer=layer,
     )
     if not centered:
         rect_in.move((width, width))

@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from scipy.interpolate import interp1d
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.bend_s import bend_s, get_min_sbend_size
 from gdsfactory.components.straight import straight
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Floats
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentFactory, CrossSectionSpec, Floats
 
 
 @gf.cell
@@ -29,6 +33,7 @@ def spiral_racetrack(
     """Returns Racetrack-Spiral.
 
     Args:
+    ----
         min_radius: smallest radius in um.
         straight_length: length of the straight segments in um.
         spacings: space between the center of neighboring waveguides in um.
@@ -84,7 +89,8 @@ def spiral_racetrack(
             bend.connect("o1", port)
 
             straight = c << straight_factory(
-                straight_length, cross_section=cross_section
+                straight_length,
+                cross_section=cross_section,
             )
             straight.connect("o1", bend.ports["o2"])
             port = straight.ports["o2"]
@@ -132,6 +138,7 @@ def spiral_racetrack_fixed_length(
     the most important parameter is the length difference between the arms.
 
     Args:
+    ----
         length: total length of the spiral from input to output ports in um.
         in_out_port_spacing: spacing between input and output ports of the spiral in um.
         n_straight_sections: total number of straight sections for the racetrack spiral. Has to be even.
@@ -145,13 +152,13 @@ def spiral_racetrack_fixed_length(
         n_bend_points: optional bend points.
         with_inner_ports: if True, will build the spiral, but expose the inner ports where the S-bend would be.
     """
-
     c = gf.Component()
 
     xs_s_bend = cross_section_s or cross_section
 
     if np.mod(n_straight_sections, 2) != 0:
-        raise ValueError("The number of straight sections has to be even!")
+        msg = "The number of straight sections has to be even!"
+        raise ValueError(msg)
 
     # First, we need to get the length of the straight sections to achieve the required length,
     # given the specified parameters
@@ -166,8 +173,6 @@ def spiral_racetrack_fixed_length(
         bend_s_factory,
         xs_s_bend,
     )
-
-    # print(straight_length)
 
     spiral = c << spiral_racetrack(
         min_radius=min_radius,
@@ -195,7 +200,8 @@ def spiral_racetrack_fixed_length(
 
     # Input waveguide
     in_wg = c << straight_factory(
-        spiral.ports["o1"].x - spiral.xmin, cross_section=cross_section
+        spiral.ports["o1"].x - spiral.xmin,
+        cross_section=cross_section,
     )
     if np.mod(n_straight_sections // 2, 2) == 1:
         in_wg.mirror_y()
@@ -248,6 +254,7 @@ def _req_straight_len(
     """Returns geometrical parameters to make a spiral of a given length.
 
     Args:
+    ----
         length: total length of the spiral from input to output ports in um.
         in_out_port_spacing: spacing between input and output ports of the spiral in um.
         min_radius: smallest radius in um.
@@ -256,7 +263,6 @@ def _req_straight_len(
         bend_s_factory: factory to generate the s-bend segments.
         cross_section_s_bend: s bend cross section
     """
-
     # "Brute force" approach - sweep length and save total length
 
     lens = []
@@ -264,12 +270,14 @@ def _req_straight_len(
     # Figure out the min straight for the spiral so that the inner
     # s bend has min radius within the bend radius of the waveguide
     min_straigth_length = get_min_sbend_size(
-        [None, -min_radius * 2 + 1 * spacings[0]], cross_section_s_bend
+        [None, -min_radius * 2 + 1 * spacings[0]],
+        cross_section_s_bend,
     )
 
     if min_straigth_length > 0.8 * in_out_port_spacing:
+        msg = "The maximum straight length makes the inner s bend too tight. Increase the in-out port spacing."
         raise ValueError(
-            "The maximum straight length makes the inner s bend too tight. Increase the in-out port spacing."
+            msg,
         )
 
     straight_lengths = np.linspace(min_straigth_length, 0.9 * in_out_port_spacing, 100)
@@ -338,6 +346,7 @@ def spiral_racetrack_heater_metal(
     based on https://doi.org/10.1364/OL.400230 .
 
     Args:
+    ----
         min_radius: smallest radius.
         straight_length: length of the straight segments.
         spacing: space between the center of neighboring waveguides.
@@ -363,16 +372,18 @@ def spiral_racetrack_heater_metal(
     )
 
     heater_top = c << gf.components.straight(
-        straight_length, cross_section=heater_cross_section
+        straight_length,
+        cross_section=heater_cross_section,
     )
     heater_top.connect("e1", spiral.ports["o1"].copy().rotate(180)).movey(
-        spacing * num // 2
+        spacing * num // 2,
     )
     heater_bot = c << gf.components.straight(
-        straight_length, cross_section=heater_cross_section
+        straight_length,
+        cross_section=heater_cross_section,
     )
     heater_bot.connect("e1", spiral.ports["o2"].copy().rotate(180)).movey(
-        -spacing * num // 2
+        -spacing * num // 2,
     )
 
     heater_bend = c << gf.components.bend_circular(
@@ -408,6 +419,7 @@ def spiral_racetrack_heater_doped(
     based on https://doi.org/10.1364/OL.400230 but with the heater between the loops.
 
     Args:
+    ----
         min_radius: smallest radius in um.
         straight_length: length of the straight segments in um.
         spacing: space between the center of neighboring waveguides in um.
@@ -436,18 +448,19 @@ def spiral_racetrack_heater_doped(
     )
 
     heater_straight = gf.components.straight(
-        straight_length, cross_section=heater_cross_section
+        straight_length,
+        cross_section=heater_cross_section,
     )
 
     heater_top = c << heater_straight
     heater_bot = c << heater_straight
 
     heater_bot.connect("e1", spiral.ports["o1"].copy().rotate(180)).movey(
-        -spacing * (num // 2 - 1)
+        -spacing * (num // 2 - 1),
     )
 
     heater_top.connect("e1", spiral.ports["o2"].copy().rotate(180)).movey(
-        spacing * (num // 2 - 1)
+        spacing * (num // 2 - 1),
     )
 
     c.add_ports(spiral.ports)
@@ -489,7 +502,5 @@ def spiral_slab(cross_section="strip", layer_slab=(3, 0), cladding_offset=3, **k
 
 
 if __name__ == "__main__":
-    # c = spiral_racetrack(cross_section="rib_conformal", cache=False)
-
     c = spiral_slab(cache=False)
     c.show(show_ports=True)

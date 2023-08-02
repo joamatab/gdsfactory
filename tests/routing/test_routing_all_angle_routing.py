@@ -11,12 +11,12 @@ cells_to_test = [cell_name for cell_name in AAR_YAML_PICS if "error" not in cell
 error_cells = [cell_name for cell_name in AAR_YAML_PICS if "error" in cell_name]
 
 
-@pytest.fixture(params=cells_to_test, scope="function")
+@pytest.fixture(params=cells_to_test)
 def component_name(request) -> str:
     return request.param
 
 
-@pytest.fixture(params=error_cells, scope="function")
+@pytest.fixture(params=error_cells)
 def bad_component_name(request) -> str:
     return request.param
 
@@ -52,11 +52,7 @@ def test_settings(component_name: str, data_regression: DataRegressionFixture) -
 
 
 if __name__ == "__main__":
-    # name = cells_to_test[0]
-    # name = "aar_bundles"
     name = "aar_gone_wrong"
-    # name = "aar_error_intermediate_180"
-    # name = "aar_error_overconstrained"
     c = AAR_YAML_PICS[name]()
     print(sorted([i.name for i in c.get_dependencies()]))
     c.show()

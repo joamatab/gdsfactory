@@ -2,7 +2,7 @@
 import filecmp
 import pathlib
 import shutil
-from typing import Optional, Union
+from typing import Union
 
 import gdsfactory as gf
 from gdsfactory.config import GDSDIR_TEMP, PATH, logger
@@ -16,11 +16,15 @@ PathType = Union[pathlib.Path, str]
 
 
 def diff(
-    ref_file: PathType, run_file: PathType, xor: bool = True, test_name: str = ""
+    ref_file: PathType,
+    run_file: PathType,
+    xor: bool = True,
+    test_name: str = "",
 ) -> bool:
     """Returns True if files are different, prints differences and shows them in klayout.
 
     Args:
+    ----
         ref_file: reference (old) file.
         run_file: run (new) file.
         xor: runs xor on every layer between ref and run files.
@@ -28,12 +32,12 @@ def diff(
     """
     try:
         from kfactory import KCell, kdb
-    except ImportError as e:
+    except ImportError:
         print(
             "You can install `pip install gdsfactory[kfactory]` for using maskprep. "
-            "And make sure you use python >= 3.10"
+            "And make sure you use python >= 3.10",
         )
-        raise e
+        raise
     ref = read_top_cell(ref_file)
     run = read_top_cell(run_file)
     ld = kdb.LayoutDiff()
@@ -135,7 +139,7 @@ def diff(
 
 def difftest(
     component: gf.Component,
-    test_name: Optional[gf.Component] = None,
+    test_name: gf.Component | None = None,
     dirpath: pathlib.Path = PATH.gds_ref,
     xor: bool = True,
 ) -> None:
@@ -148,6 +152,7 @@ def difftest(
     If it runs for the fist time it just stores the GDS reference.
 
     Args:
+    ----
         component: to test if it has changed.
         test_name: used to store the GDS file.
         dirpath: default directory for storing reference files.
@@ -172,8 +177,9 @@ def difftest(
 
     if not ref_file.exists():
         shutil.copy(run_file, ref_file)
+        msg = f"Reference GDS file for {test_name!r} not found. Writing to {ref_file!r}"
         raise AssertionError(
-            f"Reference GDS file for {test_name!r} not found. Writing to {ref_file!r}"
+            msg,
         )
 
     if filecmp.cmp(ref_file, run_file, shallow=False):
@@ -183,15 +189,14 @@ def difftest(
         print(
             f"\ngds_run {filename!r} changed from gds_ref {str(ref_file)!r}\n"
             "You can check the differences in Klayout GUI or run XOR with\n"
-            f"gf gds diff --xor {ref_file} {run_file}\n"
+            f"gf gds diff --xor {ref_file} {run_file}\n",
         )
         try:
             overwrite(ref_file, run_file)
         except OSError as exc:
+            msg = f"\n{filename!r} changed from reference {str(ref_file)!r}. Run `pytest -s` to step and check differences in klayout GUI."
             raise GeometryDifference(
-                "\n"
-                f"{filename!r} changed from reference {str(ref_file)!r}. "
-                "Run `pytest -s` to step and check differences in klayout GUI."
+                msg,
             ) from exc
 
 
@@ -215,33 +220,9 @@ def read_top_cell(arg0):
 
 
 if __name__ == "__main__":
-    # print([i.name for i in c.get_dependencies()])
-    # c.show()
-    # c.name = "mzi"
     c = gf.components.straight(length=20, layer=(1, 0))
     c.show()
     difftest(c, "straight", dirpath=PATH.cwd)
 
-    # component = gf.components.mzi()
-    # test_name = "mzi"
-    # filename = f"{test_name}.gds"
-    # dirpath = PATH.cwd
-    # dirpath_ref = dirpath / "gds_ref"
-    # dirpath_run = GDSDIR_TEMP
-
-    # ref_file = dirpath_ref / f"{test_name}.gds"
-    # run_file = dirpath_run / filename
-    # run = gf.get_component(component)
-    # run_file = run.write_gds(gdspath=run_file)
-
     # if not ref_file.exists():
-    #     component.write_gds(gdspath=ref_file)
     #     raise AssertionError(
-    #         f"Reference GDS file for {test_name!r} not found. Writing to {ref_file!r}"
-    #     )
-
-    # ref = read_top_cell(ref_file)
-    # run = read_top_cell(run_file)
-    # ld = kdb.LayoutDiff()
-
-    # print(ld.compare(ref._kdb_cell, run._kdb_cell))

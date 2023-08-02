@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.pad import pad_array as pad_array_function
 from gdsfactory.components.straight import straight
 from gdsfactory.port import select_ports_electrical
 from gdsfactory.routing.route_quad import route_quad
-from gdsfactory.typings import Callable, ComponentSpec, Float2, Optional, Strs
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Callable, ComponentSpec, Float2, Optional, Strs
 
 
 @gf.cell
@@ -16,12 +20,13 @@ def add_electrical_pads_top(
     spacing: Float2 = (0.0, 100.0),
     pad_array: ComponentSpec = pad_array_function,
     select_ports: Callable = select_ports_electrical,
-    port_names: Optional[Strs] = None,
+    port_names: Optional[Strs] | None = None,
     layer: gf.typings.LayerSpec = "MTOP",
 ) -> Component:
     """Returns new component with electrical ports connected to top pad array.
 
     Args:
+    ----
         component: to route.
         direction: 'top' or 'right', sets direction of the array.
         spacing: component to pad spacing.
@@ -52,11 +57,17 @@ def add_electrical_pads_top(
 
     if direction == "top":
         pads = c << gf.get_component(
-            pad_array, columns=len(ports_electrical), rows=1, orientation=270
+            pad_array,
+            columns=len(ports_electrical),
+            rows=1,
+            orientation=270,
         )
     elif direction == "right":
         pads = c << gf.get_component(
-            pad_array, columns=1, rows=len(ports_electrical), orientation=270
+            pad_array,
+            columns=1,
+            rows=len(ports_electrical),
+            orientation=270,
         )
     pads.x = ref.x + spacing[0]
     pads.ymin = ref.ymax + spacing[1]
@@ -82,12 +93,8 @@ def add_electrical_pads_top(
 
 if __name__ == "__main__":
     # FIXME
-    # c = demo_mzi()
-    # c = demo_straight()
-    # c.show(show_ports=True)
     import gdsfactory as gf
 
     c = gf.components.straight_heater_metal()
-    # c = gf.components.mzi_phase_shifter_top_heater_metal()
     cc = gf.routing.add_electrical_pads_top(component=c, spacing=(-150, 30))
     cc.show(show_ports=True)

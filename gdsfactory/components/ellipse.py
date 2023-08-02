@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy import cos, pi, sin, sqrt
 
 import gdsfactory as gf
-from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -17,6 +21,7 @@ def ellipse(
     """Returns ellipse component.
 
     Args:
+    ----
         radii: Semimajor and semiminor axis lengths of the ellipse.
         angle_resolution: number of degrees per point.
         layer: Specific layer(s) to put polygon geometry on.

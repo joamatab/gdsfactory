@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from numpy import ndarray
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bezier import bezier
 from gdsfactory.components.coupler_straight_asymmetric import (
     coupler_straight_asymmetric,
 )
 from gdsfactory.components.taper import taper
-from gdsfactory.typings import CrossSectionSpec, Float2, Float3
+
+if TYPE_CHECKING:
+    from numpy import ndarray
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec, Float2, Float3
 
 
 @gf.cell
@@ -25,13 +29,14 @@ def polarization_splitter_rotator(
     cross_section: CrossSectionSpec = "strip",
     **kwargs,
 ) -> Component:
-    """Returns polarization splitter rotator
+    """Returns polarization splitter rotator.
 
     "Novel concept for ultracompact polarization splitter-rotator
     based on silicon nanowires." By D. Dai, and J. E. Bowers
     (Optics express vol 19, no. 11 pp. 10940-10949 (2011)).
 
     Args:
+    ----
         width_taper_in: Three west widths of the input tapers in um.
         length_taper_in: Two or three length of the bend regions in um.
         width_coupler: Top and bottom widths of the coupling region in um.
@@ -43,13 +48,14 @@ def polarization_splitter_rotator(
         cross_section: cross-section spec.
 
     Keyword Args:
+    ------------
         cross_section kwargs.
 
     Notes:
+    -----
         The length of third input taper is automatically determined
         if only two lengths are in arguments.
     """
-
     c = gf.Component()
     x = gf.get_cross_section(cross_section=cross_section, **kwargs)
 
@@ -66,7 +72,11 @@ def polarization_splitter_rotator(
     taper_in3 = c << taper(length=l3, width1=w2, width2=w3, cross_section=x)
 
     coupler = c << coupler_straight_asymmetric(
-        length=length_coupler, gap=gap, width_top=w4, width_bot=w3, cross_section=x
+        length=length_coupler,
+        gap=gap,
+        width_top=w4,
+        width_bot=w3,
+        cross_section=x,
     )
 
     def bend_s_width(t: ndarray) -> ndarray:
@@ -86,7 +96,10 @@ def polarization_splitter_rotator(
     )
 
     taper_out = c << taper(
-        length=length_out, width1=w3, width2=width_out, cross_section=x
+        length=length_out,
+        width1=w3,
+        width2=width_out,
+        cross_section=x,
     )
 
     taper_in3.connect("o2", destination=coupler.ports["o1"])

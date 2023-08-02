@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.add_padding import get_padding_points
 from gdsfactory.cell import cell
-from gdsfactory.component import Component
-from gdsfactory.port import Port
-from gdsfactory.typings import CrossSectionSpec, LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.port import Port
+    from gdsfactory.typings import CrossSectionSpec, LayerSpec
 
 
 @cell
@@ -26,6 +29,7 @@ def taper(
     Deprecated, use gf.components.taper_cross_section instead
 
     Args:
+    ----
         length: taper length.
         width1: width of the west port.
         width2: width of the east port.
@@ -129,6 +133,7 @@ def taper_strip_to_ridge(
     Deprecated, use gf.components.taper_cross_section instead.
 
     Args:
+    ----
         length: taper length (um).
         width1: in um.
         width2: in um.
@@ -212,6 +217,7 @@ def taper_strip_to_ridge_trenches(
     """Defines taper using trenches to define the etch.
 
     Args:
+    ----
         length: in um.
         width: in um.
         slab_offset: in um.
@@ -242,7 +248,11 @@ def taper_strip_to_ridge_trenches(
 
     c.add_port(name="o1", center=(0, 0), width=width, orientation=180, layer=layer_wg)
     c.add_port(
-        name="o2", center=(length, 0), width=width, orientation=0, layer=layer_wg
+        name="o2",
+        center=(length, 0),
+        width=width,
+        orientation=0,
+        layer=layer_wg,
     )
     return c
 
@@ -263,26 +273,10 @@ taper_sc_nc = partial(
 
 
 if __name__ == "__main__":
-    # c = gf.grid(
-    #     [
     #         taper_sc_nc(
-    #             length=length, info=dict(doe="taper_length", taper_length=length)
-    #         )
     #         for length in [1, 2, 3]
-    #     ]
-    # )
     # c.("extra/tapers.gds")
     xs = gf.get_cross_section("rib_conformal")
 
     c = taper(width2=1, cross_section="rib_conformal")
-    # c = taper_strip_to_ridge()
-    # print(c.get_optical_ports())
-    # c = taper_strip_to_ridge_trenches()
-    # c = taper()
-    # c = gf.components.taper_strip_to_ridge(width1=1, width2=2)
-    # c = gf.components.taper_strip_to_ridge(width1=1, width2=2)
-    # c = gf.components.extend_ports(c)
-    # c = taper_strip_to_ridge_trenches()
-    # c = taper()
-    # c = taper_sc_nc()
     c.show(show_ports=False)

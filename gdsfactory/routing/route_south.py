@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component, ComponentReference
 from gdsfactory.components.bend_euler import bend_euler
 from gdsfactory.components.straight import straight as straight_function
 from gdsfactory.components.taper import taper as taper_function
@@ -14,6 +13,11 @@ from gdsfactory.port import Port, select_ports_optical
 from gdsfactory.routing.get_route import get_route
 from gdsfactory.routing.utils import direction_ports_from_list_ports, flip
 from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Number, Routes, Strs
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component, ComponentReference
 
 
 def route_south(
@@ -34,6 +38,7 @@ def route_south(
     """Returns Routes to route a component ports to the south.
 
     Args:
+    ----
         component: component to route.
         optical_routing_type: routing heuristic `1` or `2`
             `1` uses the component size info to estimate the box size.
@@ -161,8 +166,9 @@ def route_south(
         # use optical port to know how far to route
         x = x_optical_min - dy - 1
     else:
+        msg = f"Invalid optical routing type {optical_routing_type!r} not in [1, 2]"
         raise ValueError(
-            f"Invalid optical routing type {optical_routing_type!r} not in [1, 2]"
+            msg,
         )
 
     # First route the ports facing west
@@ -218,8 +224,9 @@ def route_south(
         # use optical port to know how far to route
         x = x_optical_max + dy + 1
     else:
+        msg = f"Invalid optical routing type. Got {optical_routing_type}, only (1, 2 supported) "
         raise ValueError(
-            f"Invalid optical routing type. Got {optical_routing_type}, only (1, 2 supported) "
+            msg,
         )
     i = 0
 
@@ -240,7 +247,10 @@ def route_south(
 
         tmp_port = gen_port_from_port(x, y0, p, cross_section=xs)
         route = get_route(
-            p, tmp_port, start_straight_length=start_straight_length, **conn_params
+            p,
+            tmp_port,
+            start_straight_length=start_straight_length,
+            **conn_params,
         )
 
         references.extend(route.references)
@@ -274,9 +284,6 @@ def route_south(
 
 
 if __name__ == "__main__":
-    # c = gf.components.mmi2x2()
-    # c = gf.components.ring_single()
-
     c = gf.components.ring_double()
     layer = (2, 0)
     c = gf.Component()

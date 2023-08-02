@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.routing.get_route import get_route
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 default_mzm = dict(
     component="mzi",
@@ -38,6 +42,7 @@ def coh_tx_single_pol(
     """MZM-based single polarization coherent transmitter.
 
     Args:
+    ----
         balanced_phase_shifters: True adds phase sifters after the MZM at both the I and Q arms.
             False, only adds Q arm has a phase shifter.
         mzm_y_spacing: vertical spacing between the bottom of the I MZM and the top of the Q MZM.
@@ -88,7 +93,9 @@ def coh_tx_single_pol(
     else:
         # only the q arm has a phase shifter
         straight = straight_function(
-            length=phase_shifter_length, cross_section=cross_section, **kwargs
+            length=phase_shifter_length,
+            cross_section=cross_section,
+            **kwargs,
         )
         ps_i = c << straight
     ps_q = c << phase_shifter
@@ -99,7 +106,9 @@ def coh_tx_single_pol(
         ps_q.connect("o1", mzm_q.ports["o2"])
     else:
         straight_conn = straight_function(
-            length=mzm_ps_spacing, cross_section=cross_section, **kwargs
+            length=mzm_ps_spacing,
+            cross_section=cross_section,
+            **kwargs,
         )
         straight_i = c << straight_conn
         straight_q = c << straight_conn

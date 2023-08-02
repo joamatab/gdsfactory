@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.bend_s import bend_s
 from gdsfactory.components.straight import straight
 from gdsfactory.port import select_ports_optical
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -23,6 +27,7 @@ def fanout2x2(
     """Returns component with Sbend fanout routes.
 
     Args:
+    ----
         component: to fanout.
         port_spacing: for the returned component.
         bend_length: length of the bend (defaults to port_spacing).
@@ -80,7 +85,7 @@ def fanout2x2(
     c.min_bend_radius = bend.info["min_bend_radius"]
 
     optical_ports = select_ports(ref.ports)
-    for port_name in ref.ports.keys():
+    for port_name in ref.ports:
         if port_name not in optical_ports:
             c.add_port(port_name, port=ref.ports[port_name])
     c.copy_child_info(component)
@@ -88,10 +93,8 @@ def fanout2x2(
 
 
 if __name__ == "__main__":
-    # c =gf.components.coupler(gap=1.0)
     c = gf.components.nxn(west=2, east=2)
 
     cc = fanout2x2(component=c, port_spacing=20)
     print(cc.ports["o3"].y - cc.ports["o4"].y)
-    # print(cc.ports)
     cc.show(show_ports=True)

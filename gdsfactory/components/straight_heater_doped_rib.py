@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
@@ -9,7 +10,9 @@ from gdsfactory.components.via_stack import via_stack_m1_m3 as via_stack_metal_f
 from gdsfactory.components.via_stack import via_stack_slab_npp_m3
 from gdsfactory.cross_section import rib_heater_doped, strip_rib_tip
 from gdsfactory.snap import snap_to_grid
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -38,6 +41,7 @@ def straight_heater_doped_rib(
     dimensions from https://doi.org/10.1364/OE.27.010456
 
     Args:
+    ----
         length: of the waveguide in um.
         nsections: between via_stacks.
         cross_section: for the input/output ports.
@@ -197,12 +201,10 @@ def straight_heater_doped_rib(
 def test_straight_heater_doped_rib_ports() -> None:
     c = straight_heater_doped_rib(length=100.0)
     assert c.get_ports_xsize(port_type="optical") == 100.0, c.get_ports_xsize(
-        port_type="optical"
+        port_type="optical",
     )
 
 
 if __name__ == "__main__":
     c = straight_heater_doped_rib(xoffset_tip1=10)
-    # c = straight_heater_doped_rib(with_taper1=False)
-    # c = straight_heater_doped_rib(length=500)
     c.show(show_ports=True)

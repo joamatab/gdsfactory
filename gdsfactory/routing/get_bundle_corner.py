@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from gdsfactory.component_layout import _rotate_points
-from gdsfactory.port import Port
 from gdsfactory.routing.get_route import get_route_from_waypoints
 from gdsfactory.routing.manhattan import generate_manhattan_waypoints
 from gdsfactory.routing.path_length_matching import path_length_matched_points
-from gdsfactory.typings import Route
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.port import Port
+    from gdsfactory.typings import Route
 
 
 def _groups(ports, cut, axis="X"):
@@ -24,7 +28,11 @@ def _groups(ports, cut, axis="X"):
 
 
 def _transform_port(
-    point, orientation, origin=(0, 0), rotation=None, x_reflection=False
+    point,
+    orientation,
+    origin=(0, 0),
+    rotation=None,
+    x_reflection=False,
 ):
     new_point = np.array(point)
     new_orientation = orientation
@@ -47,7 +55,11 @@ def _transform_ports(ports, rotation, origin=(0, 0), x_reflection=False):
     for p in ports:
         new_port = p.copy()
         new_center, new_orientation = _transform_port(
-            p.center, p.orientation, origin, rotation, x_reflection
+            p.center,
+            p.orientation,
+            origin,
+            rotation,
+            x_reflection,
         )
         new_port.center = new_center
         new_port.new_orientation = new_orientation
@@ -69,6 +81,7 @@ def get_bundle_corner(
     r"""Connect banks of ports with either 90Deg or 270Deg angle between them.
 
     Args:
+    ----
         ports1: list of start ports.
         ports2: list of end ports.
         route_filter: filter to apply to the manhattan waypoints
@@ -79,6 +92,7 @@ def get_bundle_corner(
         path_length_match_modify_segment_i: segment to increase length.
 
     Returns:
+    -------
         returns a list of elements which can be added to a component.
         `[route_filter(r) for r in routes]` where routes is a list of coordinates list
         e.g with default `get_route_from_waypoints`.
@@ -159,30 +173,31 @@ def _get_bundle_corner_waypoints(
     port_angles1 = {p.orientation for p in ports1}
     port_angles2 = {p.orientation for p in ports2}
 
-    assert len(ports2) == nb_ports, f"ports1 = {len(ports1)} must match {len(ports2)}"
-    assert (
-        len(port_angles1) <= 1
-    ), f"ports1 should have the same angle. Got {port_angles1}"
-    assert (
-        len(port_angles2) <= 1
-    ), f"ports2 should have the same angle. Got {port_angles2}"
+    if len(ports2) != nb_ports:
+        msg = f"ports1 = {len(ports1)} must match {len(ports2)}"
+        raise ValueError(msg)
+    if len(port_angles1) > 1:
+        msg = f"ports1 should have the same angle. Got {port_angles1}"
+        raise ValueError(msg)
+    if len(port_angles2) > 1:
+        msg = f"ports2 should have the same angle. Got {port_angles2}"
+        raise ValueError(msg)
 
     a_start = ports1[0].orientation
     a_end = ports2[0].orientation
 
     da = a_end - a_start
-    assert (da) % 180 == 90, (
-        "corner_bundle can  only route port banks between orthogonal axes."
-        f"Got angles of {a_start} and {a_end}"
-    )
+    if da % 180 != 90:
+        msg = f"corner_bundle can  only route port banks between orthogonal axes.Got angles of {a_start} and {a_end}"
+        raise ValueError(
+            msg,
+        )
 
     # Rotate all ports to be in the configuration where start_angle = 0
 
     origin = ports1[0].center
     ports1_transformed = _transform_ports(ports1, rotation=-a_start, origin=origin)
     ports2_transformed = _transform_ports(ports2, rotation=-a_start, origin=origin)
-
-    # a_end_tr = ports2_transformed[0].orientation % 360
 
     ys = [p.y for p in ports1_transformed]
     ye = [p.y for p in ports2_transformed]
@@ -196,8 +211,15 @@ def _get_bundle_corner_waypoints(
     are_right = max(xs) < min(xe)
     are_left = min(xs) > max(xe)
 
-    assert are_above or are_below, "corner_bundle - ports should be below or above"
-    assert are_right or are_left, "corner_bundle - ports should be left or right"
+    ports_above_or_below = are_above or are_below
+    ports_right_or_left = are_right or are_left
+
+    if not ports_above_or_below:
+        msg = "corner_bundle - ports should be below or above"
+        raise ValueError(msg)
+    if not ports_right_or_left:
+        msg = "corner_bundle - ports should be left or rigth"
+        raise ValueError(msg)
 
     start_sort_type = ["Y", "-X", "-Y", "X"]
 
@@ -212,11 +234,12 @@ def _get_bundle_corner_waypoints(
     is_routable_90 = ((are_below and are_right) or (are_above and are_left)) and (
         da == 90
     )
-    assert is_routable_270 or is_routable_90, (
-        f"Ports not routable with corner_bundle: da={da}; are_below={are_below};"
-        f"are_above={are_above}; are_left={are_left}; are_right={are_right}. "
-        "Consider applying a U turn first and then to to the 90Deg or 270Deg connection"
-    )
+    is_routable_90_or_270 = is_routable_270 or is_routable_90
+    if not is_routable_90_or_270:
+        msg = f"Ports not routable with corner_bundle: da={da}; are_below={are_below};are_above={are_above}; are_left={are_left}; are_right={are_right}. Consider applying a U turn first and then to to the 90Deg or 270Deg connection"
+        raise ValueError(
+            msg,
+        )
 
     end_sort_type = ["Y", "-X", "-Y", "X"] if da > 0 else ["-Y", "X", "Y", "-X"]
     start_angle_sort_index = a_start // 90
@@ -241,7 +264,6 @@ def _get_bundle_corner_waypoints(
         "-Y": lambda p: -p.y,
     }
 
-    # print(a_start, a_end, start_angle_sort_type, end_angle_sort_type)
     ports1.sort(key=type2key[start_angle_sort_type])
     ports2.sort(key=type2key[end_angle_sort_type])
 

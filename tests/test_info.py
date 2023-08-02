@@ -1,6 +1,4 @@
-"""
-
-info:
+"""info:
 
 - default
 - changed
@@ -25,5 +23,3 @@ def test_args() -> None:
 if __name__ == "__main__":
     test_args()
     # assert c1.settings.['full']['size'][0] == 150
-    # c1 = gf.components.pad((150, 150))
-    # c1.show()

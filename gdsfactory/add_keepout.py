@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from gdsfactory.cell import cell
 from gdsfactory.component import Component
 from gdsfactory.component_layout import _parse_layer
 from gdsfactory.generic_tech import LAYER
 from gdsfactory.geometry.functions import polygon_grow
-from gdsfactory.typings import Layers
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import Layers
 
 
 @cell
@@ -20,6 +24,7 @@ def add_keepout(
     You can also use add_padding for rectangular keepout.
 
     Args:
+    ----
         component: to add keepout.
         target_layers: list of layers to read.
         keepout_layers: list of layers to add keepout.
@@ -50,7 +55,9 @@ def test_add_keepout() -> None:
 
     assert len(c.get_polygons()) == polygons
     assert add_keepout(
-        component=c, target_layers=target_layers, keepout_layers=keepout_layers
+        component=c,
+        target_layers=target_layers,
+        keepout_layers=keepout_layers,
     )
 
 

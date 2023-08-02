@@ -8,7 +8,9 @@ def add_color_yaml_presenter(prefer_named_color: bool = True) -> None:
     def _color_presenter(dumper: yaml.Dumper, data: Color) -> yaml.ScalarNode:
         data = data.as_named(fallback=True) if prefer_named_color else data.as_hex()
         return dumper.represent_scalar(
-            "tag:yaml.org,2002:str", ensure_six_digit_hex_color(data), style='"'
+            "tag:yaml.org,2002:str",
+            ensure_six_digit_hex_color(data),
+            style='"',
         )
 
     yaml.add_representer(Color, _color_presenter)

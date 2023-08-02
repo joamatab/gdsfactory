@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdstk
 
-from gdsfactory.typings import Component, ComponentReference
+if TYPE_CHECKING:
+    from gdsfactory.typings import Component, ComponentReference
 
 
 def fillet(
@@ -13,6 +16,7 @@ def fillet(
     """Perform a fillet operation and return the list of resulting Polygons.
 
     Args:
+    ----
         operand: polygon, list of Polygons, Component, or ComponentReference.
         radius: Fillet radius. You can also define a value for each vertex.
         tolerance: for calculating the polygonal approximation of the filleted corners.
@@ -35,7 +39,6 @@ def fillet(
       c.show()
 
     """
-
     if hasattr(operand, "get_polygons"):
         operand = operand.get_polygons(as_array=False)
 

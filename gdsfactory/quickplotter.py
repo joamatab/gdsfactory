@@ -89,7 +89,8 @@ def _zoom_factory(axis, scale_factor=1.4) -> None:
 
     fig = axis.get_figure()
     fig.canvas.mpl_connect(
-        "scroll_event", lambda event: zoom_fun(event, axis, scale_factor)
+        "scroll_event",
+        lambda event: zoom_fun(event, axis, scale_factor),
     )
 
 
@@ -112,7 +113,7 @@ def _rectangle_selector_factory(fig, ax):
         # Update toolbar so back/forward buttons work
         fig.canvas.toolbar.push_current()
 
-    rs = RectangleSelector(
+    return RectangleSelector(
         ax,
         line_select_callback,
         drawtype="box",
@@ -123,7 +124,6 @@ def _rectangle_selector_factory(fig, ax):
         spancoords="pixels",
         interactive=False,
     )
-    return rs
 
 
 def set_quickplot_options(
@@ -139,6 +139,7 @@ def set_quickplot_options(
     """Sets plotting options for quickplot().
 
     Args:
+    ----
         show_ports: Sets whether ports are drawn.
         show_subports: Sets whether subports (ports that belong to references) are drawn.
         label_aliases: Sets whether aliases are labeled with a text name.
@@ -170,12 +171,13 @@ def set_quickplot_options(
         _quickplot_options["fontsize"] = fontsize
 
 
-def quickplot(items, **kwargs):  # noqa: C901
+def quickplot(items, **kwargs):
     """Takes a list of devices/references/polygons or single one of those, and \
     plots them. Use `set_quickplot_options()` to modify the viewer behavior \
     (e.g. displaying ports, creating new windows, etc).
 
     Args:
+    ----
         items: object or list of objects to plot.
 
     Kwargs:
@@ -192,7 +194,7 @@ def quickplot(items, **kwargs):  # noqa: C901
         fontsize: for labels.
 
 
-    Examples
+    Examples:
     --------
     >>> import gdsfactory as gf
     >>> R = gf.components.rectangle()
@@ -240,7 +242,7 @@ def quickplot(items, **kwargs):  # noqa: C901
     LAYER_VIEWS = get_layer_views()
     all_lv_tuples = LAYER_VIEWS.get_layer_tuples()
     for item in items:
-        if isinstance(item, (Component, ComponentReference)):
+        if isinstance(item, Component | ComponentReference):
             polygons_spec = item.get_polygons(by_spec=True, depth=None)
             for key in sorted(polygons_spec):
                 polygons = polygons_spec[key]
@@ -259,7 +261,7 @@ def quickplot(items, **kwargs):  # noqa: C901
                 )
                 bbox = _update_bbox(bbox, new_bbox)
             # If item is a Component or ComponentReference, draw ports
-            if isinstance(item, (Component, ComponentReference)) and show_ports is True:
+            if isinstance(item, Component | ComponentReference) and show_ports is True:
                 for port in item.ports.values():
                     if (
                         (port.width is None)
@@ -346,13 +348,14 @@ def quickplot(items, **kwargs):  # noqa: C901
 
 def _use_interactive_zoom():
     """Checks whether the current matplotlib backend is compatible with \
-    interactive zoom."""
-    import matplotlib
+    interactive zoom.
+    """
+    import matplotlib as mpl
 
     if _quickplot_options["interactive_zoom"] is not None:
         return _quickplot_options["interactive_zoom"]
     forbidden_backends = ["nbagg"]
-    backend = matplotlib.get_backend().lower()
+    backend = mpl.get_backend().lower()
     return all(fb.lower() not in backend for fb in forbidden_backends)
 
 
@@ -420,13 +423,16 @@ def _port_marker(port, is_subport):
 
 def _draw_port(ax, port, is_subport, color):
     xbound, ybound = np.column_stack(port.endpoints)
-    # plt.plot(x, y, 'rp', markersize = 12) # Draw port center
     arrow_points, text_pos = _port_marker(port, is_subport)
     xmin, ymin = np.min(np.vstack([arrow_points, port.endpoints]), axis=0)
     xmax, ymax = np.max(np.vstack([arrow_points, port.endpoints]), axis=0)
     ax.plot(xbound, ybound, alpha=0.5, linewidth=3, color=color)  # Draw port edge
     ax.plot(
-        arrow_points[:, 0], arrow_points[:, 1], alpha=0.8, linewidth=2, color=color
+        arrow_points[:, 0],
+        arrow_points[:, 1],
+        alpha=0.8,
+        linewidth=2,
+        color=color,
     )  # Draw port edge
     ax.text(
         text_pos[0],
@@ -535,7 +541,6 @@ class Viewer(QGraphicsView):
         self.setInteractive(False)
         self.scale(1, -1)  # Flips around the Y axis
         # Use OpenGL http://ralsina.me/stories/BBS53.html
-        #        self.setViewport(QtOpenGL.QGLWidget())
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.pen = QPen(QtCore.Qt.black, 0)
         self.portpen = QPen(PORT_COLOR, 3)
@@ -559,14 +564,16 @@ class Viewer(QGraphicsView):
         self.gridpen.setStyle(QtCore.Qt.DotLine)
         self.gridpen.setDashPattern([1, 4])
         self.gridpen.setColor(QtGui.QColor(0, 0, 0, 125))
-        #        self.gridpen = QPen(QtCore.Qt.black, 1)
-        #        self.gridpen.setCosmetic(True) # Makes constant width
         self.scene_polys = []
 
         self.initialize()
 
     def add_polygons(
-        self, polygons, fill_color="#A8F22A", frame_color="#A8F22A", alpha=1.0
+        self,
+        polygons,
+        fill_color="#A8F22A",
+        frame_color="#A8F22A",
+        alpha=1.0,
     ) -> None:
         qcolor_fill = QColor()
         qcolor_fill.setNamedColor(fill_color)
@@ -628,13 +635,11 @@ class Viewer(QGraphicsView):
             arrow_points, text_pos = _port_marker(port, is_subport)
             arrow_qpoly = QPolygonF([QPointF(p[0], p[1]) for p in arrow_points])
             port_scene_poly = self.scene.addPolygon(arrow_qpoly)
-            # port_scene_poly.setRotation(port.orientation)
-            # port_scene_poly.moveBy(port.center[0], port.center[1])
             port_shapes = [qline, port_scene_poly]
         qtext = self.scene.addText(str(port.name), self.portfont)
         qtext.setPos(QPointF(text_pos[0], text_pos[1]))
         qtext.setFlag(QGraphicsItem.ItemIgnoresTransformations)
-        port_items = port_shapes + [qtext]
+        port_items = [*port_shapes, qtext]
 
         if not is_subport:
             [shape.setPen(self.portpen) for shape in port_shapes]
@@ -644,8 +649,6 @@ class Viewer(QGraphicsView):
             [shape.setPen(self.subportpen) for shape in port_shapes]
             qtext.setDefaultTextColor(self.subportfontcolor)
             self.subportitems += port_items
-
-    #        self.portlabels.append(qtext)
 
     def add_aliases(self, aliases) -> None:
         for name, ref in aliases.items():
@@ -694,7 +697,6 @@ class Viewer(QGraphicsView):
             QPointF(self.scene_xmin, self.scene_ymin),
             QPointF(self.scene_xmax, self.scene_ymax),
         )
-        # self.scene_center = [self.scene_bounding_rect.center().x(), self.scene_bounding_rect.center().y()]
         self.scene_size = [
             self.scene_bounding_rect.width(),
             self.scene_bounding_rect.height(),
@@ -736,14 +738,12 @@ class Viewer(QGraphicsView):
         self.update_gridsize_label()
 
     def update_gridsize_label(self) -> None:
-        self.gridsize_label.setText(f"grid size = {str(self.grid_size_snapped)}")
+        self.gridsize_label.setText(f"grid size = {self.grid_size_snapped!s}")
         self.gridsize_label.move(QPoint(5, self.height() - 25))
 
     def update_mouse_position_label(self) -> None:
         self.position_label.setText(
-            "X = {:0.4f} / Y = {:0.4f}".format(
-                self.mouse_position[0], self.mouse_position[1]
-            )
+            f"X = {self.mouse_position[0]:0.4f} / Y = {self.mouse_position[1]:0.4f}",
         )
         self.position_label.move(QPoint(self.width() - 250, self.height() - 25))
 
@@ -850,10 +850,6 @@ class Viewer(QGraphicsView):
         super(QGraphicsView, self).mouseMoveEvent(event)
 
         # # Useful debug
-        # try:
-        #     self.debug_label.setText(str(itemsBoundingRect_nogrid().width()))
-        # except Exception:
-        #     print('Debug statement failed')
 
         # Update the X,Y label indicating where the mouse is on the geometry
         mouse_position = self.mapToScene(event.pos())
@@ -862,7 +858,7 @@ class Viewer(QGraphicsView):
 
         if not self._rb_origin.isNull() and self._mousePressed == Qt.RightButton:
             self.rubberBand.setGeometry(
-                QRect(self._rb_origin, event.pos()).normalized()
+                QRect(self._rb_origin, event.pos()).normalized(),
             )
 
         # Middle-click-to-pan
@@ -871,13 +867,11 @@ class Viewer(QGraphicsView):
             diff = newPos - self._dragPos
             self._dragPos = newPos
             self.horizontalScrollBar().setValue(
-                self.horizontalScrollBar().value() - diff.x()
+                self.horizontalScrollBar().value() - diff.x(),
             )
             self.verticalScrollBar().setValue(
-                self.verticalScrollBar().value() - diff.y()
+                self.verticalScrollBar().value() - diff.y(),
             )
-
-    #            event.accept()
 
     def mouseReleaseEvent(self, event) -> None:
         if event.button() == Qt.RightButton:
@@ -940,10 +934,9 @@ def quickplot2(item_list, *args, **kwargs):
     from gdsfactory.technology import LayerView
 
     if not qt_imported:
+        msg = "quickplot2 tried to import PyQt5 but it failed. gdsfactory willstill work but quickplot2() may not.  Try usingquickplot() instead (based on matplotlib)"
         raise ImportError(
-            "quickplot2 tried to import PyQt5 but it failed. gdsfactory will"
-            "still work but quickplot2() may not.  Try using"
-            "quickplot() instead (based on matplotlib)"
+            msg,
         )
 
     global app
@@ -954,16 +947,13 @@ def quickplot2(item_list, *args, **kwargs):
         viewer_window = ViewerWindow()
     viewer = viewer_window.viewer
     viewer.initialize()
-    if not isinstance(item_list, (list, tuple)):
+    if not isinstance(item_list, list | tuple):
         item_list = [item_list]
     LAYER_VIEWS = get_layer_views()
     for element in item_list:
         if isinstance(
             element,
-            (
-                Component,
-                ComponentReference,
-            ),
+            Component | ComponentReference,
         ):
             # Draw polygons in the element
             polygons_spec = element.get_polygons(by_spec=True, depth=None)
@@ -1020,10 +1010,8 @@ if __name__ == "__main__":
 
     import gdsfactory as gf
 
-    # set_quickplot_options(label_aliases=True, show_ports=False, show_subports=False)
     c = gf.components.straight_pn()
     c.plotqt()
-    # c.plot()
     c.show()
     quickplot(c, show_ports=False, show_subports=False, label_aliases=True)
     plt.show()

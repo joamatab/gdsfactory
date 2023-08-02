@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
 from gdsfactory.components.bend_circular import bend_circular
 from gdsfactory.components.coupler_full import coupler_full
 from gdsfactory.cross_section import strip
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec, CrossSectionSpec
 
 
 @gf.cell
@@ -18,6 +22,7 @@ def ring_crow_couplers(
     """Coupled ring resonators with coupler components between gaps.
 
     Args:
+    ----
         gap: gap between for coupler.
         radius: for the bend and coupler.
         length_x: ring coupler length.
@@ -71,7 +76,7 @@ def ring_crow_couplers(
 
     # Cascade rings
     for index, (r, bend, cross_section) in enumerate(
-        zip(radius, bends, ring_cross_sections)
+        zip(radius, bends, ring_cross_sections),
     ):
         # Add ring
         bend_c = gf.get_component(bend, radius=r, cross_section=cross_section)
@@ -95,7 +100,7 @@ def ring_crow_couplers(
 
 if __name__ == "__main__":
     c = ring_crow_couplers(
-        couplers=[gf.components.coupler_full(coupling_length=0.01, dw=0)] * 4
+        couplers=[gf.components.coupler_full(coupling_length=0.01, dw=0)] * 4,
     )
 
     c.show(show_ports=True, show_subports=False)

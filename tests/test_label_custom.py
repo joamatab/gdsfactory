@@ -51,7 +51,7 @@ def test_label_fiber_single_custom(num_regression, check=True) -> None:
                 label.origin[0],
                 label.origin[1],
                 label.layer,
-            ]
+            ],
         )
         for label in cte.labels
     }
@@ -64,28 +64,5 @@ def test_label_fiber_single_custom(num_regression, check=True) -> None:
 
 if __name__ == "__main__":
     c = gf.components.straight(length=LENGTH, cross_section=cross_section)
-    # c = gf.routing.add_fiber_array(
-    #     component=c,
-    #     with_loopback=False,
-    #     component_name=CUSTOM_LABEL,
-    #     cross_section=cross_section,
-    #     decorator=gf.add_labels.add_labels_to_ports
-    # )
 
-    # c = gf.routing.add_fiber_single(
-    #     component=c,
-    #     with_loopback=True,
-    #     component_name=CUSTOM_LABEL,
-    #     cross_section=cross_section,
-    #     decorator=gf.add_labels.add_labels_to_ports_opt
-    # )
-
-    # test_label_fiber_array_custom()
     test_label_fiber_single_custom(None, check=False)
-
-    # c = gf.components.straight()
-    # assert len(c.labels) == 0
-
-    # c = gf.routing.add_fiber_array(component=c, with_loopback=True)
-    # print(len(c.labels))
-    # c.show(show_ports=True)

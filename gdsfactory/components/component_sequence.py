@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from collections import Counter
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import ComponentSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import ComponentSpec
 
 
 class SequenceGenerator:
@@ -77,6 +80,7 @@ def component_sequence(
     if you prefix a symbol with ! it mirrors the component
 
     Args:
+    ----
         sequence: a string or a list of symbols.
         symbol_to_component: maps symbols to (component, input, output).
         ports_map: (optional) extra port mapping using the convention.
@@ -86,6 +90,7 @@ def component_sequence(
         start_orientation: in degrees.
 
     Returns:
+    -------
         component: containing the sequence of sub-components
             instantiated and connected together in the sequence order.
 
@@ -134,9 +139,9 @@ def component_sequence(
     try:
         component.add_port(name=port_name1, port=prev_device.ports[input_port])
     except KeyError as exc:
+        msg = f"{prev_device.parent.name!r} input_port {input_port!r} not in {list(prev_device.ports.keys())}"
         raise KeyError(
-            f"{prev_device.parent.name!r} input_port {input_port!r} "
-            f"not in {list(prev_device.ports.keys())}"
+            msg,
         ) from exc
 
     while index < len(sequence):
@@ -167,9 +172,9 @@ def component_sequence(
         try:
             ref.connect(input_port, prev_device.ports[prev_port])
         except KeyError as exc:
+            msg = f"{prev_device.parent.name!r} port {prev_port!r} not in {list(prev_device.ports.keys())}"
             raise KeyError(
-                f"{prev_device.parent.name!r} port {prev_port!r} "
-                f"not in {list(prev_device.ports.keys())}"
+                msg,
             ) from exc
 
         prev_device = ref
@@ -215,10 +220,7 @@ if __name__ == "__main__":
     sequence = "H"
     sequence = "AB-H-H-H-H-BA"
     c = gf.components.component_sequence(
-        sequence=sequence, symbol_to_component=symbol_to_component_map
+        sequence=sequence,
+        symbol_to_component=symbol_to_component_map,
     )
-    # n = c.get_netlist()
-    # c = gf.read.from_yaml(n)
     c.show(show_ports=True)
-    # c.pprint()
-    # print(c.named_references.keys())

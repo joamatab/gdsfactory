@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
 from gdsfactory.component import Component
-from gdsfactory.typings import LayerSpec
+
+if TYPE_CHECKING:
+    from gdsfactory.typings import LayerSpec
 
 
 @gf.cell
@@ -16,6 +20,7 @@ def C(
     based on phidl.
 
     Args:
+    ----
         width: of the line.
         size: length and height of the base.
         layer: layer spec.

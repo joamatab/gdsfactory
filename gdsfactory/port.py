@@ -33,7 +33,7 @@ import functools
 import typing
 import warnings
 from functools import partial
-from typing import Any, Callable, Dict, List, Tuple, Union, overload
+from typing import Any, Union, overload
 
 import numpy as np
 from numpy import ndarray
@@ -46,13 +46,15 @@ from gdsfactory.serialization import clean_value_json
 from gdsfactory.snap import snap_to_grid
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from gdsfactory.component import Component
 
-Layer = Tuple[int, int]
-Layers = Tuple[Layer, ...]
+Layer = tuple[int, int]
+Layers = tuple[Layer, ...]
 LayerSpec = Union[Layer, int, str, None]
-LayerSpecs = Tuple[LayerSpec, ...]
-Float2 = Tuple[float, float]
+LayerSpecs = tuple[LayerSpec, ...]
+Float2 = tuple[float, float]
 
 
 class PortNotOnGridError(ValueError):
@@ -71,6 +73,7 @@ class Port:
     """Ports are useful to connect Components with each other.
 
     Args:
+    ----
         name: we name ports clock-wise starting from bottom left.
         center: (x, y) port center coordinate.
         width: of the port in um.
@@ -106,10 +109,12 @@ class Port:
         self.shear_angle = shear_angle
 
         if cross_section is None and layer is None:
-            raise ValueError("You need Port to define cross_section or layer")
+            msg = "You need Port to define cross_section or layer"
+            raise ValueError(msg)
 
         if cross_section is None and width is None:
-            raise ValueError("You need Port to define cross_section or width")
+            msg = "You need Port to define cross_section or width"
+            raise ValueError(msg)
 
         if cross_section and isinstance(cross_section, str):
             from gdsfactory.pdk import get_cross_section
@@ -117,8 +122,9 @@ class Port:
             cross_section = get_cross_section(cross_section)
 
         if cross_section and not isinstance(cross_section, CrossSection):
+            msg = f"cross_section = {cross_section} is not a valid CrossSection."
             raise ValueError(
-                f"cross_section = {cross_section} is not a valid CrossSection."
+                msg,
             )
 
         if layer is None:
@@ -134,7 +140,8 @@ class Port:
         self.width = width
 
         if self.width < 0:
-            raise ValueError(f"Port width must be >=0. Got {self.width}")
+            msg = f"Port width must be >=0. Got {self.width}"
+            raise ValueError(msg)
 
     def to_dict(self) -> dict[str, Any]:
         x, y = np.round(self.center, 3)
@@ -170,7 +177,6 @@ class Port:
         """For pydantic assumes Port is valid if has a name and a valid type."""
         assert isinstance(v, Port), f"TypeError, Got {type(v)}, expecting Port"
         assert v.name, f"Port has no name, got {v.name!r}"
-        # assert v.assert_on_grid(), f"port.center = {v.center} has off-grid points"
         return v
 
     @property
@@ -217,7 +223,8 @@ class Port:
         """Flips port."""
         port = self.copy(**kwargs)
         if port.orientation is None:
-            raise ValueError(f"port {self.name!r} has None orientation")
+            msg = f"port {self.name!r} has None orientation"
+            raise ValueError(msg)
         port.orientation = (port.orientation + 180) % 360
         return port
 
@@ -233,7 +240,7 @@ class Port:
                 [
                     self.width / 2 * np.cos((self.orientation - 90) * np.pi / 180),
                     self.width / 2 * np.sin((self.orientation - 90) * np.pi / 180),
-                ]
+                ],
             )
             if self.orientation is not None
             else np.array([self.width, self.width])
@@ -281,6 +288,7 @@ class Port:
         specified will rotate around (0,0).
 
         Args:
+        ----
             angle: Angle to rotate the Port in degrees.
             center: array-like[2] or None center of the Port.
 
@@ -295,6 +303,7 @@ class Port:
         """Returns a copy of the port.
 
         Args:
+        ----
             name: optional new name.
 
         """
@@ -329,9 +338,9 @@ class Port:
         half_width_correct = snap_to_grid(half_width, nm=nm)
         component_name = self.parent.name
         if not np.isclose(half_width, half_width_correct):
+            msg = f"{component_name!r}, port = {self.name!r}, center = {self.center} width = {self.width} will create off-grid points"
             raise PortNotOnGridError(
-                f"{component_name!r}, port = {self.name!r}, center = {self.center} "
-                f"width = {self.width} will create off-grid points",
+                msg,
                 f"you can fix it by changing width to {2*half_width_correct}",
             )
 
@@ -347,25 +356,27 @@ class Port:
         elif self.orientation in [0, 180]:
             x = self.y + self.width / 2
             if not np.isclose(snap_to_grid(x, nm=nm), x):
+                msg = f"{self.name!r} port in {component_name!r} has an off-grid point {x}"
                 raise PortNotOnGridError(
-                    f"{self.name!r} port in {component_name!r} has an off-grid point {x}",
+                    msg,
                     f"you can fix it by moving the point to {snap_to_grid(x, nm=nm)}",
                 )
         elif self.orientation in [90, 270]:
             x = self.x + self.width / 2
             if not np.isclose(snap_to_grid(x, nm=nm), x):
+                msg = f"{self.name!r} port in {component_name!r} has an off-grid point {x}"
                 raise PortNotOnGridError(
-                    f"{self.name!r} port in {component_name!r} has an off-grid point {x}",
+                    msg,
                     f"you can fix it by moving the point to {snap_to_grid(x, nm=nm)}",
                 )
         else:
+            msg = f"{component_name!r} port {self.name!r} has invalid orientation {self.orientation}"
             raise PortOrientationError(
-                f"{component_name!r} port {self.name!r} has invalid orientation"
-                f" {self.orientation}"
+                msg,
             )
 
 
-PortsMap = Dict[str, List[Port]]
+PortsMap = dict[str, list[Port]]
 
 
 def port_array(
@@ -379,6 +390,7 @@ def port_array(
     """Returns a list of ports placed in an array.
 
     Args:
+    ----
         center: center point of the port.
         width: port width.
         orientation: angle in degrees.
@@ -403,6 +415,7 @@ def read_port_markers(component: object, layers: LayerSpecs = ("PORT",)) -> Comp
     """Returns extracted polygons from component layers.
 
     Args:
+    ----
         component: Component to extract markers.
         layers: GDS layer specs.
 
@@ -527,6 +540,7 @@ def select_ports(
     """Returns a dict of ports from a dict of ports.
 
     Args:
+    ----
         ports: Dict[str, Port] a port dict {port name: port}.
         layer: select ports with port GDS layer.
         prefix: select ports with port name prefix.
@@ -538,13 +552,14 @@ def select_ports(
         clockwise: if True, sort ports clockwise, False: counter-clockwise.
 
     Returns:
+    -------
         Dict containing the selected ports {port name: port}.
 
     """
     from gdsfactory.component import Component, ComponentReference
 
     # Make it accept Component or ComponentReference
-    if isinstance(ports, (Component, ComponentReference)):
+    if isinstance(ports, Component | ComponentReference):
         ports = ports.ports
 
     if layer:
@@ -591,7 +606,8 @@ def select_ports_list(**kwargs) -> list[Port]:
 
 def flipped(port: Port) -> Port:
     if port.orientation is None:
-        raise ValueError(f"port {port.name!r} has None orientation")
+        msg = f"port {port.name!r} has None orientation"
+        raise ValueError(msg)
     _port = port.copy()
     _port.orientation = (_port.orientation + 180) % 360
     return _port
@@ -613,11 +629,12 @@ def get_ports_facing(ports: list[Port], direction: str = "W") -> list[Port]:
     valid_directions = ["E", "N", "W", "S"]
 
     if direction not in valid_directions:
-        raise PortOrientationError(f"{direction} must be in {valid_directions} ")
+        msg = f"{direction} must be in {valid_directions} "
+        raise PortOrientationError(msg)
 
     if isinstance(ports, dict):
         ports = list(ports.values())
-    elif isinstance(ports, (Component, ComponentReference)):
+    elif isinstance(ports, Component | ComponentReference):
         ports = list(ports.ports.values())
 
     direction_ports: dict[str, list[Port]] = {x: [] for x in ["E", "N", "W", "S"]}
@@ -647,7 +664,8 @@ def deco_rename_ports(component_factory: Callable) -> Callable:
 
 
 def _rename_ports_facing_side(
-    direction_ports: dict[str, list[Port]], prefix: str = ""
+    direction_ports: dict[str, list[Port]],
+    prefix: str = "",
 ) -> None:
     """Renames ports clockwise."""
     for direction, list_ports in list(direction_ports.items()):
@@ -666,7 +684,8 @@ def _rename_ports_facing_side(
 
 
 def _rename_ports_facing_side_ccw(
-    direction_ports: dict[str, list[Port]], prefix: str = ""
+    direction_ports: dict[str, list[Port]],
+    prefix: str = "",
 ) -> None:
     """Renames ports counter-clockwise."""
     for direction, list_ports in list(direction_ports.items()):
@@ -705,7 +724,8 @@ def _rename_ports_counter_clockwise(direction_ports, prefix="") -> None:
 
 def _rename_ports_clockwise(direction_ports: PortsMap, prefix: str = "") -> None:
     """Rename ports in the clockwise direction starting from the bottom left \
-    (west) corner."""
+    (west) corner.
+    """
     east_ports = direction_ports["E"]
     east_ports.sort(key=lambda p: -p.y)  # sort north to south
 
@@ -717,7 +737,6 @@ def _rename_ports_clockwise(direction_ports: PortsMap, prefix: str = "") -> None
 
     south_ports = direction_ports["S"]
     south_ports.sort(key=lambda p: -p.x)  # sort east to west
-    # south_ports.sort(key=lambda p: p.y)  #  south first
 
     ports = west_ports + north_ports + east_ports + south_ports
 
@@ -726,10 +745,12 @@ def _rename_ports_clockwise(direction_ports: PortsMap, prefix: str = "") -> None
 
 
 def _rename_ports_clockwise_top_right(
-    direction_ports: PortsMap, prefix: str = ""
+    direction_ports: PortsMap,
+    prefix: str = "",
 ) -> None:
     """Rename ports in the clockwise direction starting from the top right \
-    corner."""
+    corner.
+    """
     east_ports = direction_ports["E"]
     east_ports.sort(key=lambda p: -p.y)  # sort north to south
 
@@ -759,6 +780,7 @@ def rename_ports_by_orientation(
     """Returns Component with port names based on port orientation (E, N, W, S).
 
     Args:
+    ----
         component: to rename ports.
         layers_excluded: to exclude.
         select_ports: function to select_ports.
@@ -823,6 +845,7 @@ def auto_rename_ports(
     """Adds prefix for optical and electrical.
 
     Args:
+    ----
         component: to auto_rename_ports.
         function: to rename ports.
         select_ports_optical: to select optical ports.
@@ -834,6 +857,7 @@ def auto_rename_ports(
         port_type: select ports with port type (optical, electrical, vertical_te).
 
     Keyword Args:
+    ------------
         prefix: select ports with port name prefix.
         suffix: select ports with port name suffix.
         orientation: select ports with orientation in degrees.
@@ -880,17 +904,20 @@ def auto_rename_ports(
 
 
 auto_rename_ports_counter_clockwise = partial(
-    auto_rename_ports, function=_rename_ports_counter_clockwise
+    auto_rename_ports,
+    function=_rename_ports_counter_clockwise,
 )
 auto_rename_ports_orientation = partial(
-    auto_rename_ports, function=_rename_ports_facing_side
+    auto_rename_ports,
+    function=_rename_ports_facing_side,
 )
 
 auto_rename_ports_electrical = partial(auto_rename_ports, select_ports_optical=None)
 
 
 def map_ports_layer_to_orientation(
-    ports: dict[str, Port], function=_rename_ports_facing_side
+    ports: dict[str, Port],
+    function=_rename_ports_facing_side,
 ) -> dict[str, str]:
     """Returns component or reference port mapping.
 
@@ -930,11 +957,14 @@ def map_ports_layer_to_orientation(
 
 
 def map_ports_to_orientation_cw(
-    ports: dict[str, Port], function=_rename_ports_facing_side, **kwargs
+    ports: dict[str, Port],
+    function=_rename_ports_facing_side,
+    **kwargs,
 ) -> dict[str, str]:
     """Returns component or reference port mapping clockwise.
 
     Args:
+    ----
         ports: dict of ports.
         function: to rename ports.
         kwargs: for the function to rename ports.
@@ -972,7 +1002,8 @@ def map_ports_to_orientation_cw(
 
 
 map_ports_to_orientation_ccw = partial(
-    map_ports_to_orientation_cw, function=_rename_ports_facing_side_ccw
+    map_ports_to_orientation_cw,
+    function=_rename_ports_facing_side_ccw,
 )
 
 

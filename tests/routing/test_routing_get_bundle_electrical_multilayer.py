@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from pytest_regressions.data_regression import DataRegressionFixture
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 
+if TYPE_CHECKING:
+    from pytest_regressions.data_regression import DataRegressionFixture
+
 
 def test_get_bundle_electrical_multilayer(
-    data_regression: DataRegressionFixture, check: bool = True
+    data_regression: DataRegressionFixture,
+    check: bool = True,
 ) -> None:
     lengths = {}
     c = gf.Component("multi-layer")
@@ -17,7 +21,10 @@ def test_get_bundle_electrical_multilayer(
     ptop.movex(300)
     ptop.movey(300)
     routes = gf.routing.get_bundle_electrical_multilayer(
-        ptop.ports, pbot.ports, end_straight_length=100, separation=20
+        ptop.ports,
+        pbot.ports,
+        end_straight_length=100,
+        separation=20,
     )
 
     for i, route in enumerate(routes):

@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 import gdsfactory as gf
-from gdsfactory.component import Component
 from gdsfactory.components.grating_coupler_elliptical import (
     grating_taper_points,
     grating_tooth_points,
 )
 from gdsfactory.geometry.functions import DEG2RAD
-from gdsfactory.typings import CrossSectionSpec, Floats, LayerSpec, Optional
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
+    from gdsfactory.typings import CrossSectionSpec, Floats, LayerSpec, Optional
 
 _gaps = (0.1,) * 10
 _widths = (0.5,) * 10
@@ -25,7 +29,7 @@ def grating_coupler_elliptical_arbitrary(
     fiber_angle: float = 15.0,
     nclad: float = 1.443,
     layer_slab: LayerSpec = "SLAB150",
-    layer_grating: Optional[LayerSpec] = None,
+    layer_grating: Optional[LayerSpec] | None = None,
     taper_to_slab_offset: float = -3.0,
     polarization: str = "te",
     spiked: bool = True,
@@ -39,6 +43,7 @@ def grating_coupler_elliptical_arbitrary(
     it depends on fiber_angle (degrees), neff, and nclad
 
     Args:
+    ----
         gaps: list of gaps.
         widths: list of widths.
         taper_length: taper length from input.
@@ -96,14 +101,20 @@ def grating_coupler_elliptical_arbitrary(
     b1s = [round(wavelength / np.sqrt(d), 3) for d in ds]
     x1s = [round(wavelength * nclad * sthc / d, 3) for d in ds]
     xis = np.add(
-        taper_length + np.cumsum(periods), -widths / 2
+        taper_length + np.cumsum(periods),
+        -widths / 2,
     )  # position of middle of each tooth
     ps = np.divide(xis, periods)
 
     # grating teeth
     for a1, b1, x1, p, width in zip(a1s, b1s, x1s, ps, widths):
         pts = grating_tooth_points(
-            p * a1, p * b1, p * x1, width, taper_angle, spiked=spiked
+            p * a1,
+            p * b1,
+            p * x1,
+            width,
+            taper_angle,
+            spiked=spiked,
         )
         c.add_polygon(pts, layer_grating)
 
@@ -116,7 +127,12 @@ def grating_coupler_elliptical_arbitrary(
 
     if layer_grating == layer_wg:
         pts = grating_taper_points(
-            a_taper, b_taper, x_output, x_taper, taper_angle, wg_width=wg_width
+            a_taper,
+            b_taper,
+            x_output,
+            x_taper,
+            taper_angle,
+            wg_width=wg_width,
         )
         c.add_polygon(pts, layer_wg)
 
@@ -186,11 +202,13 @@ def grating_coupler_elliptical_uniform(
     it depends on fiber_angle (degrees), neff, and nclad
 
     Args:
+    ----
         n_periods: number of grating periods.
         period: grating pitch in um.
         fill_factor: ratio of grating width vs gap.
 
     Keyword Args:
+    ------------
         taper_length: taper length from input.
         taper_angle: grating flare angle.
         wavelength: grating transmission central wavelength (um).
@@ -225,5 +243,4 @@ def grating_coupler_elliptical_uniform(
 
 if __name__ == "__main__":
     c = grating_coupler_elliptical_arbitrary(layer_grating=(3, 0))
-    # c = grating_coupler_elliptical_arbitrary()
     c.show(show_ports=False)

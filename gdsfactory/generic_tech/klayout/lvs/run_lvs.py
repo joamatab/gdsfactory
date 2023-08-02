@@ -21,6 +21,7 @@ Options:
 
 import logging
 import os
+import sys
 from datetime import datetime
 from subprocess import check_call
 
@@ -29,9 +30,7 @@ from docopt import docopt
 
 
 def check_klayout_version() -> None:
-    """
-    check_klayout_version checks klayout version and makes sure it would work with the LVS.
-    """
+    """check_klayout_version checks klayout version and makes sure it would work with the LVS."""
     # ======= Checking Klayout version =======
     klayout_v_ = os.popen("klayout -b -v").read()
     klayout_v_ = klayout_v_.split("\n")[0]
@@ -39,78 +38,72 @@ def check_klayout_version() -> None:
 
     if klayout_v_ == "":
         logging.error("Klayout is not found. Please make sure klayout is installed.")
-        exit(1)
+        sys.exit(1)
     else:
         klayout_v_list = [int(v) for v in klayout_v_.split(" ")[-1].split(".")]
 
     if len(klayout_v_list) < 1 or len(klayout_v_list) > 3:
         logging.error("Was not able to get klayout version properly.")
-        exit(1)
+        sys.exit(1)
     elif len(klayout_v_list) >= 2 or len(klayout_v_list) <= 3:
         if klayout_v_list[1] < 28:
             logging.error("Prerequisites at a minimum: KLayout 0.28.0")
             logging.error(
-                "Using this klayout version has not been assesed in this development. Limits are unknown"
+                "Using this klayout version has not been assesed in this development. Limits are unknown",
             )
-            exit(1)
+            sys.exit(1)
 
     logging.info(f"Your Klayout version is: {klayout_v_}")
 
 
 def check_layout_type(layout_path):
-    """
-    check_layout_type checks if the layout provided is GDS or OAS. Otherwise, kill the process. We only support GDS or OAS now.
+    """check_layout_type checks if the layout provided is GDS or OAS. Otherwise, kill the process. We only support GDS or OAS now.
 
     Parameters
     ----------
     layout_path : string
         string that represent the path of the layout.
 
-    Returns
+    Returns:
     -------
     string
         string that represent full absolute layout path.
     """
-
     if not os.path.isfile(layout_path):
         logging.error(
-            f"## GDS file path {layout_path} provided doesn't exist or not a file."
+            f"## GDS file path {layout_path} provided doesn't exist or not a file.",
         )
-        exit(1)
+        sys.exit(1)
 
     if ".gds" not in layout_path and ".oas" not in layout_path:
         logging.error(
-            f"## Layout {layout_path} is not in GDSII or OASIS format. Please use gds format."
+            f"## Layout {layout_path} is not in GDSII or OASIS format. Please use gds format.",
         )
-        exit(1)
+        sys.exit(1)
 
     return os.path.abspath(layout_path)
 
 
 def get_top_cell_names(gds_path):
-    """
-    get_top_cell_names get the top cell names from the GDS file.
+    """get_top_cell_names get the top cell names from the GDS file.
 
     Parameters
     ----------
     gds_path : string
         Path to the target GDS file.
 
-    Returns
+    Returns:
     -------
     List of string
         Names of the top cell in the layout.
     """
     layout = klayout.db.Layout()
     layout.read(gds_path)
-    top_cells = [t.name for t in layout.top_cells()]
-
-    return top_cells
+    return [t.name for t in layout.top_cells()]
 
 
 def get_run_top_cell_name(arguments, layout_path):
-    """
-    get_run_top_cell_name Get the top cell name to use for running. If it's provided by the user, we use the user input.
+    """get_run_top_cell_name Get the top cell name to use for running. If it's provided by the user, we use the user input.
     If not, we get it from the GDS file.
 
     Parameters
@@ -120,22 +113,21 @@ def get_run_top_cell_name(arguments, layout_path):
     layout_path : string
         Path to the target layout.
 
-    Returns
+    Returns:
     -------
     string
         Name of the topcell to use in run.
 
     """
-
     if arguments["--topcell"]:
         topcell = arguments["--topcell"]
     else:
         layout_topcells = get_top_cell_names(layout_path)
         if len(layout_topcells) > 1:
             logging.error(
-                "## Layout has multiple topcells. Please use --topcell to determine which topcell you want to run on."
+                "## Layout has multiple topcells. Please use --topcell to determine which topcell you want to run on.",
             )
-            exit(1)
+            sys.exit(1)
         else:
             topcell = layout_topcells[0]
 
@@ -143,8 +135,7 @@ def get_run_top_cell_name(arguments, layout_path):
 
 
 def generate_klayout_switches(arguments, layout_path, netlist_path):
-    """
-    parse_switches Function that parse all the args from input to prepare switches for LVS run.
+    """parse_switches Function that parse all the args from input to prepare switches for LVS run.
 
     Parameters
     ----------
@@ -155,7 +146,7 @@ def generate_klayout_switches(arguments, layout_path, netlist_path):
     netlist_path : string
         Path to the netlist file that we will run LVS on.
 
-    Returns
+    Returns:
     -------
     dict
         Dictionary that represent all run switches passed to klayout.
@@ -170,7 +161,7 @@ def generate_klayout_switches(arguments, layout_path, netlist_path):
         switches["run_mode"] = arguments["--run_mode"]
     else:
         logging.error("Allowed klayout modes are (flat , deep , tiling) only")
-        exit()
+        sys.exit()
 
     if arguments["--lvs_sub"]:
         switches["lvs_sub"] = arguments["--lvs_sub"]
@@ -205,8 +196,7 @@ def generate_klayout_switches(arguments, layout_path, netlist_path):
 
 
 def build_switches_string(sws: dict):
-    """
-    build_switches_string Build switches string from dictionary.
+    """build_switches_string Build switches string from dictionary.
 
     Parameters
     ----------
@@ -217,23 +207,20 @@ def build_switches_string(sws: dict):
 
 
 def check_lvs_results(results_db_files: list) -> None:
-    """
-    check_lvs_results Checks the results db generated from run and report at the end if the LVS run failed or passed.
+    """check_lvs_results Checks the results db generated from run and report at the end if the LVS run failed or passed.
 
     Parameters
     ----------
     results_db_files : list
         A list of strings that represent paths to results databases of all the LVS runs.
     """
-
     if len(results_db_files) < 1:
         logging.error("Klayout did not generate any db results. Please check run logs")
-        exit(1)
+        sys.exit(1)
 
 
 def run_check(lvs_file: str, path: str, run_dir: str, sws: dict):
-    """
-    run_check run LVS check.
+    """run_check run LVS check.
 
     Parameters
     ----------
@@ -246,15 +233,14 @@ def run_check(lvs_file: str, path: str, run_dir: str, sws: dict):
     sws : dict
         Dictionary that holds all switches that needs to be passed to the antenna checks.
 
-    Returns
+    Returns:
     -------
     string
         string that represent the path to the results output database for this run.
 
     """
-
     logging.info(
-        f'Running GENERIC TECH {lvs_file} checks on design {path} on cell {sws["topcell"]}'
+        f'Running GENERIC TECH {lvs_file} checks on design {path} on cell {sws["topcell"]}',
     )
 
     layout_base_name = os.path.basename(path).split(".")[0]
@@ -273,8 +259,7 @@ def run_check(lvs_file: str, path: str, run_dir: str, sws: dict):
 
 
 def main(lvs_run_dir: str, arguments: dict) -> None:
-    """
-    main function to run the LVS.
+    """Main function to run the LVS.
 
     Parameters
     ----------
@@ -283,7 +268,6 @@ def main(lvs_run_dir: str, arguments: dict) -> None:
     arguments : dict
         Dictionary that holds the arguments used by user in the run command. This is generated by docopt library.
     """
-
     ## Check Klayout version
     check_klayout_version()
 
@@ -291,9 +275,9 @@ def main(lvs_run_dir: str, arguments: dict) -> None:
     layout_path = arguments["--layout"]
     if not os.path.exists(arguments["--layout"]):
         logging.error(
-            f"The input GDS file path {layout_path} doesn't exist, please recheck."
+            f"The input GDS file path {layout_path} doesn't exist, please recheck.",
         )
-        exit(1)
+        sys.exit(1)
 
     ## Check layout type
     layout_path = check_layout_type(layout_path)
@@ -302,12 +286,13 @@ def main(lvs_run_dir: str, arguments: dict) -> None:
     netlist_path = arguments["--netlist"]
     if not os.path.exists(arguments["--netlist"]):
         logging.error(
-            f"The input netlist file path {netlist_path} doesn't exist, please recheck."
+            f"The input netlist file path {netlist_path} doesn't exist, please recheck.",
         )
-        exit(1)
+        sys.exit(1)
 
     lvs_rule_deck = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "generic_tech.lvs"
+        os.path.dirname(os.path.abspath(__file__)),
+        "generic_tech.lvs",
     )
 
     ## Get run switches
@@ -341,7 +326,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
         handlers=[
-            logging.FileHandler(os.path.join(lvs_run_dir, "{}.log".format(now_str))),
+            logging.FileHandler(os.path.join(lvs_run_dir, f"{now_str}.log")),
             logging.StreamHandler(),
         ],
         format="%(asctime)s | %(levelname)-7s | %(message)s",

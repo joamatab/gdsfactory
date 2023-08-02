@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import gdsfactory as gf
 from gdsfactory.component import Component, ComponentReference
 from gdsfactory.component_layout import _parse_layer
-from gdsfactory.port import Port
 from gdsfactory.typings import ComponentOrReference, Label, LayerSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.port import Port
 
 
 def get_input_label_text_dash(
@@ -51,6 +55,7 @@ def get_input_label_text(
     {label_prefix}_{polarization}_{wavelength_nm}_({prefix}{component_name})
 
     Args:
+    ----
         port: to label.
         gc: grating coupler component or reference.
         gc_index: grating_coupler index, which grating_coupler we are labelling.
@@ -62,10 +67,12 @@ def get_input_label_text(
     wavelength = gc.info.get("wavelength") or gc.metadata_child.get("wavelength")
 
     if polarization not in ["te", "tm"]:
-        raise ValueError(f"polarization {polarization!r} needs to be [te, tm]")
-    if not isinstance(wavelength, (int, float)) or not 0.5 < wavelength < 5.0:
+        msg = f"polarization {polarization!r} needs to be [te, tm]"
+        raise ValueError(msg)
+    if not isinstance(wavelength, int | float) or not 0.5 < wavelength < 5.0:
+        msg = f"{wavelength} needs to be > 0.5um and < 5um. Make sure it's in um"
         raise ValueError(
-            f"{wavelength} needs to be > 0.5um and < 5um. Make sure it's in um"
+            msg,
         )
 
     component_name = component_name or port.parent.metadata_child.get("name")
@@ -96,6 +103,7 @@ def get_input_label(
     Test equipment to extract grating coupler coordinates and match it to the component.
 
     Args:
+    ----
         port: port to label.
         gc: grating coupler reference.
         gc_index: grating coupler index.
@@ -105,11 +113,14 @@ def get_input_label(
         get_input_label_text_function: function to get input label.
     """
     text = get_input_label_text_function(
-        port=port, gc=gc, gc_index=gc_index, component_name=component_name
+        port=port,
+        gc=gc,
+        gc_index=gc_index,
+        component_name=component_name,
     )
 
     if gc_port_name is None:
-        gc_port_name = list(gc.ports.values())[0].name
+        gc_port_name = next(iter(gc.ports.values())).name
 
     layer, texttype = gf.get_layer(layer_label)
     return Label(
@@ -122,7 +133,8 @@ def get_input_label(
 
 
 get_input_label_dash = partial(
-    get_input_label, get_input_label_text_function=get_input_label_text_dash
+    get_input_label,
+    get_input_label_text_function=get_input_label_text_dash,
 )
 
 
@@ -139,6 +151,7 @@ def get_input_label_electrical(
     and match it to the component.
 
     Args:
+    ----
         port: to label.
         gc_index: index of the label.
         component_name: Optional component_name.
@@ -174,12 +187,14 @@ def add_labels(
     """Returns component with labels on ports.
 
     Args:
+    ----
         component: to add labels to.
         get_label_function: function to get label.
         layer_label: layer_label.
         gc: Optional grating coupler.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         layer: port GDS layer.
         prefix: with in port name.
         suffix: select ports with port name suffix.
@@ -190,6 +205,7 @@ def add_labels(
         clockwise: if True, sort ports clockwise, False: counter-clockwise.
 
     Returns:
+    -------
         original component with labels.
     """
     ports = component.get_ports_list(**kwargs)
@@ -218,6 +234,7 @@ def add_siepic_labels(
     """Adds labels and returns the same component.
 
     Args:
+    ----
         component: component.
         model: Lumerical Interconnect model.
             'auto' attempts to extract this from the cross_section.
@@ -252,7 +269,10 @@ def add_siepic_labels(
 
     for i, text in enumerate(labels):
         c.add_label(
-            text=text, position=(0, i * label_spacing), layer=label_layer, anchor="w"
+            text=text,
+            position=(0, i * label_spacing),
+            layer=label_layer,
+            anchor="w",
         )
     return c
 
@@ -266,11 +286,13 @@ def add_labels_to_ports(
     """Add labels to component ports.
 
     Args:
+    ----
         component: to add labels.
         label_layer: layer spec for the label.
         port_type: to select ports.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         layer: select ports with GDS layer.
         prefix: select ports with prefix in port name.
         suffix: select ports with port name suffix.
@@ -293,14 +315,16 @@ def add_labels_to_ports_x_y(
     port_type: str | None = None,
     **kwargs,
 ) -> Component:
-    """Add labels to component ports. Prepends -x-y coordinates
+    """Add labels to component ports. Prepends -x-y coordinates.
 
     Args:
+    ----
         component: to add labels.
         label_layer: layer spec for the label.
         port_type: to select ports.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         layer: select ports with GDS layer.
         prefix: select ports with prefix in port name.
         suffix: select ports with port name suffix.
@@ -348,13 +372,15 @@ def get_labels(
     """Returns component labels on ports.
 
     Args:
+    ----
         component: to add labels to.
         get_label_function: function to get label.
         layer_label: layer_label.
         gc: Optional grating coupler.
         component_name: optional component name.
 
-    keyword Args:
+    Keyword Args:
+    ------------
         layer: port GDS layer.
         prefix: look for prefix in port name.
         suffix: select ports with port name suffix.
@@ -365,6 +391,7 @@ def get_labels(
         clockwise: if True, sort ports clockwise, False: counter-clockwise.
 
     Returns:
+    -------
         list of component labels.
     """
     labels = []
@@ -385,12 +412,5 @@ def get_labels(
 
 
 if __name__ == "__main__":
-    # c = gf.components.mzi_phase_shifter()
-    # add_labels_ports(c, c.get_ports_list(port_type="electrical"), prefix="pad_")
-    # from gdsfactory.tests.test_labels import test_add_labels_electrical
-    # c = test_add_labels_optical()
-    # c = test_add_labels_electrical()
-    # c = gf.routing.add_fiber_single(c)
-
     c = gf.components.pad(decorator=add_labels_to_ports_vertical_dc)
     c.show(show_ports=True)

@@ -15,7 +15,9 @@ def test_component_with_net_layers():
 
     # Run the function
     net_component = LAYER_STACK.get_component_with_net_layers(
-        original_component, portnames=portnames_to_test, delimiter=delimiter
+        original_component,
+        portnames=portnames_to_test,
+        delimiter=delimiter,
     )
     layernames_after = set(LAYER_STACK.layers.keys())
 

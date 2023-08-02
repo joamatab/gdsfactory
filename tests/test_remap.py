@@ -6,7 +6,10 @@ from gdsfactory.add_pins import add_bbox, add_pins_siepic
 
 def test_remap_layers() -> None:
     c = gf.components.straight(
-        length=1, width=0.5, add_pins=add_pins_siepic, add_bbox=add_bbox
+        length=1,
+        width=0.5,
+        add_pins=add_pins_siepic,
+        add_bbox=add_bbox,
     )
     c2 = c.remap_layers({gf.LAYER.WG: gf.LAYER.WGN, gf.LAYER.PORT: gf.LAYER.PORTE})
 
@@ -22,7 +25,6 @@ def test_remap_layers() -> None:
 
 if __name__ == "__main__":
     c = test_remap_layers()
-    # c.show()
 
     c = gf.components.straight(length=1, width=0.5, add_pins=add_pins_siepic)
     c2 = c.remap_layers({gf.LAYER.WG: gf.LAYER.WGN, gf.LAYER.PORT: gf.LAYER.PORTE})

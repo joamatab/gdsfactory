@@ -13,8 +13,12 @@ polygons to that single layer.
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import gdsfactory as gf
-from gdsfactory.component import Component
+
+if TYPE_CHECKING:
+    from gdsfactory.component import Component
 
 
 @gf.cell
@@ -27,7 +31,6 @@ def flatten_device() -> Component:
 
     assert len(c.references) == 3
     c2 = c.flatten()
-    # c2 = c.flatten(single_layer=(34, 0))
     assert len(c2.references) == 0
     return c2
 

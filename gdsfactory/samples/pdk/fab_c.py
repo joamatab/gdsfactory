@@ -4,17 +4,21 @@ from __future__ import annotations
 
 import pathlib
 from functools import partial
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
 import gdsfactory as gf
 from gdsfactory.add_pins import add_pin_rectangle_inside
-from gdsfactory.component import Component
 from gdsfactory.cross_section import strip
 from gdsfactory.port import select_ports
 from gdsfactory.technology import LayerLevel, LayerStack
-from gdsfactory.typings import Layer
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from gdsfactory.component import Component
+    from gdsfactory.typings import Layer
 
 
 class LayerMap(BaseModel):
@@ -46,7 +50,7 @@ def get_layer_stack_fab_c(thickness: float = 350.0) -> LayerStack:
                 zmin=0.22 + 0.1,
                 thickness=0.4,
             ),
-        )
+        ),
     )
 
 
@@ -60,6 +64,7 @@ def add_pins(
     """Add Pin port markers.
 
     Args:
+    ----
         component: to add ports.
         function: to add pins.
         pin_length: pin length in um.
@@ -165,29 +170,3 @@ pdk = gf.Pdk(name="fab_c_demopdk", cells=cells, cross_sections=cross_sections)
 if __name__ == "__main__":
     c1 = mmi1x2_nc()
     print(c1.name)
-    # c1 = mmi1x2_nc()
-    # d1 = c1.to_dict()
-
-    # c2 = mmi1x2_nc(cache=False)
-    # d2 = c2.to_dict()
-
-    # from jsondiff import diff
-
-    # d = diff(d1, d2)
-    # c.show(show_ports=True)
-
-    # c = mzi_nc()
-    # print(c.name)
-    # c.show()
-
-    # mzi.show()
-    # mzi_gc = gf.routing.add_fiber_single(
-    #     component=mzi,
-    #     grating_coupler=gc_nc,
-    #     cross_section=xs_nc,
-    #     optical_routing_type=1,
-    #     straight=straight_nc,
-    #     bend=bend_euler_nc,
-    #     select_ports=select_ports_optical,
-    # )
-    # mzi_gc.show(show_ports=True)

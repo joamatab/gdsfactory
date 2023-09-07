@@ -434,16 +434,7 @@ class ComponentReference(_GeometryHelper):
 
     def __repr__(self) -> str:
         """Return a string representation of the object."""
-        return (
-            'ComponentReference (parent Component "{}", ports {}, origin {}, rotation {},'
-            " x_reflection {})".format(
-                self.parent.name,
-                list(self.ports.keys()),
-                self.origin,
-                self.rotation,
-                self.x_reflection,
-            )
-        )
+        return f'ComponentReference (parent Component "{self.parent.name}", ports {list(self.ports.keys())}, origin {self.origin}, rotation {self.rotation}, x_reflection {self.x_reflection})'
 
     def to_dict(self):
         d = self.parent.to_dict()

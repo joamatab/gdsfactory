@@ -622,7 +622,6 @@ class Pdk(BaseModel):
         """Export to uPDK YAML definition."""
         from gdsfactory.components.bbox import bbox_to_points
 
-        d = {}
         blocks = {cell_name: cell() for cell_name, cell in self.cells.items()}
         blocks = {
             name: dict(
@@ -679,9 +678,7 @@ class Pdk(BaseModel):
 
         header = dict(description=self.name)
 
-        d["blocks"] = blocks
-        d["xsections"] = xsections
-        d["header"] = header
+        d = {"blocks": blocks, "xsections": xsections, "header": header}
         return omegaconf.OmegaConf.to_yaml(d)
 
     # _on_cell_registered = Event()

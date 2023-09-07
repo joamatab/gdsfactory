@@ -68,10 +68,8 @@ def get_netlist_flat(
         for key, value in p.items():
             if len(value) != 0:
                 ports[key] = value
-        placements.update(
-            _accumulate_placements(hierarchical_instance, recursive_netlist)
-        )
-        instances.update(_get_instance_info(hierarchical_instance, recursive_netlist))
+        placements |= _accumulate_placements(hierarchical_instance, recursive_netlist)
+        instances |= _get_instance_info(hierarchical_instance, recursive_netlist)
 
     return {
         "connections": connections,
@@ -283,12 +281,10 @@ def _flatten_hierarchy_recurse(
         if component_name not in all_netlists.keys():
             instance_dict[hierarchy_str] = True  # Done for this leaf
         else:
-            instance_dict.update(
-                _flatten_hierarchy_recurse(
-                    component_name,
-                    all_netlists,
-                    hierarchy_str,
-                )
+            instance_dict |= _flatten_hierarchy_recurse(
+                component_name,
+                all_netlists,
+                hierarchy_str,
             )
 
     return instance_dict

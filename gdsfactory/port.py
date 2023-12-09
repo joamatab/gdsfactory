@@ -924,7 +924,7 @@ def map_ports_layer_to_orientation(
                 else:
                     direction_ports["S"].append(p)
         function(direction_ports, prefix=f"{layer[0]}_{layer[1]}_")
-        m.update({p.name: p.name_original for p in ports_on_layer})
+        m |= {p.name: p.name_original for p in ports_on_layer}
     return m
 
 

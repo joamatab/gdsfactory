@@ -64,7 +64,7 @@ def clean_value_json(value: Any) -> str | int | float | dict | list | bool | Non
     elif callable(value) and isinstance(value, functools.partial):
         sig = inspect.signature(value.func)
         args_as_kwargs = dict(zip(sig.parameters.keys(), value.args))
-        args_as_kwargs.update(value.keywords)
+        args_as_kwargs |= value.keywords
         args_as_kwargs = clean_dict(args_as_kwargs)
 
         func = value.func

@@ -2705,7 +2705,7 @@ def recurse_structures(
             isinstance(reference, ComponentReference)
             and reference.ref_cell.name not in output
         ):
-            output.update(recurse_structures(reference.ref_cell))
+            output |= recurse_structures(reference.ref_cell)
 
     return output
 
@@ -2762,7 +2762,7 @@ def flatten_invalid_refs_recursive(
                 subcell_modified = True
     if invalid_refs or subcell_modified:
         new_component = component.copy()
-        new_component.name = component.name + "_t"
+        new_component.name = f"{component.name}_t"
         # make sure all modified cells have their references updated
         new_refs = new_component.references.copy()
         for ref in new_refs:

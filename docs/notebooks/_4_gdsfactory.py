@@ -166,14 +166,11 @@ def build_dependency_graph(package_name):
             visited.add(package)
             graph.add_node(package)
 
-            try:
+            with contextlib.suppress(pkg_resources.DistributionNotFound):
                 dependencies = pkg_resources.get_distribution(package).requires()
                 for dependency in dependencies:
                     graph.add_edge(package, dependency)
                     traverse_dependencies(dependency)
-            except pkg_resources.DistributionNotFound:
-                # Package is not installed or cannot be found
-                pass
 
     traverse_dependencies(package_name)
     return graph
@@ -242,14 +239,11 @@ def build_dependency_graph(package_name):
             visited.add(package)
             graph.add_node(package)
 
-            try:
+            with contextlib.suppress(pkg_resources.DistributionNotFound):
                 dependencies = pkg_resources.get_distribution(package).requires()
                 for dependency in dependencies:
                     graph.add_edge(package, dependency)
                     traverse_dependencies(dependency)
-            except pkg_resources.DistributionNotFound:
-                # Package is not installed or cannot be found
-                pass
 
     traverse_dependencies(package_name)
     return graph
